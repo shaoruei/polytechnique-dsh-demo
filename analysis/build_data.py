@@ -15,6 +15,7 @@ that issued at least one request are used for workload statistics. Others are st
 from __future__ import annotations
 
 import json
+import re
 import statistics
 import sys
 from pathlib import Path
@@ -32,6 +33,14 @@ TASK_TITLES = {
 }
 
 
+def failing_cases(output: str) -> list[str]:
+    """Names (and subTest parameters) of failing hidden/visible tests, from unittest output."""
+    cases = []
+    for m in re.finditer(r"^(?:FAIL|ERROR): (\w+) \([^)]*\)(?: \((.*?)\))?$", output, re.M):
+        cases.append(m.group(1) + (f" [{m.group(2)}]" if m.group(2) else ""))
+    return sorted(set(cases))
+
+
 def trajectory(result: dict) -> dict:
     """Replayable agent trajectory: per LLM request tokens + measured latency + gap afterwards."""
     reqs = [r for r in result["metrics"]["requests"] if r["status"] == 200]
@@ -46,6 +55,50 @@ def trajectory(result: dict) -> dict:
     total_req = sum(s["lat"] for s in steps)
     lead = max(result["wall_time_s"] - total_req - sum(s["gap"] for s in steps), 0.0)
     return {"lead_s": round(lead, 3), "steps": steps}
+
+
+def _short(text: str, n: int) -> str:
+    text = " ".join((text or "").split())
+    return text if len(text) <= n else text[: n - 1] + "\u2026"
+
+
+def replay_events(run_dir: Path) -> list[dict]:
+    """Compact, timestamped agent trajectory from DSH's session log, for the replay viewer."""
+    path = run_dir / "session.jsonl"
+    if not path.exists():
+        return []
+    events = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+    t0 = next((e["time"] for e in events if e["type"] == "turn/start"), events[0].get("time", 0) if events else 0)
+    out = []
+    workdir_prefix = None
+    for e in events:
+        if e["type"] == "session":
+            workdir_prefix = e.get("cwd")
+        t = round((e.get("time", t0) - t0) / 1000, 3)
+        d = e.get("data") or {}
+        if e["type"] == "step/start":
+            out.append({"t": t, "k": "step", "step": d.get("step")})
+        elif e["type"] == "assistant/message":
+            for block in d["message"]["content"]:
+                if block["type"] == "reasoning" and block.get("text"):
+                    out.append({"t": t, "k": "think", "text": _short(block["text"], 400)})
+                elif block["type"] == "text" and block.get("text"):
+                    out.append({"t": t, "k": "say", "text": _short(block["text"], 600)})
+                elif block["type"] == "tool-call":
+                    out.append({"t": t, "k": "call", "name": block.get("name"), "text": _short(block.get("arguments", ""), 400)})
+            u = d.get("usage") or {}
+            out.append({"t": t, "k": "usage", "u": u.get("inputTokens", 0), "c": u.get("cacheReadTokens", 0), "o": u.get("outputTokens", 0)})
+        elif e["type"] == "tool/result":
+            msg = d.get("message") or {}
+            text = " ".join(c.get("text", "") for c in msg.get("content", []) if c.get("type") == "text")
+            out.append({"t": t, "k": "result", "err": bool(msg.get("isError")), "text": _short(text, 500)})
+        elif e["type"] == "turn/end":
+            out.append({"t": t, "k": "end", "text": (d.get("reason") or {}).get("kind")})
+    if workdir_prefix:
+        for ev in out:
+            if "text" in ev and ev["text"]:
+                ev["text"] = ev["text"].replace(workdir_prefix + "/", "").replace(workdir_prefix, ".")
+    return out
 
 
 def summarise(values: list[float]) -> dict:
@@ -108,7 +161,10 @@ def main() -> None:
             "started_at": r["started_at"], "success": r["success"], "timed_out": r["timed_out"],
             "dsh_exit_code": r["dsh_exit_code"], "turn_end_reason": r.get("turn_end_reason"),
             "wall_time_s": r["wall_time_s"],
-            "acceptance": {k: r["acceptance"][k] for k in ("tests_run", "failures", "errors", "ok")},
+            "dsh_version": r.get("dsh_version"),
+            "acceptance": {**{k: r["acceptance"][k] for k in ("tests_run", "failures", "errors", "ok")},
+                           "failing_cases": failing_cases(r["acceptance"]["output_tail"])},
+            "agent_final_answer": (r.get("agent_final_answer") or "")[:1500],
             "agent_suite_ok": r["agent_test_suite"]["ok"],
             "diff_stats": r["diff_stats"], "modified_test_files": r["modified_test_files"],
             "usable": usable,
@@ -138,6 +194,12 @@ def main() -> None:
             workload["by_effort"][effort] = group_stats(sel)
     workload["pooled"] = group_stats(runs)
     (DATA / "workload.json").write_text(json.dumps(workload, indent=1) + "\n")
+
+    replays = {r["run_id"]: replay_events(RUNS / r["run_id"]) for r in runs}
+    tasks = {d.name: {"title": TASK_TITLES.get(d.name, d.name), "prompt": (d / "task.md").read_text()}
+             for d in sorted((ROOT / "tasks").iterdir()) if (d / "task.md").exists()}
+    (DATA / "tasks.json").write_text(json.dumps({"schema": 1, "tasks": tasks}, indent=1) + "\n")
+    (DATA / "replays.json").write_text(json.dumps({"schema": 1, "runs": replays}, separators=(",", ":")) + "\n")
 
     ledger = {
         "schema": 1,

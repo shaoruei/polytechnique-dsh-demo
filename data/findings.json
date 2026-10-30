@@ -1,0 +1,589 @@
+{
+ "generatedAt": "2026-10-30T15:24:56.131Z",
+ "perTaskMedium": {
+  "n": 18,
+  "tokens": {
+   "uncached": 4174.444444444444,
+   "cached": 46096,
+   "output": 1426.4444444444443,
+   "prompt_plus_output": 51696.88888888889
+  },
+  "requests": 8.88888888888889,
+  "work": 5600.888888888889,
+  "successRate": 0.7222222222222222,
+  "soloDurationS": 10.040444444444445
+ },
+ "costPerTask": 0.006091633333333334,
+ "breakEven": [
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.41407591014788153
+  },
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.41407591014788153
+  },
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.41407591014788153
+  },
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 13296.926385370096,
+   "permanentFrom": 187124.7984212862,
+   "reason": null,
+   "breakEvenUtil": 0.19159648356323644
+  },
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 162517.9891545234,
+   "permanentFrom": 989602.2993433404,
+   "reason": null,
+   "breakEvenUtil": 0.19159648356323644
+  },
+  {
+   "gpu": "h100",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 539264.2367400095,
+   "permanentFrom": 3283680.3569119936,
+   "reason": null,
+   "breakEvenUtil": 0.19159648356323644
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6350894263164957
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6350894263164957
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6350894263164957
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 13296.926385370096,
+   "permanentFrom": 385975.11896002776,
+   "reason": null,
+   "breakEvenUtil": 0.20006644209143026
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 162517.9891545234,
+   "permanentFrom": 1326789.4714250953,
+   "reason": null,
+   "breakEvenUtil": 0.20006644209143026
+  },
+  {
+   "gpu": "h100",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 539264.2367400095,
+   "permanentFrom": 4402528.700637816,
+   "reason": null,
+   "breakEvenUtil": 0.20006644209143026
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.465022231308177
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.465022231308177
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.465022231308177
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.21516978436527978
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 195021.5869854281,
+   "permanentFrom": 2537811.9198752707,
+   "reason": null,
+   "breakEvenUtil": 0.21516978436527978
+  },
+  {
+   "gpu": "h200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 647117.0840880114,
+   "permanentFrom": 8420921.370495217,
+   "reason": null,
+   "breakEvenUtil": 0.21516978436527978
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6845433366030725
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6845433366030725
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.6845433366030725
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.22468185429579512
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 195021.5869854281,
+   "permanentFrom": 5265805.575413005,
+   "reason": null,
+   "breakEvenUtil": 0.22468185429579512
+  },
+  {
+   "gpu": "h200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 647117.0840880114,
+   "permanentFrom": 17472900.31841588,
+   "reason": null,
+   "breakEvenUtil": 0.22468185429579512
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 25116.41650569907,
+   "permanentFrom": 112426.59200954644,
+   "reason": null,
+   "breakEvenUtil": 0.13900619251278168
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 306978.4239585442,
+   "permanentFrom": 1030577.0934208423,
+   "reason": null,
+   "breakEvenUtil": 0.13900619251278168
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 1018610.2249533512,
+   "permanentFrom": 3419642.173623704,
+   "reason": null,
+   "breakEvenUtil": 0.13900619251278168
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 25116.41650569907,
+   "permanentFrom": 83655.17537545976,
+   "reason": null,
+   "breakEvenUtil": 0.06227147104086779
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 306978.4239585442,
+   "permanentFrom": 1150258.6614125718,
+   "reason": null,
+   "breakEvenUtil": 0.06227147104086779
+  },
+  {
+   "gpu": "b200",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 1018610.2249533512,
+   "permanentFrom": 3816767.3765053516,
+   "reason": null,
+   "breakEvenUtil": 0.06227147104086779
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 25116.41650569907,
+   "permanentFrom": 728799.0342219741,
+   "reason": null,
+   "breakEvenUtil": 0.20013921041819155
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 306978.4239585442,
+   "permanentFrom": 2505246.680138036,
+   "reason": null,
+   "breakEvenUtil": 0.20013921041819155
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 1018610.2249533512,
+   "permanentFrom": 8312863.9840943925,
+   "reason": null,
+   "breakEvenUtil": 0.20013921041819155
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": 25116.41650569907,
+   "permanentFrom": 79899.87328355057,
+   "reason": null,
+   "breakEvenUtil": 0.06519823645182342
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": 306978.4239585442,
+   "permanentFrom": 1098623.2576488203,
+   "reason": null,
+   "breakEvenUtil": 0.06519823645182342
+  },
+  {
+   "gpu": "b200",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": 1018610.2249533512,
+   "permanentFrom": 3645431.718561995,
+   "reason": null,
+   "breakEvenUtil": 0.06519823645182342
+  }
+ ],
+ "classroom": [
+  {
+   "students": 20,
+   "public_default": {
+    "costSession": 0.9704469,
+    "p50": 10.699999999990268,
+    "p95": 19.09999999998263,
+    "slowdownP95": 1.0776123017304644,
+    "peakTpm": 495339,
+    "peakRpm": 80,
+    "peakAgents": 1.7616666666666667,
+    "tasks": 157,
+    "requests": 1409
+   },
+   "public_20x": {
+    "costSession": 0.9704469,
+    "p50": 10.699999999990268,
+    "p95": 19.09999999998263,
+    "slowdownP95": 1.0708661417361791,
+    "peakTpm": 509689,
+    "peakRpm": 82,
+    "peakAgents": 1.6716666666666666,
+    "tasks": 157,
+    "requests": 1409
+   },
+   "dedicated_h100": {
+    "replicas": 1,
+    "costSession": 10.125,
+    "p50": 10.60000000000241,
+    "p95": 27.55999999997493,
+    "slowdownP95": 1.1927924403796903,
+    "vsPublicP95": 1.5775531167201957,
+    "slotUtil": 0.012268054815325478
+   },
+   "dedicated_b200": {
+    "replicas": 1,
+    "costSession": 19.125,
+    "p50": 10.099999999990814,
+    "p95": 26.29999999997608,
+    "slowdownP95": 1.0696983642215272,
+    "vsPublicP95": 1.4218521922460985,
+    "slotUtil": 0.0010645184637153727
+   }
+  },
+  {
+   "students": 100,
+   "public_default": {
+    "costSession": 4.730376150000001,
+    "p50": 147.0999999998662,
+    "p95": 293.599999999733,
+    "slowdownP95": 28.691588785046147,
+    "peakTpm": 599823,
+    "peakRpm": 119,
+    "peakAgents": 53.615,
+    "tasks": 778,
+    "requests": 6890
+   },
+   "public_20x": {
+    "costSession": 4.730376150000001,
+    "p50": 10.699999999990268,
+    "p95": 19.09999999998263,
+    "slowdownP95": 1.0776123017304644,
+    "peakTpm": 1687222,
+    "peakRpm": 289,
+    "peakAgents": 5.905,
+    "tasks": 778,
+    "requests": 6890
+   },
+   "dedicated_h100": {
+    "replicas": 2,
+    "costSession": 20.25,
+    "p50": 11.300000000020603,
+    "p95": 27.900000000006344,
+    "slowdownP95": 1.3956797757294377,
+    "vsPublicP95": 1.8135007384390551,
+    "slotUtil": 0.03174843150409939
+   },
+   "dedicated_b200": {
+    "replicas": 1,
+    "costSession": 19.125,
+    "p50": 10.099999999990814,
+    "p95": 26.29999999997608,
+    "slowdownP95": 1.0695493067827175,
+    "vsPublicP95": 1.4218521922460985,
+    "slotUtil": 0.005007117948263455
+   }
+  },
+  {
+   "students": 200,
+   "public_default": {
+    "costSession": 9.369756050000001,
+    "p50": 442.4500000002686,
+    "p95": 888.0499999999374,
+    "slowdownP95": 86.90096709010277,
+    "peakTpm": 1489046,
+    "peakRpm": 240,
+    "peakAgents": 172.74666666666667,
+    "tasks": 1546,
+    "requests": 13667
+   },
+   "public_20x": {
+    "costSession": 9.369756050000001,
+    "p50": 10.699999999990268,
+    "p95": 19.09999999998263,
+    "slowdownP95": 1.0776123017304644,
+    "peakTpm": 3476917,
+    "peakRpm": 596,
+    "peakAgents": 12.046666666666667,
+    "tasks": 1546,
+    "requests": 13667
+   },
+   "dedicated_h100": {
+    "replicas": 4,
+    "costSession": 40.5,
+    "p50": 11.200000000040745,
+    "p95": 27.175000000068053,
+    "slowdownP95": 1.3481559490365718,
+    "vsPublicP95": 1.7124398551120248,
+    "slotUtil": 0.02990402519881005
+   },
+   "dedicated_b200": {
+    "replicas": 1,
+    "costSession": 19.125,
+    "p50": 10.099999999990814,
+    "p95": 26.29999999997608,
+    "slowdownP95": 1.1335059537678391,
+    "vsPublicP95": 1.4218521922525644,
+    "slotUtil": 0.009846384893491286
+   }
+  },
+  {
+   "students": 500,
+   "public_default": {
+    "costSession": 23.431226250000005,
+    "p50": 828.4500000030139,
+    "p95": 2396.0399999978204,
+    "slowdownP95": 238.0840738534288,
+    "peakTpm": 2579726,
+    "peakRpm": 442,
+    "peakAgents": 490.62,
+    "tasks": 3848,
+    "requests": 34179
+   },
+   "public_20x": {
+    "costSession": 23.431226250000005,
+    "p50": 10.699999999990268,
+    "p95": 19.09999999998263,
+    "slowdownP95": 1.0776123017304644,
+    "peakTpm": 7878161,
+    "peakRpm": 1357,
+    "peakAgents": 26.918333333333333,
+    "tasks": 3848,
+    "requests": 34179
+   },
+   "dedicated_h100": {
+    "replicas": 8,
+    "costSession": 81,
+    "p50": 11.6000000000422,
+    "p95": 27.300000000006207,
+    "slowdownP95": 1.4382363444455806,
+    "vsPublicP95": 1.811841744530108,
+    "slotUtil": 0.036071004213296176
+   },
+   "dedicated_b200": {
+    "replicas": 2,
+    "costSession": 38.25,
+    "p50": 10.099999999999426,
+    "p95": 26.29999999997608,
+    "slowdownP95": 1.185643681876935,
+    "vsPublicP95": 1.4366377801116008,
+    "slotUtil": 0.011514677064606123
+   }
+  }
+ ]
+}

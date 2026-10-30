@@ -1,0 +1,17 @@
+{
+ "schema": 1,
+ "tasks": {
+  "t1-grade-average": {
+   "title": "T1 Fix weighted grade average (1 file bug-fix)",
+   "prompt": "A student reported that `final_grade()` in the `gradebook` package returns wrong results\nwhen the coursework weights do not add up to exactly 1.0, and that it crashes for a\nstudent with no graded items.\n\nPlease fix the bug(s) in `gradebook/grades.py` so that:\n- the final grade is the weighted average of the item scores, normalised by the sum of\n  the weights that were actually used;\n- items with a score of `None` (not yet graded) are ignored entirely;\n- a student with no graded items gets `None` instead of an exception.\n\nRun the existing test-suite with `python3 -m unittest discover -s tests -v` and make\nsure it passes. Do not change the tests.\n"
+  },
+  "t2-duration-parser": {
+   "title": "T2 Implement duration parser + tests (feature from spec)",
+   "prompt": "Implement `parse_duration()` in `timeutil/duration.py`. It is currently a stub.\nThe exact specification is in the function's docstring; `format_duration()` in the\nsame file already works and is the inverse operation for canonical strings.\n\nAlso add unit tests for `parse_duration()` to `tests/test_duration.py` covering the\nvalid and invalid cases from the specification.\n\nRun `python3 -m unittest discover -s tests -v` and make sure everything passes.\n"
+  },
+  "t3-schedule-conflicts": {
+   "title": "T3 Fix timetable clash detection (multi-file debugging)",
+   "prompt": "Bug report from the teaching office about the `scheduler` package:\n\n> The weekly timetable checker reports far too many conflicts. Sessions that are\n> back-to-back (one ends at 10:00, the next starts at 10:00) are flagged as clashing,\n> sessions on different days are flagged as clashing, and every clash appears twice\n> in the report.\n\n`find_conflicts()` should return each conflicting pair exactly once, as a tuple\n`(first, second)` ordered by the sessions' position in the input list, and the overall\nlist should be ordered the same way. Two sessions conflict when they are on the same\nday, their time intervals genuinely overlap (touching end/start does not count), and\nthey share a room or a student group.\n\nInvestigate the package (the bug may involve more than one module), fix it, and run\n`python3 -m unittest discover -s tests -v` until it passes. Do not change the tests.\n"
+  }
+ }
+}

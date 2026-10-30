@@ -15,12 +15,15 @@
     "kind": "completed"
    },
    "wall_time_s": 9.41,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust `final_grade` calculation:\n\n- Added filtering of ungraded items.\n- Handled cases with no graded items, returning `None`.\n- Correctly summed weighted scores and used weights.\n- Normalized by actual weight sum, accommodating non\u2011unit totals.\n- Added safeguards for zero weight sum.\n\nAll tests now pass:\n\n```\n5 passed in 0.000s\n```",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -290,12 +293,15 @@
     "kind": "completed"
    },
    "wall_time_s": 11.411,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes:\n\n### `scheduler/models.py`\n* Updated `overlaps` method to enforce strict interval overlap (non\u2011touching) and added detailed docstring.\n\n### `scheduler/conflicts.py`\n* Rewrote `find_conflicts`:\n  * Ensures each conflicting pair is returned exactly once and maintains order.\n  * Adds day equality check.\n  * Uses proper iteration (`i < j`) to avoid duplicates.\n  * Enhanced documentation to clarify conflict criteria.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe scheduler now correctly detects timetable clashes.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -685,12 +691,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.244,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust grade calculation in `gradebook/grades.py`:\n\n- Added proper handling of `None` scores, ignoring ungraded items.\n- Normalized weighted average based on the sum of used weights.\n- Returned `None` for students with no graded items.\n- Updated logic to compute totals and weight sums correctly, with appropriate rounding.\n\nAll tests now pass (`5 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -930,12 +939,17 @@
     "kind": "completed"
    },
    "wall_time_s": 18.497,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` with comprehensive validation and parsing logic, handling whitespace, case-insensitivity, unit ordering, and error conditions. Added extensive unit tests covering valid durations, round\u2011trip consistency, and numerous invalid inputs. All tests now pass (`4 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -1327,12 +1341,15 @@
     "kind": "completed"
    },
    "wall_time_s": 10.842,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes for conflict detection:\n\n### **Key Updates**\n1. **`scheduler/models.py`**\n   * Added day comparison to ensure sessions only overlap if on the same day.\n   * Refined overlap logic to be strict (`<` rather than `<=`) to prevent back\u2011to\u2011back sessions from being flagged.\n   * Updated docstring to reflect strict overlap behavior.\n\n2. **`scheduler/conflicts.py`**\n   * Adjusted nested loops to iterate `j` from `i + 1` onward, eliminating self\u2011comparisons and duplicate pairs.\n   * Simplified conflict collection while maintaining input order.\n\n### **Result**\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now correctly returns each conflicting pair exactly once, respects day boundaries, and does not consider adjacent sessions as overlapping.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -1691,12 +1708,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.985,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust `final_grade` computation:\n\n- Converted items to a list for multiple passes.\n- Calculated total weighted score and weight sum only for items with non-`None` scores.\n- Returned `None` when no graded items exist.\n- Normalized the average by the actual sum of used weights, handling non\u2011unit weight totals.\n- Rounded the resulting average to two decimal places.\n\nAll tests now pass successfully.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -1966,12 +1986,17 @@
     "kind": "completed"
    },
    "wall_time_s": 11.9,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` functionality with comprehensive parsing, validation, and error handling according to specification. Added extensive unit tests for both valid and invalid cases, and updated imports to include `parse_duration`. All tests now pass successfully.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -2303,12 +2328,15 @@
     "kind": "completed"
    },
    "wall_time_s": 9.658,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes for conflict detection:\n\n### **Key Updates**\n1. **`scheduler/models.py`**\n   - Added day comparison to `overlaps`.\n   - Implemented strict overlap logic using `<` to exclude back\u2011to\u2011back sessions.\n   - Updated docstring for clarity.\n\n2. **`scheduler/conflicts.py`**\n   - Revised nested loops to avoid self\u2011comparison and double counting.\n   - Utilized index range `i + 1` for unique pair generation.\n   - Simplified logic while maintaining resource sharing checks.\n\n### **Result**\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now correctly returns each conflicting pair once, respects day boundaries, and excludes touching intervals.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -2668,12 +2696,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.35,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust weighted grade calculation:\n\n- Ignored items with `None` scores.\n- Normalized by sum of used weights.\n- Returned `None` when no graded items exist.\n- Added proper rounding.\n\nAll tests now pass (`5 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -2913,12 +2944,17 @@
     "kind": "completed"
    },
    "wall_time_s": 10.32,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented `parse_duration` with full validation, whitespace handling, unit ordering, duplicate detection, and case insensitivity. Added comprehensive unit tests covering valid parsing cases, round\u2011trip consistency with `format_duration`, and various invalid inputs. All tests now pass successfully.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -3220,12 +3256,15 @@
     "kind": "completed"
    },
    "wall_time_s": 10.257,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes for conflict detection:\n\n### **Key Updates**\n1. **`scheduler/conflicts.py`**\n   * Adjusted loop to only consider each pair once (`j > i`).\n   * Added day equality check to ensure conflicts are only detected on the same day.\n   * Simplified variable handling for readability.\n\n2. **`scheduler/models.py`**\n   * Refined `overlaps` method to enforce strict interval overlap (excluding back\u2011to\u2011back sessions).\n   * Updated docstring and added explanatory comment.\n\n### **Result**\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now correctly returns each conflicting pair exactly once, respects day boundaries, and does not flag back\u2011to\u2011back sessions as overlapping.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -3617,12 +3656,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.313,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust weighted grade calculation in **gradebook/grades.py**:\n\n- Ignored `None` scores during aggregation.\n- Correctly summed weights only for graded items.\n- Handled case with no graded items by returning `None`.\n- Normalized average by actual weight sum and rounded to two decimals.\n\nAll tests now pass:\n\n```\n5 tests passed\n```\n\nThe `final_grade` function now behaves as expected for varying weight totals, ungraded items, and empty grade lists.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -3862,12 +3904,17 @@
     "kind": "completed"
    },
    "wall_time_s": 13.44,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` functionality with comprehensive validation, unit handling, ordering, and duplication checks. Added extensive unit tests covering valid scenarios (including case insensitivity, spaces, and simple integers) and invalid inputs (empty strings, negatives, decimals, unknown units, duplicates, wrong order, missing units). Updated imports and test suite accordingly. All tests now pass.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -4230,12 +4277,15 @@
     "kind": "completed"
    },
    "wall_time_s": 8.259,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes in **scheduler/conflicts.py**:\n\n- Added detailed docstrings for clarity.\n- Refined `_shares_resource` to clearly describe its purpose.\n- Introduced `_overlaps_strict` to ensure only true time overlaps count (excluding back\u2011to\u2011back sessions).\n- Updated `find_conflicts`:\n  - Added same\u2011day requirement.\n  - Utilized strict overlap check.\n  - Implemented pair generation with `j > i` to avoid duplicate and self pairs.\n  - Provided extensive documentation of conflict criteria and ordering.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe conflict detection now behaves correctly per specifications.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -4566,12 +4616,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.605,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust weighted grade calculation in **gradebook/grades.py**:\n\n- Ignored items with `None` scores.\n- Normalized weighted average using sum of used weights.\n- Returned `None` when no graded items exist.\n- Added clear logic and comments.\n\nAll tests now pass:\n\n```\n5 tests passed\n```",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -4811,12 +4864,17 @@
     "kind": "completed"
    },
    "wall_time_s": 14.463,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` functionality with comprehensive validation, ordering, and unit handling. Added extensive unit tests covering valid parsing cases, edge conditions, and various invalid inputs. Updated imports accordingly. All tests now pass successfully.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -5238,12 +5296,15 @@
     "kind": "completed"
    },
    "wall_time_s": 8.759,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes for conflict detection:\n\n### **Key Changes**\n1. **`scheduler/models.py`**\n   - Updated `overlaps` method to use strict inequality, ensuring sessions that touch endpoints are not considered overlapping.\n\n2. **`scheduler/conflicts.py`**\n   - Adjusted loop to only consider each session pair once (`j > i`).\n   - Added day equality check to ensure conflicts are only reported for sessions on the same day.\n   - Integrated these checks into the conflict detection condition.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now correctly returns each conflicting pair exactly once, respecting day, time overlap, and shared resources.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -5603,12 +5664,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.009,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust weighted grade calculation in **gradebook/grades.py**:\n\n- Added filtering to exclude ungraded items.\n- Handled case with no graded items, returning `None`.\n- Calculated weighted sum and total weight only for graded items.\n- Normalized final grade by actual summed weights.\n- Updated comments for clarity.\n\nAll tests now pass:\n\n```\n5 passed in 0.000s\n```",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -5848,12 +5912,17 @@
     "kind": "completed"
    },
    "wall_time_s": 15.56,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` with robust validation, regex parsing, order enforcement, duplicate detection, and whitespace handling. Added comprehensive unit tests covering valid parsing, round\u2011trip consistency, and numerous invalid cases. All tests now pass.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -6425,12 +6494,15 @@
     "kind": "completed"
    },
    "wall_time_s": 12.543,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fix for conflict detection:\n\n- Updated `find_conflicts` to return each conflicting pair once, respecting input order.\n- Added strict overlap logic (excluding touching intervals) and ensured same-day requirement.\n- Integrated resource sharing check with clearer documentation.\n- Adjusted type hints and added detailed docstring.\n\nAll unit tests now pass.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -6850,12 +6922,15 @@
     "kind": "completed"
    },
    "wall_time_s": 5.777,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes in **gradebook/grades.py**:\n\n- Corrected weighted average computation to consider only graded items.\n- Added proper handling of `None` scores by ignoring them.\n- Implemented normalization using the sum of actual weights.\n- Returned `None` when no items are graded.\n- Updated logic for rounding and returning final grades.\n\nAll tests now pass:\n\n```\n5 tests passed\n```\n\nThe `final_grade` function now behaves correctly across all edge cases.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -7095,12 +7170,17 @@
     "kind": "completed"
    },
    "wall_time_s": 11.299,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented `parse_duration` with full validation, handling whitespace, case-insensitivity, ordering, duplicate units, and error cases. Added comprehensive unit tests for both valid and invalid scenarios, ensuring round\u2011trip consistency with `format_duration`. All tests now pass.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -7402,12 +7482,15 @@
     "kind": "completed"
    },
    "wall_time_s": 8.916,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes:\n\n1. **`scheduler/models.py`**\n   * Updated `overlaps` method:\n   * Added day check and strict interval overlap logic.\n   * Provided detailed docstring.\n\n2. **`scheduler/conflicts.py`**\n   * Refactored conflict detection to avoid duplicate and self-pairings.\n   * Implemented iteration with `i < j` to ensure each pair is reported once and ordered correctly.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now correctly returns each conflicting session pair exactly once, respecting day, time overlap, and shared resources.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -7799,12 +7882,15 @@
     "kind": "completed"
    },
    "wall_time_s": 6.136,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented correct weighted grade calculation in **gradebook/grades.py**:\n\n- Added handling to filter out items with `None` scores.\n- Returned `None` when no graded items exist.\n- Calculated total weighted score and sum of used weights.\n- Normalized by actual weight sum and rounded result.\n- Updated comments for clarity.\n\nAll tests now pass:\n\n```\n5 tests passed\n```\n\nThe package now correctly handles non\u2011normalized weights, ignores ungraded items, and safely returns `None` for students with no graded entries.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -8044,12 +8130,17 @@
     "kind": "completed"
    },
    "wall_time_s": 10.367,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` with comprehensive parsing, validation, and error handling. Added extensive unit tests covering valid scenarios (including case insensitivity and spaced components) and invalid inputs (empty strings, negative values, duplicate units, incorrect order, decimals, unknown units, missing numbers). Updated imports accordingly. All tests now pass successfully.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -8381,12 +8472,15 @@
     "kind": "completed"
    },
    "wall_time_s": 9.721,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fix for conflict detection:\n\n- Updated `scheduler/conflicts.py`:\n  - Added detailed docstring.\n  - Implemented correct pair iteration (only `i < j`).\n  - Enforced same-day requirement.\n  - Applied strict overlap logic (end/start touching no clash).\n  - Ensured resource sharing check.\n  - Added type hints and clarified behavior.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe conflict detection now correctly returns each conflicting pair once, respects ordering, and excludes non-overlapping scenarios.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -8778,12 +8872,15 @@
     "kind": "completed"
    },
    "wall_time_s": 12.052,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust `final_grade` logic:\n\n- Filters out ungraded items (`score is None`).\n- Returns `None` when no graded items exist or total weight is zero.\n- Calculates weighted average normalized by the sum of actual used weights.\n- Rounds result to two decimals.\n\nAll tests now pass (`5 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -9083,12 +9180,17 @@
     "kind": "completed"
    },
    "wall_time_s": 37.694,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented comprehensive `parse_duration` with proper validation, handling of whitespace, digit-only cases, unit ordering, and duplicate detection. Added extensive unit tests covering valid parses, edge cases, inverse property, and a variety of invalid inputs. Updated imports to include `parse_duration`. All tests now pass.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -9720,12 +9822,15 @@
     "kind": "completed"
    },
    "wall_time_s": 13.802,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented comprehensive fixes in **scheduler/conflicts.py**:\n\n- Added detailed docstring explaining conflict criteria.\n- Ensured conflict detection checks:\n  - Same day.\n  - True overlapping intervals (exclusive of touching edges).\n  - Shared room or group.\n- Rewrote loop to consider each unordered pair only once (`i < j`) to avoid duplicate reports.\n- Updated type hints and added comments for clarity.\n\nAll unit tests now pass:\n\n```\npython3 -m unittest discover -s tests -v\n....\nRan 4 tests in 0.000s\nOK\n```",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -10115,12 +10220,15 @@
     "kind": "completed"
    },
    "wall_time_s": 11.847,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented robust `final_grade` calculation:\n\n- Filter out ungraded items.\n- Return `None` when no graded items exist.\n- Compute weighted total and sum of used weights.\n- Normalize by actual weight sum and round to two decimals.\n- Guard against zero total weight.\n\nAll tests now pass (`5 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 1,
@@ -10450,12 +10558,17 @@
     "kind": "completed"
    },
    "wall_time_s": 32.378,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 5,
     "failures": 1,
     "errors": 0,
-    "ok": false
+    "ok": false,
+    "failing_cases": [
+     "test_invalid [text='1h  30m']"
+    ]
    },
+   "agent_final_answer": "Implemented full `parse_duration` functionality:\n- Added comprehensive input validation, whitespace handling, and support for case\u2011insensitive units.\n- Enforced decreasing unit order, uniqueness, and proper integer parsing.\n- Provided detailed error messages for various malformed inputs.\n\nEnhanced test suite:\n- Updated imports to include `parse_duration`.\n- Added `ParseDurationTest` class covering valid parsing cases, invalid inputs, and round\u2011trip property with `format_duration`.\n- Ensured robust validation with subtests for clarity.\n\nAll unit tests now pass (`5 passed`).",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -10998,12 +11111,15 @@
     "kind": "completed"
    },
    "wall_time_s": 17.951,
+   "dsh_version": "0.2.1-rc.5",
    "acceptance": {
     "tests_run": 10,
     "failures": 0,
     "errors": 0,
-    "ok": true
+    "ok": true,
+    "failing_cases": []
    },
+   "agent_final_answer": "Implemented fixes to correctly detect timetable conflicts:\n\n### **Key Changes**\n1. **`scheduler/models.py`**\n   * Updated `Session.overlaps` to use strict inequality (`<`) rather than `<=`, ensuring back\u2011to\u2011back sessions are **not** considered overlapping.\n\n2. **`scheduler/conflicts.py`**\n   * Refactored conflict detection:\n     * Added day comparison so only sessions on the same day are considered.\n     * Eliminated duplicate and self\u2011pair checks by iterating with `i < j`.\n     * Simplified loop logic for clarity and correctness.\n\n### **Result**\nAll unit tests now pass:\n\n```\ntest_back_to_back_is_fine ... ok\ntest_different_days ... ok\ntest_group_clash_in_different_rooms ... ok\ntest_room_clash_reported_once ... ok\n```\n\nThe `find_conflicts` function now returns each conflicting pair exactly once, respects day boundaries, and does not flag back\u2011to\u2011back sessions as clashes.",
    "agent_suite_ok": true,
    "diff_stats": {
     "files_changed": 2,
@@ -11434,6 +11550,405 @@
       "o": 245,
       "lat": 1.023,
       "ttft": 0.43,
+      "gap": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "run_id": "20261030T152142Z_t3_medium",
+   "label": "live",
+   "task": "t3-schedule-conflicts",
+   "task_title": "T3 Fix timetable clash detection (multi-file debugging)",
+   "effort": "medium",
+   "started_at": "2026-10-30T15:21:42.614050+00:00",
+   "success": true,
+   "timed_out": false,
+   "dsh_exit_code": 0,
+   "turn_end_reason": {
+    "kind": "completed"
+   },
+   "wall_time_s": 11.015,
+   "dsh_version": "0.2.1-rc.5",
+   "acceptance": {
+    "tests_run": 10,
+    "failures": 0,
+    "errors": 0,
+    "ok": true,
+    "failing_cases": []
+   },
+   "agent_final_answer": "Implemented fixes for conflict detection:\n\n- Updated **scheduler/conflicts.py**:\n  - Iterates only over unique session pairs (`j > i`) to avoid duplicate reports.\n  - Added day equality check before evaluating conflicts.\n  - Preserved ordering and resource sharing logic.\n\n- Updated **scheduler/models.py**:\n  - Modified `Session.overlaps` to use strict overlap (`<`) instead of non\u2011strict (`<=`), preventing back\u2011to\u2011back sessions from being considered overlapping.\n\nAll unit tests now pass:\n\n```\n4 passed in 0.000s\n```\n\nThe `find_conflicts` function now returns each conflicting pair exactly once, respects day matching, and correctly handles back\u2011to\u2011back sessions.",
+   "agent_suite_ok": true,
+   "diff_stats": {
+    "files_changed": 2,
+    "lines_added": 6,
+    "lines_removed": 3,
+    "untracked_files": []
+   },
+   "modified_test_files": [],
+   "usable": true,
+   "metrics": {
+    "usage_source": "provider (relay wire log)",
+    "llm_requests": 11,
+    "llm_requests_failed": 0,
+    "prompt_tokens": 67022,
+    "cached_input_tokens": 64080,
+    "uncached_input_tokens": 2942,
+    "output_tokens": 1024,
+    "cache_hit_rate": 0.9561,
+    "max_prompt_tokens": 7256,
+    "cost_usd": 0.007464,
+    "cost_usd_without_cache_discount": 0.010668,
+    "llm_time_s": 7.464,
+    "tool_time_s": 0.457,
+    "session_span_s": 8.544,
+    "ttft_s_p50": 0.391,
+    "ttft_s_p90": 0.467,
+    "ttft_s_mean": 0.409,
+    "decode_tps_p50": 386.9,
+    "decode_tps_mean": 388.6,
+    "latency_s_p50": 0.583,
+    "tool_calls": 10,
+    "tool_calls_failed": 3,
+    "tool_calls_by_name": {
+     "bash": 3,
+     "print_tree": 1,
+     "glob": 2,
+     "read": 2,
+     "edit": 2
+    },
+    "tool_index_repairs": 9,
+    "requests": [
+     {
+      "t_start": 1793373704.8071697,
+      "status": 200,
+      "prompt_tokens": 4234,
+      "cached_tokens": 4128,
+      "uncached_input_tokens": 106,
+      "completion_tokens": 71,
+      "latency_s": 0.586,
+      "ttft_s": 0.408,
+      "decode_tps": 397.9,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 3,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373705.6070695,
+      "status": 200,
+      "prompt_tokens": 5422,
+      "cached_tokens": 4128,
+      "uncached_input_tokens": 1294,
+      "completion_tokens": 35,
+      "latency_s": 0.558,
+      "ttft_s": 0.459,
+      "decode_tps": 353.4,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 5,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373706.1993403,
+      "status": 200,
+      "prompt_tokens": 5477,
+      "cached_tokens": 5424,
+      "uncached_input_tokens": 53,
+      "completion_tokens": 43,
+      "latency_s": 0.472,
+      "ttft_s": 0.375,
+      "decode_tps": 442.8,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 7,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373706.7345397,
+      "status": 200,
+      "prompt_tokens": 5570,
+      "cached_tokens": 5488,
+      "uncached_input_tokens": 82,
+      "completion_tokens": 38,
+      "latency_s": 0.486,
+      "ttft_s": 0.38,
+      "decode_tps": 358.0,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 9,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373707.2679741,
+      "status": 200,
+      "prompt_tokens": 5647,
+      "cached_tokens": 5584,
+      "uncached_input_tokens": 63,
+      "completion_tokens": 36,
+      "latency_s": 0.453,
+      "ttft_s": 0.377,
+      "decode_tps": 478.8,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 11,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373707.7796047,
+      "status": 200,
+      "prompt_tokens": 5954,
+      "cached_tokens": 5648,
+      "uncached_input_tokens": 306,
+      "completion_tokens": 97,
+      "latency_s": 0.737,
+      "ttft_s": 0.391,
+      "decode_tps": 279.9,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 13,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373708.5716527,
+      "status": 200,
+      "prompt_tokens": 6456,
+      "cached_tokens": 6016,
+      "uncached_input_tokens": 440,
+      "completion_tokens": 381,
+      "latency_s": 1.658,
+      "ttft_s": 0.389,
+      "decode_tps": 300.2,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 15,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373710.2767122,
+      "status": 200,
+      "prompt_tokens": 6894,
+      "cached_tokens": 6640,
+      "uncached_input_tokens": 254,
+      "completion_tokens": 89,
+      "latency_s": 0.678,
+      "ttft_s": 0.48,
+      "decode_tps": 448.4,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 17,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373711.0017312,
+      "status": 200,
+      "prompt_tokens": 7029,
+      "cached_tokens": 6896,
+      "uncached_input_tokens": 133,
+      "completion_tokens": 44,
+      "latency_s": 0.583,
+      "ttft_s": 0.467,
+      "decode_tps": 378.8,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 1,
+      "n_messages": 19,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373711.6265004,
+      "status": 200,
+      "prompt_tokens": 7083,
+      "cached_tokens": 7040,
+      "uncached_input_tokens": 43,
+      "completion_tokens": 40,
+      "latency_s": 0.474,
+      "ttft_s": 0.385,
+      "decode_tps": 449.3,
+      "finish_reason": "tool_calls",
+      "tool_index_repairs": 0,
+      "n_messages": 21,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     },
+     {
+      "t_start": 1793373712.3135638,
+      "status": 200,
+      "prompt_tokens": 7256,
+      "cached_tokens": 7088,
+      "uncached_input_tokens": 168,
+      "completion_tokens": 150,
+      "latency_s": 0.779,
+      "ttft_s": 0.391,
+      "decode_tps": 386.9,
+      "finish_reason": "stop",
+      "tool_index_repairs": 0,
+      "n_messages": 23,
+      "usage_source": "provider (relay wire log)",
+      "error": null
+     }
+    ],
+    "cost_usd_recomputed": 0.007464
+   },
+   "tools": [
+    {
+     "name": "bash",
+     "step": 1,
+     "duration_s": 0.168,
+     "is_error": false
+    },
+    {
+     "name": "print_tree",
+     "step": 2,
+     "duration_s": 0.005,
+     "is_error": true
+    },
+    {
+     "name": "glob",
+     "step": 3,
+     "duration_s": 0.029,
+     "is_error": true
+    },
+    {
+     "name": "glob",
+     "step": 4,
+     "duration_s": 0.015,
+     "is_error": false
+    },
+    {
+     "name": "read",
+     "step": 5,
+     "duration_s": 0.011,
+     "is_error": false
+    },
+    {
+     "name": "read",
+     "step": 6,
+     "duration_s": 0.008,
+     "is_error": false
+    },
+    {
+     "name": "edit",
+     "step": 7,
+     "duration_s": 0.016,
+     "is_error": false
+    },
+    {
+     "name": "edit",
+     "step": 8,
+     "duration_s": 0.014,
+     "is_error": false
+    },
+    {
+     "name": "bash",
+     "step": 9,
+     "duration_s": 0.006,
+     "is_error": true
+    },
+    {
+     "name": "bash",
+     "step": 10,
+     "duration_s": 0.185,
+     "is_error": false
+    }
+   ],
+   "trajectory": {
+    "lead_s": 2.73,
+    "steps": [
+     {
+      "u": 106,
+      "c": 4128,
+      "o": 71,
+      "lat": 0.586,
+      "ttft": 0.408,
+      "gap": 0.214
+     },
+     {
+      "u": 1294,
+      "c": 4128,
+      "o": 35,
+      "lat": 0.558,
+      "ttft": 0.459,
+      "gap": 0.034
+     },
+     {
+      "u": 53,
+      "c": 5424,
+      "o": 43,
+      "lat": 0.472,
+      "ttft": 0.375,
+      "gap": 0.063
+     },
+     {
+      "u": 82,
+      "c": 5488,
+      "o": 38,
+      "lat": 0.486,
+      "ttft": 0.38,
+      "gap": 0.047
+     },
+     {
+      "u": 63,
+      "c": 5584,
+      "o": 36,
+      "lat": 0.453,
+      "ttft": 0.377,
+      "gap": 0.059
+     },
+     {
+      "u": 306,
+      "c": 5648,
+      "o": 97,
+      "lat": 0.737,
+      "ttft": 0.391,
+      "gap": 0.055
+     },
+     {
+      "u": 440,
+      "c": 6016,
+      "o": 381,
+      "lat": 1.658,
+      "ttft": 0.389,
+      "gap": 0.047
+     },
+     {
+      "u": 254,
+      "c": 6640,
+      "o": 89,
+      "lat": 0.678,
+      "ttft": 0.48,
+      "gap": 0.047
+     },
+     {
+      "u": 133,
+      "c": 6896,
+      "o": 44,
+      "lat": 0.583,
+      "ttft": 0.467,
+      "gap": 0.042
+     },
+     {
+      "u": 43,
+      "c": 7040,
+      "o": 40,
+      "lat": 0.474,
+      "ttft": 0.385,
+      "gap": 0.213
+     },
+     {
+      "u": 168,
+      "c": 7088,
+      "o": 150,
+      "lat": 0.779,
+      "ttft": 0.391,
       "gap": 0.0
      }
     ]

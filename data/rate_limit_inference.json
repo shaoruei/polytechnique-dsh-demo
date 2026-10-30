@@ -1,0 +1,15 @@
+{
+ "n_pairs": 317,
+ "model_with_cached": {
+  "coef_uncached": 1.011,
+  "coef_cached": 0.734,
+  "coef_prev_output": 2.475,
+  "refill_per_s": 4219.5,
+  "r2": 0.638
+ },
+ "model_without_cached": {
+  "coef_uncached": 0.842,
+  "r2": 0.289
+ },
+ "conclusion": "cached prompt tokens appear to count towards tokens/min"
+}
