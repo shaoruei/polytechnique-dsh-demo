@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "run_id": "20261030T145907Z_t2_medium",
+  "label": "batch",
+  "task": "t2-duration-parser",
+  "model": "openai/gpt-oss-120b",
+  "provider": "Nebius Token Factory (public endpoint)",
+  "base_url": "https://api.tokenfactory.nebius.com/v1",
+  "reasoning_effort": "medium",
+  "dsh_version": "0.2.1-rc.5",
+  "permission_mode": "workspace-write",
+  "relay": true,
+  "started_at": "2026-10-30T14:59:07.719992+00:00",
+  "ended_at": "2026-10-30T14:59:19.620500+00:00",
+  "wall_time_s": 11.9,
+  "timeout_s": 600,
+  "timed_out": false,
+  "dsh_exit_code": 0,
+  "dsh_stderr_tail": "",
+  "turn_end_reason": {
+    "kind": "completed"
+  },
+  "agent_final_answer": "Implemented full `parse_duration` functionality with comprehensive parsing, validation, and error handling according to specification. Added extensive unit tests for both valid and invalid cases, and updated imports to include `parse_duration`. All tests now pass successfully.",
+  "success": false,
+  "acceptance": {
+    "ok": false,
+    "exit_code": 1,
+    "tests_run": 5,
+    "failures": 1,
+    "errors": 0,
+    "duration_s": 0.068,
+    "output_tail": "..F..\n======================================================================\nFAIL: test_invalid (test_hidden_duration.HiddenParseDurationTest.test_invalid) (text='1h  30m')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/tmpnailjwyl/judge/tests/test_hidden_duration.py\", line 21, in test_invalid\n    with self.assertRaises(ValueError):\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nFAILED (failures=1)\n"
+  },
+  "agent_test_suite": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 4,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.064,
+    "output_tail": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK\n"
+  },
+  "modified_test_files": [
+    "tests/test_duration.py"
+  ],
+  "diff_stats": {
+    "files_changed": 2,
+    "lines_added": 66,
+    "lines_removed": 2,
+    "untracked_files": []
+  },
+  "metrics": {
+    "usage_source": "provider (relay wire log)",
+    "llm_requests": 9,
+    "llm_requests_failed": 0,
+    "prompt_tokens": 51118,
+    "cached_input_tokens": 48576,
+    "uncached_input_tokens": 2542,
+    "output_tokens": 2306,
+    "cache_hit_rate": 0.9503,
+    "max_prompt_tokens": 7463,
+    "cost_usd": 0.006622,
+    "cost_usd_without_cache_discount": 0.009051,
+    "llm_time_s": 9.446,
+    "tool_time_s": 0.187,
+    "session_span_s": 10.072,
+    "ttft_s_p50": 0.371,
+    "ttft_s_p90": 0.468,
+    "ttft_s_mean": 0.396,
+    "decode_tps_p50": 472.7,
+    "decode_tps_mean": 472.3,
+    "latency_s_p50": 0.509,
+    "tool_calls": 8,
+    "tool_calls_failed": 1,
+    "tool_calls_by_name": {
+      "glob": 2,
+      "read": 2,
+      "edit": 3,
+      "bash": 1
+    },
+    "tool_index_repairs": 6,
+    "requests": [
+      {
+        "t_start": 1793372349.37836,
+        "status": 200,
+        "prompt_tokens": 4127,
+        "cached_tokens": 3888,
+        "uncached_input_tokens": 239,
+        "completion_tokens": 53,
+        "latency_s": 0.7,
+        "ttft_s": 0.563,
+        "decode_tps": 387.0,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 3,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372350.119735,
+        "status": 200,
+        "prompt_tokens": 4198,
+        "cached_tokens": 4016,
+        "uncached_input_tokens": 182,
+        "completion_tokens": 41,
+        "latency_s": 0.43,
+        "ttft_s": 0.352,
+        "decode_tps": 524.2,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 5,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372350.6154263,
+        "status": 200,
+        "prompt_tokens": 4270,
+        "cached_tokens": 4208,
+        "uncached_input_tokens": 62,
+        "completion_tokens": 37,
+        "latency_s": 0.412,
+        "ttft_s": 0.34,
+        "decode_tps": 511.3,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 7,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372351.068073,
+        "status": 200,
+        "prompt_tokens": 4899,
+        "cached_tokens": 4272,
+        "uncached_input_tokens": 627,
+        "completion_tokens": 36,
+        "latency_s": 0.422,
+        "ttft_s": 0.358,
+        "decode_tps": 569.7,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 9,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372351.5213864,
+        "status": 200,
+        "prompt_tokens": 5154,
+        "cached_tokens": 4896,
+        "uncached_input_tokens": 258,
+        "completion_tokens": 1589,
+        "latency_s": 4.895,
+        "ttft_s": 0.444,
+        "decode_tps": 357.1,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 11,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372356.4644792,
+        "status": 200,
+        "prompt_tokens": 6780,
+        "cached_tokens": 6288,
+        "uncached_input_tokens": 492,
+        "completion_tokens": 84,
+        "latency_s": 0.569,
+        "ttft_s": 0.387,
+        "decode_tps": 463.1,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 13,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372357.0692148,
+        "status": 200,
+        "prompt_tokens": 6909,
+        "cached_tokens": 6784,
+        "uncached_input_tokens": 125,
+        "completion_tokens": 358,
+        "latency_s": 1.015,
+        "ttft_s": 0.355,
+        "decode_tps": 542.5,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 15,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372358.1181595,
+        "status": 200,
+        "prompt_tokens": 7318,
+        "cached_tokens": 6912,
+        "uncached_input_tokens": 406,
+        "completion_tokens": 58,
+        "latency_s": 0.494,
+        "ttft_s": 0.371,
+        "decode_tps": 472.7,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 17,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372358.7344851,
+        "status": 200,
+        "prompt_tokens": 7463,
+        "cached_tokens": 7312,
+        "uncached_input_tokens": 151,
+        "completion_tokens": 50,
+        "latency_s": 0.509,
+        "ttft_s": 0.391,
+        "decode_tps": 423.4,
+        "finish_reason": "stop",
+        "tool_index_repairs": 0,
+        "n_messages": 19,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      }
+    ],
+    "tools": [
+      {
+        "name": "glob",
+        "step": 1,
+        "duration_s": 0.009,
+        "is_error": true
+      },
+      {
+        "name": "glob",
+        "step": 2,
+        "duration_s": 0.034,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 3,
+        "duration_s": 0.01,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 4,
+        "duration_s": 0.006,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 5,
+        "duration_s": 0.015,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 6,
+        "duration_s": 0.009,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 7,
+        "duration_s": 0.009,
+        "is_error": false
+      },
+      {
+        "name": "bash",
+        "step": 8,
+        "duration_s": 0.095,
+        "is_error": false
+      }
+    ]
+  }
+}

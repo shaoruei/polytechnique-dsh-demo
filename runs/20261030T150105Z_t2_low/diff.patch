@@ -1,0 +1,98 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..2fca75d 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -12,7 +12,35 @@ class FormatDurationTest(unittest.TestCase):
+     def test_negative(self):
+         with self.assertRaises(ValueError):
+             format_duration(-1)
++    def test_examples(self):
++        self.assertEqual(format_duration(0), "0s")
++        self.assertEqual(format_duration(5400), "1h30m")
++        self.assertEqual(format_duration(90061), "1d1h1m1s")
+ 
++    def test_negative(self):
++        with self.assertRaises(ValueError):
++            format_duration(-1)
++
++
++class ParseDurationTest(unittest.TestCase):
++    def test_valid(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1H 30M"), 5400)
++        self.assertEqual(parse_duration("2d"), 2*86400)
++        self.assertEqual(parse_duration("1d2h3m4s"), 86400+7200+180+4)
++        self.assertEqual(parse_duration("  5m  " ), 300)
++        # round-trip
++        for n in [0, 1, 59, 60, 61, 3599, 3600, 86400, 90061]:
++            self.assertEqual(parse_duration(format_duration(n)), n)
++    def test_invalid(self):
++        for txt in ["", "-5s", "1.5h", "1h 30", "h30", "30m1h", "1h1h", "3w", "10 ", "  "]:
++            with self.assertRaises(ValueError):
++                parse_duration(txt)
+ 
+ if __name__ == "__main__":
+     unittest.main()
++    unittest.main()
++    unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..be27847 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,44 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    import re
++    orig_text = text
++    text = text.strip()
++    # reject trailing/leading whitespace when resulting in bare integer
++    if text.isdigit() and (orig_text != text):
++        raise ValueError("invalid format with whitespace")
++    if not text:
++        raise ValueError("empty duration")
++    # plain integer seconds
++    if text.isdigit():
++        return int(text)
++    # find components
++    # remove internal spaces for parsing
++    text_nospace = text.replace(' ', '')
++    pattern = re.compile(r"(\d+)([dhms])", re.IGNORECASE)
++    pos = 0
++    total = 0
++    seen = set()
++    last_index = -1
++    for m in pattern.finditer(text_nospace):
++        if m.start() != pos:
++            # there is unmatched text
++            raise ValueError(f"invalid format at position {pos}")
++        num = int(m.group(1))
++        unit = m.group(2).lower()
++        if unit in seen:
++            raise ValueError("duplicate unit")
++        # enforce decreasing order
++        unit_order = {u: i for i, (u, _) in enumerate(_UNITS)}
++        cur_index = unit_order[unit]
++        if cur_index <= last_index:
++            raise ValueError("units not in decreasing order")
++        seen.add(unit)
++        last_index = cur_index
++        # add seconds
++        size = dict(_UNITS)[unit]
++        total += num * size
++        pos = m.end()
++    if pos != len(text_nospace):
++        raise ValueError("trailing characters")
++    return total

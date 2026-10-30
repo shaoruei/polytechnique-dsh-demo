@@ -1,0 +1,42 @@
+# DSH overlay: route the agent through Nebius Token Factory (OpenAI-compatible API).
+# No secret lives here. `apiKeyEnv` names an env var; in the Claude Code cloud
+# environment it holds a dummy value and the egress proxy injects the real key.
+- id: llm-pi-ai
+  config:
+    providers:
+      tofa:
+        displayName: Nebius Token Factory
+        apiKeyEnv: TOFA_API_KEY
+        api: openai-completions
+        baseURL: https://api.tokenfactory.nebius.com/v1
+        # Token Factory's chat-completions schema accepts only system/user/assistant/tool
+        # roles (no OpenAI "developer" role) and no `store` field.
+        compat:
+          supportsDeveloperRole: false
+          supportsStore: false
+          supportsUsageInStreaming: true
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+        models:
+          - id: openai/gpt-oss-120b
+            name: gpt-oss-120b (Token Factory)
+            contextWindow: 131072
+            maxTokens: 16384
+            reasoningEfforts:
+              low: low
+              medium: medium
+              high: high
+- id: agent-default-model
+  config:
+    provider: tofa
+    model: openai/gpt-oss-120b
+    reasoningEffort: medium
+# Keep all session data on this machine.
+- id: session-telemetry-otel
+  config:
+    mode: DISABLED
+# Not needed for the demo; avoids extra LLM calls and third-party egress.
+- id: session-title-llm
+  disabled: true
+- id: tool-web
+  disabled: true

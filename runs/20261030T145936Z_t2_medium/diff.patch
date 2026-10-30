@@ -1,0 +1,44 @@
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..1aeb082 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,38 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip whitespace
++    text = text.strip()
++    if not text:
++        raise ValueError("invalid duration string")
++
++    # If the string is just digits, interpret as seconds
++    if text.isdigit():
++        return int(text)
++
++    # Remove internal spaces to simplify parsing
++    compact = text.replace(" ", "")
++    # Validate overall pattern: sequence of <int><unit>
++    import re
++    pattern = r'^(\d+)([dhmsDHMS])(?:\d+[dhmsDHMS])*?$'
++    if not re.fullmatch(pattern, compact):
++        raise ValueError("invalid duration string")
++
++    unit_to_seconds = {"d": 86400, "h": 3600, "m": 60, "s": 1}
++    unit_order = {"d": 0, "h": 1, "m": 2, "s": 3}
++    seen = set()
++    last_order = -1
++    total = 0
++    # Find all components
++    for number, unit in re.findall(r"(\d+)([dhmsDHMS])", compact):
++        unit_low = unit.lower()
++        if unit_low in seen:
++            raise ValueError("duplicate unit in duration string")
++        seen.add(unit_low)
++        order = unit_order[unit_low]
++        if order <= last_order:
++            # Must be strictly decreasing (i.e., larger units first)
++            raise ValueError("units out of order in duration string")
++        last_order = order
++        total += int(number) * unit_to_seconds[unit_low]
++    return total

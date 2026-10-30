@@ -1,0 +1,99 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..464cafa 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,38 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_simple(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("90s"), 90)
++        self.assertEqual(parse_duration("2d"), 2 * 86400)
++        self.assertEqual(parse_duration("1h30m"), 3600 + 30 * 60)
++        self.assertEqual(parse_duration("1d2h3m4s"), 1 * 86400 + 2 * 3600 + 3 * 60 + 4)
++        # case‑insensitive and spaces
++        self.assertEqual(parse_duration("1D 2H 3M 4S"), 1 * 86400 + 2 * 3600 + 3 * 60 + 4)
++        self.assertEqual(parse_duration("1h 30m"), 3600 + 30 * 60)
++
++    def test_invalid(self):
++        invalid_cases = [
++            "",               # empty
++            "   ",            # whitespace only
++            "-5s",            # negative number
++            "1.5h",           # decimal
++            "3w",             # unknown unit
++            "h",              # missing number
++            "1h1h",           # duplicate unit
++            "30m1h",          # wrong order
++            "5m 5m",          # duplicate with space
++            "1h 30",          # missing unit after number
++            "1 h",            # space between number and unit
++        ]
++        for case in invalid_cases:
++            with self.subTest(case=case):
++                with self.assertRaises(ValueError):
++                    parse_duration(case)
++
++
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..db71a84 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,42 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Implementation based on the specification above.
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++    s = text.strip()
++    if s == "":
++        raise ValueError("empty duration string")
++    # If the string is just digits, interpret as seconds.
++    if s.isdigit():
++        return int(s)
++    # Mapping of unit to its size in seconds and order index.
++    unit_to_seconds = {"d": 86400, "h": 3600, "m": 60, "s": 1}
++    unit_order = {"d": 0, "h": 1, "m": 2, "s": 3}
++    import re
++    pattern = re.compile(r"(?i)\s*(\d+)([dhms])")
++    pos = 0
++    total = 0
++    seen = set()
++    last_index = -1
++    while pos < len(s):
++        m = pattern.match(s, pos)
++        if not m:
++            raise ValueError(f"invalid duration component at: '{s[pos:]}'")
++        number = int(m.group(1))
++        unit = m.group(2).lower()
++        # Check duplicate units.
++        if unit in seen:
++            raise ValueError(f"duplicate unit '{unit}' in duration")
++        seen.add(unit)
++        # Enforce decreasing order (d > h > m > s).
++        cur_index = unit_order[unit]
++        if cur_index < last_index:
++            raise ValueError("units out of order in duration")
++        last_index = cur_index
++        total += number * unit_to_seconds[unit]
++        pos = m.end()
++    # Ensure any trailing characters are only whitespace.
++    if s[pos:].strip():
++        raise ValueError("invalid trailing characters in duration")
++    return total

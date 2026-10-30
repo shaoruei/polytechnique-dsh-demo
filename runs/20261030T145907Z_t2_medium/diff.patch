@@ -1,0 +1,92 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..dfade14 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,25 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_cases(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1h 30m"), 5400)
++        self.assertEqual(parse_duration("2d"), 2 * 86400)
++        self.assertEqual(parse_duration("1d2h3m4s"), 1*86400 + 2*3600 + 3*60 + 4)
++        self.assertEqual(parse_duration("1H30M"), 5400)
++        self.assertEqual(parse_duration("  1h30m  "), 5400)
++
++    def test_invalid_cases(self):
++        invalids = ["", "-5s", "1.5h", "3w", "h", "1h1h", "30m1h", "1h 30", "   "]
++        for txt in invalids:
++            with self.subTest(txt=txt):
++                self.assertRaises(ValueError, parse_duration, txt)
++
+ if __name__ == "__main__":
+     unittest.main()
++    unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..7916b31 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,48 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Implementation based on specification
++    import re
++    # Define unit seconds mapping
++    unit_seconds = {suffix: size for suffix, size in _UNITS}
++    order = {suffix: idx for idx, (suffix, _) in enumerate(_UNITS)}
++    text = text.strip()
++    if not text:
++        raise ValueError("empty duration string")
++    # Pure integer without unit -> seconds
++    if text.isdigit():
++        return int(text)
++    # We'll parse sequentially, allowing optional whitespace between components
++    i = 0
++    total = 0
++    last_idx = -1
++    seen = set()
++    length = len(text)
++    while i < length:
++        # skip whitespace
++        if text[i].isspace():
++            i += 1
++            continue
++        # parse number
++        if not text[i].isdigit():
++            raise ValueError(f"invalid duration component at position {i}: '{text[i:]}'")
++        start = i
++        while i < length and text[i].isdigit():
++            i += 1
++        number = int(text[start:i])
++        if i >= length:
++            raise ValueError("unit missing after number")
++        unit = text[i].lower()
++        i += 1
++        if unit not in unit_seconds:
++            raise ValueError(f"unknown unit '{unit}'")
++        idx = order[unit]
++        # enforce decreasing order and single occurrence
++        if idx <= last_idx:
++            raise ValueError("units not in decreasing order or repeated")
++        if unit in seen:
++            raise ValueError("duplicate unit")
++        seen.add(unit)
++        last_idx = idx
++        total += number * unit_seconds[unit]
++    return total

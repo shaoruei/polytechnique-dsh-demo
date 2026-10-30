@@ -1,0 +1,97 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..0e8546e 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -16,3 +16,39 @@ class FormatDurationTest(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class ParseDurationTest(unittest.TestCase):
++    def test_valid(self):
++        cases = [
++            ("0", 0),
++            ("0s", 0),
++            ("120", 120),
++            ("1h30m", 5400),
++            ("1d 2h 3m 4s", 1*86400 + 2*3600 + 3*60 + 4),
++            ("1D2H3M4S", 1*86400 + 2*3600 + 3*60 + 4),
++            ("5m", 300),
++            ("7s", 7),
++            ("2d", 2*86400),
++        ]
++        for txt, expected in cases:
++            with self.subTest(txt=txt):
++                self.assertEqual(parse_duration(txt), expected)
++
++    def test_invalid(self):
++        invalids = [
++            "",
++            " ",
++            "-1s",
++            "1h1h",
++            "30m1h",
++            "1.5h",
++            "3w",
++            "h",
++            "1h -30m",
++        ]
++        for txt in invalids:
++            with self.subTest(txt=txt):
++                with self.assertRaises(ValueError):
++                    parse_duration(txt)
++
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..0828e4f 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,39 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    import re
++    s = text.strip()
++    if not s:
++        raise ValueError("invalid duration string")
++    # Bare integer without unit
++    if s.isdigit():
++        return int(s)
++    # Mapping unit to seconds
++    unit_seconds = dict(_UNITS)
++    order_map = {"d": 0, "h": 1, "m": 2, "s": 3}
++    seen = set()
++    last_order = None
++    total = 0
++    pos = 0
++    pattern = re.compile(r"(?i)\s*(\d+)([dhms])")
++    while pos < len(s):
++        m = pattern.match(s, pos)
++        if not m:
++            raise ValueError("invalid duration component")
++        value = int(m.group(1))
++        unit = m.group(2).lower()
++        if unit in seen:
++            raise ValueError("duplicate unit")
++        seen.add(unit)
++        cur_order = order_map[unit]
++        if last_order is not None and cur_order < last_order:
++            raise ValueError("units out of order")
++        last_order = cur_order
++        total += value * unit_seconds[unit]
++        pos = m.end()
++        # skip spaces between components
++        while pos < len(s) and s[pos].isspace():
++            pos += 1
++    if pos != len(s):
++        raise ValueError("trailing characters")
++    return total

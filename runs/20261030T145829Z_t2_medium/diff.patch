@@ -1,0 +1,67 @@
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..e06e662 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,61 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Implementation of parsing according to the specification above.
++    import re
++
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++
++    # Strip leading/trailing whitespace
++    s = text.strip()
++    if s == "":
++        raise ValueError("empty duration string")
++
++    # Handle pure integer (seconds) without unit
++    if s.isdigit():
++        return int(s)
++
++    # Negative numbers are invalid
++    if s.startswith("-"):
++        raise ValueError("negative durations not allowed")
++
++    # Remove internal spaces for easier parsing
++    s_nospace = s.replace(" ", "").lower()
++
++    # Mapping of units to seconds and order index
++    unit_seconds = {"d": 86400, "h": 3600, "m": 60, "s": 1}
++    unit_order = {"d": 0, "h": 1, "m": 2, "s": 3}
++
++    total = 0
++    seen = set()
++    last_order = -1
++    i = 0
++    length = len(s_nospace)
++    while i < length:
++        # Parse integer value
++        if not s_nospace[i].isdigit():
++            raise ValueError(f"expected number at position {i} in '{text}'")
++        j = i
++        while j < length and s_nospace[j].isdigit():
++            j += 1
++        number_str = s_nospace[i:j]
++        # Disallow leading zeros? Not required.
++        value = int(number_str)
++        if j >= length:
++            # No unit after number – this is only allowed if the whole string was just digits,
++            # which we already handled. Therefore this is invalid.
++            raise ValueError(f"missing unit after number at position {i} in '{text}'")
++        unit = s_nospace[j]
++        if unit not in unit_seconds:
++            raise ValueError(f"unknown unit '{unit}' in '{text}'")
++        if unit in seen:
++            raise ValueError(f"duplicate unit '{unit}' in '{text}'")
++        order = unit_order[unit]
++        if order <= last_order:
++            raise ValueError(f"units not in decreasing order in '{text}'")
++        seen.add(unit)
++        last_order = order
++        total += value * unit_seconds[unit]
++        i = j + 1
++    return total

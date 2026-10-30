@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "currency": "USD",
+  "checked_at": "2026-10-30",
+  "public": {
+    "model": "openai/gpt-oss-120b",
+    "evidence": "verified",
+    "input_per_mtok": 0.15,
+    "cached_input_per_mtok": 0.10,
+    "output_per_mtok": 0.60,
+    "billing_notes": "prompt_tokens includes cached_tokens. Billed as (prompt-cached)*input + cached*cached_input + completion*output. Reasoning tokens are part of completion_tokens.",
+    "rate_limits": {
+      "evidence": "verified",
+      "requests_per_minute": 600,
+      "tokens_per_minute": 500000,
+      "notes": "per_request_limits for this account/model from /v1/models?verbose=true and identical x-ratelimit-limit-* response headers. The rate-limit docs describe dynamic upscaling (+20% per 15-min window at >=80% utilisation, ceiling 20x base) and an Enterprise tier without soft caps."
+    },
+    "sources": [
+      {"label": "Token Factory /v1/models?verbose=true pricing block (prompt 0.00000015, input_cache_read 0.0000001, completion 0.0000006 USD/token)", "ref": "data/provenance/tofa_models_verbose_2026-10-30.json"},
+      {"label": "Cached tokens are billed at the model's cached input price (Serverless only)", "ref": "https://docs.tokenfactory.nebius.com/cached-tokens"},
+      {"label": "Rate limits", "ref": "https://docs.tokenfactory.nebius.com/ai-models-inference/rate-limits"},
+      {"label": "Third-party cross-check: OpenRouter Nebius endpoint lists 0.15 / 0.60 per 1M", "ref": "https://openrouter.ai/api/v1/models/openai/gpt-oss-120b/endpoints"}
+    ]
+  },
+  "dedicated": {
+    "evidence": "assumption",
+    "billing_model": "Per GPU-hour, per-minute granularity; billed while >=1 replica is ready; zero replicas = no charge; provisioning/not-ready not billed.",
+    "price_note": "Token Factory does not publish Dedicated Endpoint GPU-hour prices (contract/console-dependent). Defaults below are Nebius AI Cloud on-demand GPU-instance list prices used as a PROXY. They are adjustable in the dashboard. Commitments are advertised up to 35% lower.",
+    "gpus": {
+      "h100": {"label": "NVIDIA H100 80GB", "price_per_gpu_hour": 4.50, "alt_prices": {"ai_cloud_docs_gpu_line_item": 3.85, "preemptible": 2.15}},
+      "h200": {"label": "NVIDIA H200 141GB", "price_per_gpu_hour": 5.40, "alt_prices": {"ai_cloud_docs_gpu_line_item": 4.50, "preemptible": 2.45}},
+      "b200": {"label": "NVIDIA B200 180GB", "price_per_gpu_hour": 8.50, "alt_prices": {"ai_cloud_docs_gpu_line_item": 7.15, "preemptible": 3.95}}
+    },
+    "sources": [
+      {"label": "Nebius AI Cloud on-demand prices (H100 $4.50, H200 $5.40, B200 $8.50 per GPU-hour), checked 2026-10-30", "ref": "https://nebius.com/prices"},
+      {"label": "Nebius AI Cloud compute pricing docs (GPU line items $3.85 / $4.50 / $7.15)", "ref": "https://docs.nebius.com/compute/resources/pricing"},
+      {"label": "Dedicated endpoints overview: per GPU/hour billed with per-minute granularity", "ref": "https://docs.tokenfactory.nebius.com/ai-models-inference/dedicated-endpoints/overview"},
+      {"label": "Dedicated endpoints billing policy", "ref": "https://docs.tokenfactory.nebius.com/ai-models-inference/dedicated-endpoints/billing-policy"}
+    ]
+  },
+  "batch": {
+    "evidence": "verified",
+    "discount": 0.5,
+    "note": "Batch inference at half the real-time price (24h turnaround) - not suitable for interactive coding agents; shown for context only.",
+    "ref": "https://nebius.com/solutions/inference"
+  }
+}

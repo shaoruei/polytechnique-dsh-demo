@@ -1,0 +1,37 @@
+diff --git a/scheduler/conflicts.py b/scheduler/conflicts.py
+index e6a3cbc..827c5d2 100644
+--- a/scheduler/conflicts.py
++++ b/scheduler/conflicts.py
+@@ -10,12 +10,27 @@ def _shares_resource(a: Session, b: Session) -> bool:
+ 
+ 
+ def find_conflicts(sessions: Sequence[Session]) -> List[Tuple[Session, Session]]:
+-    """Return every pair of sessions that clash (same room or group, overlapping time)."""
+-    conflicts = []
++    """Return every pair of sessions that clash (same room or group, overlapping time).
++
++    A conflict occurs only when sessions are on the same day, their time intervals
++    truly overlap (touching end/start does not count), and they share a room or a
++    student group. Each conflicting pair is returned exactly once, ordered by the
++    sessions' positions in the input list (i.e., the first element of the tuple
++    appears earlier in the list than the second).
++    """
++    conflicts: List[Tuple[Session, Session]] = []
++    # Only consider each unordered pair once (i < j) to avoid duplicates.
+     for i, a in enumerate(sessions):
+-        for j, b in enumerate(sessions):
+-            if i == j:
++        for b in sessions[i + 1 :]:
++            # Sessions must be on the same day.
++            if a.day != b.day:
++                continue
++            # Time intervals must overlap with positive length.
++            if not (
++                a.start_minutes < b.end_minutes and b.start_minutes < a.end_minutes
++            ):
+                 continue
+-            if a.overlaps(b) and _shares_resource(a, b):
++            # Shared resource (room or at least one common group).
++            if _shares_resource(a, b):
+                 conflicts.append((a, b))
+     return conflicts

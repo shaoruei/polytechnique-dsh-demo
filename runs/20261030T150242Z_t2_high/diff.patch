@@ -1,0 +1,131 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..cbe4d7c 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,32 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_bare_seconds(self):
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++
++    def test_examples(self):
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1h 30m"), 5400)
++        self.assertEqual(parse_duration("2d"), 2 * 86400)
++        self.assertEqual(parse_duration("1d2h3m4s"), 1 * 86400 + 2 * 3600 + 3 * 60 + 4)
++        self.assertEqual(parse_duration("1H30M"), 5400)
++        self.assertEqual(parse_duration("45s"), 45)
++
++    def test_inverse(self):
++        # Test a range of values that format_duration can produce.
++        for n in [0, 1, 59, 60, 61, 3599, 3600, 86400, 86401, 90061, 1234567]:
++            with self.subTest(seconds=n):
++                self.assertEqual(parse_duration(format_duration(n)), n)
++
++    def test_invalid(self):
++        invalid_cases = ["", "   ", "-5", "1.5h", "3w", "h", "1h 30x", "30m1h", "1h1h", "1h 1h", "1h30", "1 h30m", "1h30m5s2d"]
++        for case in invalid_cases:
++            with self.subTest(case=case):
++                with self.assertRaises(ValueError):
++                    parse_duration(case)
++
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..a5f4557 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,80 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Implementation of parse_duration according to the specification.
++    # Strip leading/trailing whitespace.
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++    s = text.strip()
++    if s == "":
++        raise ValueError("empty duration string")
++    # If the string consists solely of digits, interpret as seconds.
++    if s.isdigit():
++        return int(s)
++    # Validate overall format: one or more <int><unit> components, optionally separated by spaces.
++    import re
++    component_pattern = r"\d+[dhmsDHMS]"
++    full_pattern = rf"^(?:{component_pattern}\s*)+$"
++    if not re.fullmatch(full_pattern, s):
++        raise ValueError("invalid duration format")
++    # Extract all components (ignoring spaces) and compute total seconds.
++    matches = re.finditer(r"(\d+)([dhmsDHMS])", s, flags=re.IGNORECASE)
++    total_seconds = 0
++    seen_units = set()
++    last_order = -1
++    order_map = {"d": 0, "h": 1, "m": 2, "s": 3}
++    size_map = {suffix: size for suffix, size in _UNITS}
++    for m in matches:
++        number = int(m.group(1))
++        unit_char = m.group(2).lower()
++        # Duplicate unit check.
++        if unit_char in seen_units:
++            raise ValueError(f"duplicate unit '{unit_char}' in duration")
++        # Order check: must be strictly increasing order (d, h, m, s).
++        current_order = order_map[unit_char]
++        if current_order <= last_order:
++            raise ValueError("units not in decreasing order")
++        seen_units.add(unit_char)
++        last_order = current_order
++        total_seconds += number * size_map[unit_char]
++    return total_seconds
++    s_nospace = s.replace(" ", "")
++    # If the string consists solely of digits, interpret as seconds.
++    if s_nospace.isdigit():
++        return int(s_nospace)
++    # Otherwise, parse components of the form <integer><unit>.
++    import re
++    pattern = re.compile(r"(\d+)([dhmsDHMS])")
++    pos = 0
++    total_seconds = 0
++    seen_units = set()
++    # Define ordering for units: d < h < m < s.
++    order_map = {"d": 0, "h": 1, "m": 2, "s": 3}
++    # Map unit to its size in seconds for conversion.
++    size_map = {suffix: size for suffix, size in _UNITS}
++    last_order = -1
++    while pos < len(s_nospace):
++        m = pattern.match(s_nospace, pos)
++        if not m:
++            # Invalid format: characters that do not match a component.
++            raise ValueError(f"invalid duration component at position {pos}: '{s_nospace[pos:]}'")
++        number_str, unit_char = m.group(1), m.group(2).lower()
++        # Ensure number does not have a leading plus sign; pattern only allows digits, so fine.
++        # Convert number.
++        number = int(number_str)
++        # Duplicate unit check.
++        if unit_char in seen_units:
++            raise ValueError(f"duplicate unit '{unit_char}' in duration")
++        # Order check: must be strictly increasing order (d, h, m, s).
++        current_order = order_map[unit_char]
++        if current_order <= last_order:
++            raise ValueError("units not in decreasing order or duplicate unit")
++        seen_units.add(unit_char)
++        last_order = current_order
++        total_seconds += number * size_map[unit_char]
++        pos = m.end()
++    # Ensure we consumed the whole string.
++    if pos != len(s_nospace):
++        raise ValueError("invalid trailing characters in duration")
++    return total_seconds
++

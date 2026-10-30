@@ -1,0 +1,22 @@
+diff --git a/gradebook/grades.py b/gradebook/grades.py
+index 1d7c63f..6b4bbe2 100644
+--- a/gradebook/grades.py
++++ b/gradebook/grades.py
+@@ -18,10 +18,14 @@ def final_grade(items: Iterable[GradedItem]) -> Optional[float]:
+     """
+     items = list(items)
+     total = 0.0
++    weight_sum = 0.0
+     for item in items:
+-        total += item.weight * (item.score or 0)
+-    weight_sum = sum(item.weight for item in items)
+-    return round(total, 2) if weight_sum == 1 else round(total / len(items), 2)
++        if item.score is not None:
++            total += item.weight * item.score
++            weight_sum += item.weight
++    if weight_sum == 0:
++        return None
++    return round(total / weight_sum, 2)
+ 
+ 
+ def letter_grade(score: Optional[float]) -> str:

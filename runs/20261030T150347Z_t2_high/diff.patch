@@ -1,0 +1,109 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..5d576e1 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,39 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_cases(self):
++        cases = [
++            ("0", 0),
++            ("0s", 0),
++            ("45s", 45),
++            ("90s", 90),
++            ("2d", 2 * 86400),
++            ("1h30m", 5400),
++            ("1h 30m", 5400),
++            ("1H30M", 5400),
++            ("1d2h3m4s", 93784),
++            ("120", 120),
++        ]
++        for text, expected in cases:
++            with self.subTest(text=text):
++                self.assertEqual(parse_duration(text), expected)
++
++    def test_invalid_cases(self):
++        invalids = [
++            "", "   ", "-5s", "-5", "1.5h", "1h30.5m", "3w", "h", "1h30", "30m1h",
++            "1h1h", "1h 30", "123abc", "1h30m4s2m"
++        ]
++        for text in invalids:
++            with self.subTest(text=text):
++                with self.assertRaises(ValueError):
++                    parse_duration(text)
++
++    def test_roundtrip(self):
++        # Test a selection of values to ensure parse_duration(format_duration(n)) == n
++        for n in [0, 1, 59, 60, 61, 3599, 3600, 3601, 86399, 86400, 86401, 123456, 90061]:
++            with self.subTest(seconds=n):
++                self.assertEqual(parse_duration(format_duration(n)), n)
++
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..b46dc5b 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,51 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip surrounding whitespace
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++    text = text.strip()
++    if not text:
++        raise ValueError("empty duration string")
++
++    # Bare integer – interpreted as seconds
++    # Note: .isdigit() returns False for empty string and for strings containing non-digit characters.
++    if text.isdigit():
++        return int(text)
++
++    # Remove any spaces that may separate components (single spaces are allowed, but we ignore them entirely)
++    # Using split to handle any whitespace (spaces, tabs, newlines) uniformly.
++    compact = "".join(text.split())
++
++    # Mapping of unit to (order index, multiplier in seconds)
++    unit_map = {u: (idx, secs) for idx, (u, secs) in enumerate(_UNITS)}
++    total_seconds = 0
++    last_index = -1  # Tracks the order index of the previous unit
++    i = 0
++    length = len(compact)
++    while i < length:
++        # Parse the integer part
++        start = i
++        while i < length and compact[i].isdigit():
++            i += 1
++        if start == i:
++            # No digits where a number was expected
++            raise ValueError(f"expected integer at position {start}")
++        number = int(compact[start:i])
++        # After a number we must have a unit character
++        if i >= length:
++            # No unit after number – this is only allowed if the whole string was a bare integer,
++            # which we already handled above. Therefore this is an error.
++            raise ValueError("missing unit after integer")
++        unit_char = compact[i].lower()
++        i += 1
++        if unit_char not in unit_map:
++            raise ValueError(f"unknown unit '{unit_char}'")
++        idx, multiplier = unit_map[unit_char]
++        # Enforce decreasing order and uniqueness of units
++        if idx <= last_index:
++            raise ValueError("units out of order or duplicated")
++        total_seconds += number * multiplier
++        last_index = idx
++    return total_seconds
++

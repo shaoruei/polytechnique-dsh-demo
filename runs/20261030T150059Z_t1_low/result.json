@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "run_id": "20261030T150059Z_t1_low",
+  "label": "batch",
+  "task": "t1-grade-average",
+  "model": "openai/gpt-oss-120b",
+  "provider": "Nebius Token Factory (public endpoint)",
+  "base_url": "https://api.tokenfactory.nebius.com/v1",
+  "reasoning_effort": "low",
+  "dsh_version": "0.2.1-rc.5",
+  "permission_mode": "workspace-write",
+  "relay": true,
+  "started_at": "2026-10-30T15:00:59.264854+00:00",
+  "ended_at": "2026-10-30T15:01:05.274233+00:00",
+  "wall_time_s": 6.009,
+  "timeout_s": 600,
+  "timed_out": false,
+  "dsh_exit_code": 0,
+  "dsh_stderr_tail": "",
+  "turn_end_reason": {
+    "kind": "completed"
+  },
+  "agent_final_answer": "Implemented robust weighted grade calculation in **gradebook/grades.py**:\n\n- Added filtering to exclude ungraded items.\n- Handled case with no graded items, returning `None`.\n- Calculated weighted sum and total weight only for graded items.\n- Normalized final grade by actual summed weights.\n- Updated comments for clarity.\n\nAll tests now pass:\n\n```\n5 passed in 0.000s\n```",
+  "success": true,
+  "acceptance": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 10,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.076,
+    "output_tail": "..........\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK\n"
+  },
+  "agent_test_suite": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 5,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.062,
+    "output_tail": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n"
+  },
+  "modified_test_files": [],
+  "diff_stats": {
+    "files_changed": 1,
+    "lines_added": 10,
+    "lines_removed": 6,
+    "untracked_files": []
+  },
+  "metrics": {
+    "usage_source": "provider (relay wire log)",
+    "llm_requests": 6,
+    "llm_requests_failed": 0,
+    "prompt_tokens": 28308,
+    "cached_input_tokens": 14688,
+    "uncached_input_tokens": 13620,
+    "output_tokens": 572,
+    "cache_hit_rate": 0.5189,
+    "max_prompt_tokens": 5397,
+    "cost_usd": 0.003855,
+    "cost_usd_without_cache_discount": 0.004589,
+    "llm_time_s": 3.611,
+    "tool_time_s": 0.194,
+    "session_span_s": 4.155,
+    "ttft_s_p50": 0.392,
+    "ttft_s_p90": 0.481,
+    "ttft_s_mean": 0.405,
+    "decode_tps_p50": 539.0,
+    "decode_tps_mean": 527.9,
+    "latency_s_p50": 0.542,
+    "tool_calls": 5,
+    "tool_calls_failed": 1,
+    "tool_calls_by_name": {
+      "exec": 1,
+      "bash": 2,
+      "read": 1,
+      "edit": 1
+    },
+    "tool_index_repairs": 1,
+    "requests": [
+      {
+        "t_start": 1793372460.8883836,
+        "status": 200,
+        "prompt_tokens": 4188,
+        "cached_tokens": 48,
+        "uncached_input_tokens": 4140,
+        "completion_tokens": 59,
+        "latency_s": 0.62,
+        "ttft_s": 0.531,
+        "decode_tps": 659.3,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 3,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372461.558078,
+        "status": 200,
+        "prompt_tokens": 4257,
+        "cached_tokens": 48,
+        "uncached_input_tokens": 4209,
+        "completion_tokens": 36,
+        "latency_s": 0.494,
+        "ttft_s": 0.431,
+        "decode_tps": 571.6,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 5,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372462.1195238,
+        "status": 200,
+        "prompt_tokens": 4386,
+        "cached_tokens": 80,
+        "uncached_input_tokens": 4306,
+        "completion_tokens": 37,
+        "latency_s": 0.494,
+        "ttft_s": 0.43,
+        "decode_tps": 582.4,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 7,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372462.6538522,
+        "status": 200,
+        "prompt_tokens": 4862,
+        "cached_tokens": 4384,
+        "uncached_input_tokens": 478,
+        "completion_tokens": 311,
+        "latency_s": 0.991,
+        "ttft_s": 0.35,
+        "decode_tps": 485.2,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 9,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372463.6875823,
+        "status": 200,
+        "prompt_tokens": 5218,
+        "cached_tokens": 4912,
+        "uncached_input_tokens": 306,
+        "completion_tokens": 43,
+        "latency_s": 0.421,
+        "ttft_s": 0.336,
+        "decode_tps": 506.3,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 11,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793372464.2720718,
+        "status": 200,
+        "prompt_tokens": 5397,
+        "cached_tokens": 5216,
+        "uncached_input_tokens": 181,
+        "completion_tokens": 86,
+        "latency_s": 0.591,
+        "ttft_s": 0.354,
+        "decode_tps": 362.7,
+        "finish_reason": "stop",
+        "tool_index_repairs": 0,
+        "n_messages": 13,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      }
+    ],
+    "tools": [
+      {
+        "name": "exec",
+        "step": 1,
+        "duration_s": 0.008,
+        "is_error": true
+      },
+      {
+        "name": "bash",
+        "step": 2,
+        "duration_s": 0.048,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 3,
+        "duration_s": 0.009,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 4,
+        "duration_s": 0.013,
+        "is_error": false
+      },
+      {
+        "name": "bash",
+        "step": 5,
+        "duration_s": 0.116,
+        "is_error": false
+      }
+    ]
+  }
+}

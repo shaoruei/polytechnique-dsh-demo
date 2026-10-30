@@ -1,0 +1,31 @@
+diff --git a/scheduler/conflicts.py b/scheduler/conflicts.py
+index e6a3cbc..0ea4a0c 100644
+--- a/scheduler/conflicts.py
++++ b/scheduler/conflicts.py
+@@ -13,9 +13,8 @@ def find_conflicts(sessions: Sequence[Session]) -> List[Tuple[Session, Session]]
+     """Return every pair of sessions that clash (same room or group, overlapping time)."""
+     conflicts = []
+     for i, a in enumerate(sessions):
+-        for j, b in enumerate(sessions):
+-            if i == j:
+-                continue
++        for j in range(i + 1, len(sessions)):
++            b = sessions[j]
+             if a.overlaps(b) and _shares_resource(a, b):
+                 conflicts.append((a, b))
+     return conflicts
+diff --git a/scheduler/models.py b/scheduler/models.py
+index c45fc88..7b51c1a 100644
+--- a/scheduler/models.py
++++ b/scheduler/models.py
+@@ -32,5 +32,8 @@ class Session:
+         return to_minutes(self.end)
+ 
+     def overlaps(self, other: "Session") -> bool:
+-        """True when the two sessions' time intervals overlap."""
+-        return self.start_minutes <= other.end_minutes and other.start_minutes <= self.end_minutes
++        """True when the two sessions' time intervals overlap (strictly)."""
++        # Overlap only if intervals intersect with positive length and on the same day.
++        if self.day != other.day:
++            return False
++        return self.start_minutes < other.end_minutes and other.start_minutes < self.end_minutes

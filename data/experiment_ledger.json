@@ -1,0 +1,9 @@
+{
+ "schema": 1,
+ "note": "Measured spend of every saved experiment run: provider-reported usage x verified public prices. Excludes a handful of tiny manual probe requests (<1k tokens each) made while debugging.",
+ "runs": 32,
+ "llm_requests": 311,
+ "prompt_tokens": 1896520,
+ "output_tokens": 62030,
+ "total_cost_usd": 0.236309
+}

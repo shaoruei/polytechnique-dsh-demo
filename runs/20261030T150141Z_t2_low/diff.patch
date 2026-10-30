@@ -1,0 +1,111 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..3a62db8 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,7 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
+-
++from timeutil import format_duration, parse_duration
+ 
+ class FormatDurationTest(unittest.TestCase):
+     def test_examples(self):
+@@ -13,6 +12,35 @@ class FormatDurationTest(unittest.TestCase):
+         with self.assertRaises(ValueError):
+             format_duration(-1)
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid(self):
++        cases = [
++            ("0", 0),
++            ("0s", 0),
++            ("120", 120),
++            ("45s", 45),
++            ("1m", 60),
++            ("2h", 7200),
++            ("1d", 86400),
++            ("1h30m", 5400),
++            ("1d1h1m1s", 90061),
++            ("1d 2h 3m 4s", 93784),
++            ("1H30M", 5400),  # case insensitive
++        ]
++        for txt, expected in cases:
++            with self.subTest(txt=txt):
++                self.assertEqual(parse_duration(txt), expected)
++                # round‑trip property
++                self.assertEqual(parse_duration(format_duration(expected)), expected)
++
++    def test_invalid(self):
++        invalid = [
++            "", " ", "-5s", "1.5h", "3w", "h", "1h 30", "30m1h", "1h1h", "1d 2d", "1h 60", "abc", "1h -30m"
++        ]
++        for txt in invalid:
++            with self.subTest(txt=txt):
++                with self.assertRaises(ValueError):
++                    parse_duration(txt)
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..fa7b34a 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -1,4 +1,4 @@
+-"""Human-friendly durations such as "1h30m" or "45s"."""
++'''Human-friendly durations such as "1h30m" or "45s".'''
+ 
+ _UNITS = (("d", 86400), ("h", 3600), ("m", 60), ("s", 1))
+ 
+@@ -34,4 +34,50 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++    s = text.strip()
++    if s == "":
++        raise ValueError("empty duration string")
++
++    # Bare integer case
++    if s.isdigit():
++        return int(s)
++
++    import re
++    pattern = re.compile(r"(\d+)([dhmsDHMS]?)")
++    pos = 0
++    total = 0
++    seen_units = set()
++    last_index = -1  # order index, higher means later in list
++    while pos < len(s):
++        if s[pos] == " ":
++            # allow single spaces between components
++            pos += 1
++            continue
++        m = pattern.match(s, pos)
++        if not m:
++            raise ValueError(f"invalid duration component at position {pos}: '{s[pos:]}'")
++        number_str, unit = m.groups()
++        if number_str == "":
++            raise ValueError("missing number before unit")
++        value = int(number_str)
++        if unit == "":
++            # No unit only allowed if this is the sole component
++            # but we already handled pure digit case, so this is invalid
++            raise ValueError("missing unit for component")
++        unit = unit.lower()
++        if unit not in dict(_UNITS):
++            raise ValueError(f"unknown unit '{unit}'")
++        if unit in seen_units:
++            raise ValueError(f"duplicate unit '{unit}'")
++        current_index = [u for u, _ in _UNITS].index(unit)
++        if last_index != -1 and current_index <= last_index:
++            # Must be decreasing order: larger unit first (smaller index)
++            raise ValueError("units out of order")
++        seen_units.add(unit)
++        last_index = current_index
++        total += value * dict(_UNITS)[unit]
++        pos = m.end()
++    return total
++

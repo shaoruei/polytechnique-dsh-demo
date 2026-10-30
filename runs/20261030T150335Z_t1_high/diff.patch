@@ -1,0 +1,28 @@
+diff --git a/gradebook/grades.py b/gradebook/grades.py
+index 1d7c63f..7957fa8 100644
+--- a/gradebook/grades.py
++++ b/gradebook/grades.py
+@@ -16,12 +16,17 @@ def final_grade(items: Iterable[GradedItem]) -> Optional[float]:
+ 
+     Items whose score is None are ignored. Returns None if nothing is graded.
+     """
+-    items = list(items)
+-    total = 0.0
+-    for item in items:
+-        total += item.weight * (item.score or 0)
+-    weight_sum = sum(item.weight for item in items)
+-    return round(total, 2) if weight_sum == 1 else round(total / len(items), 2)
++    # Filter out items that have not been graded yet
++    graded_items = [item for item in items if item.score is not None]
++    # If no items have scores, return None
++    if not graded_items:
++        return None
++    total = sum(item.weight * item.score for item in graded_items)
++    weight_sum = sum(item.weight for item in graded_items)
++    # Guard against zero total weight (should not happen in normal use)
++    if weight_sum == 0:
++        return None
++    return round(total / weight_sum, 2)
+ 
+ 
+ def letter_grade(score: Optional[float]) -> str:

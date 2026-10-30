@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "evidence": "historical benchmark + derived assumptions (NOT measured by this project)",
+  "benchmark": {
+    "name": "SemiAnalysis InferenceX, gpt-oss-120b, 8k input / 1k output, fp4 (read 2026-10-30)",
+    "refs": [
+      "https://inferencex.semianalysis.com/compare/gptoss-120b-h100-vs-h200",
+      "https://inferencex.semianalysis.com/compare/gptoss-120b-h200-vs-b200"
+    ],
+    "interpretation": "'tok/s/chip' counts input+output tokens per GPU; 'concurrency' is per serving instance. Check: H100 at 90/143/197 tok/s/user gives concurrency x interactivity / (tok/s/chip / 9) = 4.0 GPUs per instance at all three points, consistent with a 4-GPU instance. We therefore convert to per-GPU concurrency c = (tok_s_chip / 9) / interactivity.",
+    "workload_input_output_ratio": 8
+  },
+  "model_assumptions": {
+    "per_user_speed": "I(c): per-user output tok/s at c concurrent requests per GPU, log-log interpolated between benchmark points; flat (= highest benchmarked interactivity) below the lowest concurrency; above the highest benchmarked concurrency aggregate output may grow at most 15%.",
+    "request_time": "baseLatency + uncached_input / prefill_tps + output / (I(c) x efficiency), with c re-evaluated continuously as requests come and go (processor sharing).",
+    "capacity": "Decode-slot capacity at a target interactivity I*: c*(I*) x I* output tok/s per GPU. Conservative: benchmark requests carry an 8k-token prefill per 1k output; measured agent requests carry ~3 uncached input tokens per output token.",
+    "prefill_tps": "Assumed per-request prefill speed (uncached tokens/s): H100 10k, H200 12k, B200 25k. Not benchmarked here; contributes ~0.1-0.5 s per request.",
+    "base_latency_s": 0.15,
+    "cached_tokens": "Prefix-cache hits are treated as free (cachedWorkWeight 0); adjustable.",
+    "h100_tp1": "vLLM recipe: TP=1 on H100 needs --gpu-memory-utilization 0.95; KV cache is tight, hence the lower concurrency cap."
+  },
+  "gpus": {
+    "h100": {
+      "label": "1x H100 80GB (TP1)",
+      "gpus_per_replica": 1,
+      "points": [
+        {
+          "interactivity": 197,
+          "tps_per_gpu": 2636
+        },
+        {
+          "interactivity": 143,
+          "tps_per_gpu": 4148
+        },
+        {
+          "interactivity": 90,
+          "tps_per_gpu": 6362
+        }
+      ],
+      "max_concurrency_per_gpu": 24,
+      "max_concurrency_note": "KV-cache bound (assumption): ~8 GB free after 65 GB fp4 weights at 0.95 memory utilisation; ~37 KB/token (18 full-attention layers x 8 KV heads x 64 dim x bf16 K+V; sliding-window layers negligible) -> ~220k tokens -> ~24 agent contexts of ~9k tokens.",
+      "prefill_tps": 10000
+    },
+    "h200": {
+      "label": "1x H200 141GB (TP1)",
+      "gpus_per_replica": 1,
+      "points": [
+        {
+          "interactivity": 197,
+          "tps_per_gpu": 2945
+        },
+        {
+          "interactivity": 143,
+          "tps_per_gpu": 4618
+        },
+        {
+          "interactivity": 90,
+          "tps_per_gpu": 6798
+        }
+      ],
+      "max_concurrency_per_gpu": 128,
+      "max_concurrency_note": "Batch-size cap (assumption); KV cache (~65 GB free) is not binding for ~9k-token agent contexts.",
+      "prefill_tps": 12000
+    },
+    "b200": {
+      "label": "1x B200 180GB (TP1)",
+      "gpus_per_replica": 1,
+      "points": [
+        {
+          "interactivity": 199,
+          "tps_per_gpu": 17264
+        },
+        {
+          "interactivity": 142,
+          "tps_per_gpu": 25056
+        },
+        {
+          "interactivity": 86,
+          "tps_per_gpu": 37093
+        }
+      ],
+      "max_concurrency_per_gpu": 256,
+      "max_concurrency_note": "Batch-size cap (assumption). vLLM recipe: B200 max throughput with TP=1.",
+      "prefill_tps": 25000
+    }
+  },
+  "gpu_requirements": {
+    "evidence": "verified",
+    "facts": [
+      "gpt-oss-120b: 116.83B total / 5.13B active parameters, MoE 128 experts top-4, MXFP4 MoE weights, ~60.8 GiB checkpoint, 131k context; fits on a single 80 GB GPU (OpenAI model card).",
+      "vLLM recipe: TP=1 works on H100 with --gpu-memory-utilization 0.95 --max-num-batched-tokens 1024; for B200 max throughput use TP=1."
+    ],
+    "refs": [
+      "https://arxiv.org/html/2508.10925v1",
+      "https://openai.com/index/introducing-gpt-oss",
+      "https://docs.vllm.ai/projects/recipes/en/stable/OpenAI/GPT-OSS.html"
+    ]
+  }
+}
