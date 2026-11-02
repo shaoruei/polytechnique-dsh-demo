@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T14:51:10+00:00",
+ "generated_at": "2026-11-02T15:26:36+00:00",
  "price_per_mtok_public": {
   "input": 0.14,
   "cached_input": 0.01,
@@ -197,11 +197,3528 @@
      "phase_ids": [
       "20261102T145014Z_scaling-c2_public_A"
      ]
+    },
+    "c=5": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 0.8124,
+      "p50": 0.824,
+      "p95": 1.1911,
+      "min": 0.5007,
+      "max": 1.7213,
+      "p50_ci95": [
+       0.7273,
+       0.8661
+      ],
+      "p95_ci95": [
+       0.9523,
+       1.7213
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 2.2918,
+      "p50": 2.1851,
+      "p95": 2.942,
+      "min": 1.428,
+      "max": 4.1636,
+      "p50_ci95": [
+       2.0703,
+       2.4045
+      ],
+      "p95_ci95": [
+       2.8007,
+       4.1636
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 185.2918,
+      "p50": 179.745,
+      "p95": 280.3815,
+      "min": 104.41,
+      "max": 322.34
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 116.3693,
+      "p50": 117.16,
+      "p95": 150.199,
+      "min": 61.49,
+      "max": 179.27
+     },
+     "wall_span_s": 20.304,
+     "aggregate_output_tps": 504.34,
+     "completed_rps": 1.9701,
+     "achieved_ok_rpm": 118.2,
+     "input_tokens": {
+      "total": 124702,
+      "per_request": {
+       "n": 40,
+       "mean": 3117.55,
+       "p50": 3143.0,
+       "p95": 4048.65,
+       "min": 2052,
+       "max": 4399
+      }
+     },
+     "output_tokens": {
+      "total": 10240,
+      "per_request": {
+       "n": 40,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.020325,
+     "phase_ids": [
+      "20261102T145108Z_scaling-c5_public_A"
+     ]
+    },
+    "c=10": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 0.8938,
+      "p50": 0.8966,
+      "p95": 1.2086,
+      "min": 0.5268,
+      "max": 1.3209,
+      "p50_ci95": [
+       0.8129,
+       1.0071
+      ],
+      "p95_ci95": [
+       1.0904,
+       1.3209
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 2.7426,
+      "p50": 2.6682,
+      "p95": 3.5077,
+      "min": 1.6675,
+      "max": 4.0462,
+      "p50_ci95": [
+       2.5174,
+       2.9475
+      ],
+      "p95_ci95": [
+       3.4045,
+       4.0462
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 151.1378,
+      "p50": 150.46,
+      "p95": 247.065,
+      "min": 77.21,
+      "max": 256.34
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 97.4685,
+      "p50": 95.945,
+      "p95": 133.506,
+      "min": 63.27,
+      "max": 153.52
+     },
+     "wall_span_s": 12.836,
+     "aggregate_output_tps": 797.78,
+     "completed_rps": 3.1163,
+     "achieved_ok_rpm": 187.0,
+     "input_tokens": {
+      "total": 122865,
+      "per_request": {
+       "n": 40,
+       "mean": 3071.625,
+       "p50": 3084.5,
+       "p95": 3840.45,
+       "min": 2018,
+       "max": 4124
+      }
+     },
+     "output_tokens": {
+      "total": 10240,
+      "per_request": {
+       "n": 40,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.020068,
+     "phase_ids": [
+      "20261102T145136Z_scaling-c10_public_A"
+     ]
+    },
+    "c=20": {
+     "n_requests": 60,
+     "n_ok": 60,
+     "error_counts": {
+      "ok": 60
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 60,
+      "mean": 1.0738,
+      "p50": 0.969,
+      "p95": 1.8014,
+      "min": 0.4875,
+      "max": 2.043,
+      "p50_ci95": [
+       0.9103,
+       1.0181
+      ],
+      "p95_ci95": [
+       1.6538,
+       1.9705
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 60,
+      "mean": 3.4518,
+      "p50": 3.4139,
+      "p95": 4.6152,
+      "min": 2.1844,
+      "max": 4.9228,
+      "p50_ci95": [
+       3.2028,
+       3.6009
+      ],
+      "p95_ci95": [
+       4.3201,
+       4.6592
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 60,
+      "mean": 115.813,
+      "p50": 113.035,
+      "p95": 179.351,
+      "min": 63.6,
+      "max": 199.39
+     },
+     "e2e_output_tps_per_request": {
+      "n": 60,
+      "mean": 77.1873,
+      "p50": 74.99,
+      "p95": 111.552,
+      "min": 52.0,
+      "max": 117.2
+     },
+     "wall_span_s": 11.666,
+     "aggregate_output_tps": 1316.67,
+     "completed_rps": 5.1432,
+     "achieved_ok_rpm": 308.6,
+     "input_tokens": {
+      "total": 188031,
+      "per_request": {
+       "n": 60,
+       "mean": 3133.85,
+       "p50": 3319.0,
+       "p95": 3979.0,
+       "min": 1889,
+       "max": 4042
+      }
+     },
+     "output_tokens": {
+      "total": 15360,
+      "per_request": {
+       "n": 60,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.030625,
+     "phase_ids": [
+      "20261102T145156Z_scaling-c20_public_A"
+     ]
+    },
+    "c=30": {
+     "n_requests": 90,
+     "n_ok": 90,
+     "error_counts": {
+      "ok": 90
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 90,
+      "mean": 1.49,
+      "p50": 1.3714,
+      "p95": 2.3576,
+      "min": 0.5335,
+      "max": 3.5247,
+      "p50_ci95": [
+       1.2658,
+       1.4914
+      ],
+      "p95_ci95": [
+       2.1283,
+       3.4793
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 90,
+      "mean": 4.9405,
+      "p50": 4.3138,
+      "p95": 7.8925,
+      "min": 2.2342,
+      "max": 8.2348,
+      "p50_ci95": [
+       4.0497,
+       4.5272
+      ],
+      "p95_ci95": [
+       7.595,
+       8.032
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 90,
+      "mean": 94.0326,
+      "p50": 88.415,
+      "p95": 165.295,
+      "min": 34.18,
+      "max": 184.71
+     },
+     "e2e_output_tps_per_request": {
+      "n": 90,
+      "mean": 56.7432,
+      "p50": 59.34,
+      "p95": 77.2025,
+      "min": 31.09,
+      "max": 114.58
+     },
+     "wall_span_s": 16.516,
+     "aggregate_output_tps": 1395.02,
+     "completed_rps": 5.4493,
+     "achieved_ok_rpm": 327.0,
+     "input_tokens": {
+      "total": 277377,
+      "per_request": {
+       "n": 90,
+       "mean": 3081.9667,
+       "p50": 3067.0,
+       "p95": 3878.65,
+       "min": 1950,
+       "max": 4098
+      }
+     },
+     "output_tokens": {
+      "total": 23040,
+      "per_request": {
+       "n": 90,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.045284,
+     "phase_ids": [
+      "20261102T145217Z_scaling-c30_public_A"
+     ]
+    }
+   },
+   "B": {
+    "c=1": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 1.2328,
+      "p50": 1.2109,
+      "p95": 1.5225,
+      "min": 0.8027,
+      "max": 1.9273,
+      "p50_ci95": [
+       1.0979,
+       1.3032
+      ],
+      "p95_ci95": [
+       1.4495,
+       1.9273
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 3.9189,
+      "p50": 3.8791,
+      "p95": 5.1424,
+      "min": 2.6899,
+      "max": 6.7418,
+      "p50_ci95": [
+       3.5471,
+       4.0225
+      ],
+      "p95_ci95": [
+       4.4384,
+       6.7418
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 201.6635,
+      "p50": 203.175,
+      "p95": 261.0295,
+      "min": 89.81,
+      "max": 342.46
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 135.0913,
+      "p50": 131.99,
+      "p95": 168.713,
+      "min": 75.94,
+      "max": 190.34
+     },
+     "wall_span_s": 156.815,
+     "aggregate_output_tps": 130.6,
+     "completed_rps": 0.2551,
+     "achieved_ok_rpm": 15.3,
+     "input_tokens": {
+      "total": 412812,
+      "per_request": {
+       "n": 40,
+       "mean": 10320.3,
+       "p50": 10259.0,
+       "p95": 12051.85,
+       "min": 7854,
+       "max": 12589
+      }
+     },
+     "output_tokens": {
+      "total": 20480,
+      "per_request": {
+       "n": 40,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.063528,
+     "phase_ids": [
+      "20261102T145243Z_scaling-c1_public_B"
+     ]
+    },
+    "c=2": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 1.2655,
+      "p50": 1.2398,
+      "p95": 1.544,
+      "min": 0.961,
+      "max": 1.713,
+      "p50_ci95": [
+       1.1941,
+       1.2946
+      ],
+      "p95_ci95": [
+       1.4508,
+       1.713
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 3.7407,
+      "p50": 3.534,
+      "p95": 5.4248,
+      "min": 2.3562,
+      "max": 7.8491,
+      "p50_ci95": [
+       3.2338,
+       3.9139
+      ],
+      "p95_ci95": [
+       4.2867,
+       7.8491
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 230.6892,
+      "p50": 226.15,
+      "p95": 344.5275,
+      "min": 76.94,
+      "max": 430.99
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 144.7103,
+      "p50": 144.925,
+      "p95": 192.6815,
+      "min": 65.23,
+      "max": 217.3
+     },
+     "wall_span_s": 75.286,
+     "aggregate_output_tps": 272.03,
+     "completed_rps": 0.5313,
+     "achieved_ok_rpm": 31.9,
+     "input_tokens": {
+      "total": 411248,
+      "per_request": {
+       "n": 40,
+       "mean": 10281.2,
+       "p50": 10120.5,
+       "p95": 12276.6,
+       "min": 8288,
+       "max": 12332
+      }
+     },
+     "output_tokens": {
+      "total": 20480,
+      "per_request": {
+       "n": 40,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.063309,
+     "phase_ids": [
+      "20261102T145530Z_scaling-c2_public_B"
+     ]
+    },
+    "c=5": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 1.4677,
+      "p50": 1.3849,
+      "p95": 2.0139,
+      "min": 1.0729,
+      "max": 3.8684,
+      "p50_ci95": [
+       1.3207,
+       1.4403
+      ],
+      "p95_ci95": [
+       1.6236,
+       3.8684
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 4.4921,
+      "p50": 4.5248,
+      "p95": 5.6616,
+      "min": 2.7844,
+      "max": 6.0324,
+      "p50_ci95": [
+       4.1544,
+       4.8267
+      ],
+      "p95_ci95": [
+       5.1999,
+       6.0324
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 180.0787,
+      "p50": 172.81,
+      "p95": 251.8135,
+      "min": 106.18,
+      "max": 315.2
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 117.4537,
+      "p50": 113.155,
+      "p95": 152.5425,
+      "min": 84.88,
+      "max": 183.88
+     },
+     "wall_span_s": 38.728,
+     "aggregate_output_tps": 528.82,
+     "completed_rps": 1.0328,
+     "achieved_ok_rpm": 62.0,
+     "input_tokens": {
+      "total": 411222,
+      "per_request": {
+       "n": 40,
+       "mean": 10280.55,
+       "p50": 9940.0,
+       "p95": 12070.1,
+       "min": 8457,
+       "max": 12487
+      }
+     },
+     "output_tokens": {
+      "total": 20480,
+      "per_request": {
+       "n": 40,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.063305,
+     "phase_ids": [
+      "20261102T145654Z_scaling-c5_public_B"
+     ]
+    },
+    "c=10": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 1.8217,
+      "p50": 1.8242,
+      "p95": 2.4627,
+      "min": 1.0137,
+      "max": 2.949,
+      "p50_ci95": [
+       1.6195,
+       2.0342
+      ],
+      "p95_ci95": [
+       2.3061,
+       2.949
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 5.2732,
+      "p50": 4.889,
+      "p95": 6.6558,
+      "min": 3.3836,
+      "max": 9.3742,
+      "p50_ci95": [
+       4.7436,
+       5.4586
+      ],
+      "p95_ci95": [
+       5.988,
+       9.3742
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 164.3108,
+      "p50": 150.645,
+      "p95": 259.1985,
+      "min": 62.71,
+      "max": 318.61
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 100.95,
+      "p50": 104.74,
+      "p95": 122.25,
+      "min": 54.62,
+      "max": 151.32
+     },
+     "wall_span_s": 23.794,
+     "aggregate_output_tps": 860.73,
+     "completed_rps": 1.6811,
+     "achieved_ok_rpm": 100.9,
+     "input_tokens": {
+      "total": 412708,
+      "per_request": {
+       "n": 40,
+       "mean": 10317.7,
+       "p50": 10395.0,
+       "p95": 11881.4,
+       "min": 8177,
+       "max": 12601
+      }
+     },
+     "output_tokens": {
+      "total": 20480,
+      "per_request": {
+       "n": 40,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.063514,
+     "phase_ids": [
+      "20261102T145741Z_scaling-c10_public_B"
+     ]
+    },
+    "c=20": {
+     "n_requests": 60,
+     "n_ok": 60,
+     "error_counts": {
+      "ok": 60
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 60,
+      "mean": 1.7158,
+      "p50": 1.5106,
+      "p95": 2.5348,
+      "min": 0.9668,
+      "max": 6.5324,
+      "p50_ci95": [
+       1.365,
+       1.7083
+      ],
+      "p95_ci95": [
+       2.0872,
+       4.3535
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 60,
+      "mean": 9.2699,
+      "p50": 9.3897,
+      "p95": 13.6063,
+      "min": 3.7874,
+      "max": 14.4451,
+      "p50_ci95": [
+       7.7994,
+       9.8876
+      ],
+      "p95_ci95": [
+       13.08,
+       13.7314
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 60,
+      "mean": 78.8733,
+      "p50": 77.43,
+      "p95": 138.1585,
+      "min": 39.48,
+      "max": 191.85
+     },
+     "e2e_output_tps_per_request": {
+      "n": 60,
+      "mean": 60.806,
+      "p50": 54.535,
+      "p95": 98.484,
+      "min": 35.44,
+      "max": 135.18
+     },
+     "wall_span_s": 32.176,
+     "aggregate_output_tps": 954.75,
+     "completed_rps": 1.8647,
+     "achieved_ok_rpm": 111.9,
+     "input_tokens": {
+      "total": 606241,
+      "per_request": {
+       "n": 60,
+       "mean": 10104.0167,
+       "p50": 9984.0,
+       "p95": 11868.15,
+       "min": 8230,
+       "max": 12433
+      }
+     },
+     "output_tokens": {
+      "total": 30720,
+      "per_request": {
+       "n": 60,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.093475,
+     "phase_ids": [
+      "20261102T145815Z_scaling-c20_public_B"
+     ]
+    },
+    "c=30": {
+     "n_requests": 90,
+     "n_ok": 90,
+     "error_counts": {
+      "ok": 90
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 90,
+      "mean": 1.8557,
+      "p50": 1.7105,
+      "p95": 2.9973,
+      "min": 0.9683,
+      "max": 3.4922,
+      "p50_ci95": [
+       1.5103,
+       1.8632
+      ],
+      "p95_ci95": [
+       2.7352,
+       3.1561
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 90,
+      "mean": 9.6988,
+      "p50": 10.1711,
+      "p95": 13.2252,
+      "min": 3.654,
+      "max": 14.127,
+      "p50_ci95": [
+       9.3014,
+       10.5276
+      ],
+      "p95_ci95": [
+       12.8353,
+       13.9313
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 90,
+      "mean": 75.0876,
+      "p50": 62.88,
+      "p95": 130.8635,
+      "min": 39.86,
+      "max": 211.62
+     },
+     "e2e_output_tps_per_request": {
+      "n": 90,
+      "mean": 57.936,
+      "p50": 50.34,
+      "p95": 97.4685,
+      "min": 36.24,
+      "max": 140.12
+     },
+     "wall_span_s": 32.871,
+     "aggregate_output_tps": 1401.83,
+     "completed_rps": 2.738,
+     "achieved_ok_rpm": 164.3,
+     "input_tokens": {
+      "total": 904952,
+      "per_request": {
+       "n": 90,
+       "mean": 10055.0222,
+       "p50": 10123.5,
+       "p95": 12106.55,
+       "min": 8002,
+       "max": 12498
+      }
+     },
+     "output_tokens": {
+      "total": 46080,
+      "per_request": {
+       "n": 90,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.139596,
+     "phase_ids": [
+      "20261102T145900Z_scaling-c30_public_B"
+     ]
     }
    }
   }
  },
- "ratelimit": {},
+ "ratelimit": {
+  "public": {
+   "Bc": {
+    "rpm=50": {
+     "n_requests": 42,
+     "n_ok": 42,
+     "error_counts": {
+      "ok": 42
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 42,
+      "mean": 1.1433,
+      "p50": 1.0277,
+      "p95": 1.6555,
+      "min": 0.6539,
+      "max": 2.2814,
+      "p50_ci95": [
+       0.9515,
+       1.2463
+      ],
+      "p95_ci95": [
+       1.4828,
+       2.2771
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 42,
+      "mean": 3.6374,
+      "p50": 3.5429,
+      "p95": 5.0034,
+      "min": 2.4773,
+      "max": 5.6945,
+      "p50_ci95": [
+       3.229,
+       3.8726
+      ],
+      "p95_ci95": [
+       4.409,
+       5.684
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 42,
+      "mean": 214.0212,
+      "p50": 209.325,
+      "p95": 295.712,
+      "min": 133.51,
+      "max": 316.66
+     },
+     "e2e_output_tps_per_request": {
+      "n": 42,
+      "mean": 146.7067,
+      "p50": 144.535,
+      "p95": 205.6015,
+      "min": 89.91,
+      "max": 206.67
+     },
+     "wall_span_s": 61.157,
+     "aggregate_output_tps": 351.62,
+     "completed_rps": 0.6868,
+     "achieved_ok_rpm": 41.2,
+     "input_tokens": {
+      "total": 414092,
+      "per_request": {
+       "n": 42,
+       "mean": 9859.3333,
+       "p50": 9672.5,
+       "p95": 11507.7,
+       "min": 8178,
+       "max": 12022
+      }
+     },
+     "output_tokens": {
+      "total": 21504,
+      "per_request": {
+       "n": 42,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 354048,
+     "cache_hit_ratio": 0.855,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.017968,
+     "offered_rpm": 50.0,
+     "offered_tpm_est": 518567,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T151443Z_ratelimit-rpm50_public_Bc"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 184.0,
+       "max": 242.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "57%"
+       ],
+       "min": 57.0,
+       "max": 57.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "2%",
+        "3%",
+        "4%"
+       ],
+       "min": 2.0,
+       "max": 4.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "998",
+        "999"
+       ],
+       "min": 998.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1969238.0,
+       "max": 1991743.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=100": {
+     "n_requests": 104,
+     "n_ok": 104,
+     "error_counts": {
+      "ok": 104
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 104,
+      "mean": 1.0397,
+      "p50": 0.9603,
+      "p95": 1.6626,
+      "min": 0.6367,
+      "max": 2.1219,
+      "p50_ci95": [
+       0.8959,
+       1.0184
+      ],
+      "p95_ci95": [
+       1.5498,
+       1.6924
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 104,
+      "mean": 4.7354,
+      "p50": 4.6173,
+      "p95": 6.2765,
+      "min": 2.6922,
+      "max": 6.705,
+      "p50_ci95": [
+       4.3858,
+       4.8484
+      ],
+      "p95_ci95": [
+       6.1318,
+       6.5707
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 104,
+      "mean": 147.4869,
+      "p50": 139.81,
+      "p95": 239.4905,
+      "min": 89.3,
+      "max": 277.08
+     },
+     "e2e_output_tps_per_request": {
+      "n": 104,
+      "mean": 112.8885,
+      "p50": 110.89,
+      "p95": 155.817,
+      "min": 76.36,
+      "max": 190.18
+     },
+     "wall_span_s": 62.822,
+     "aggregate_output_tps": 847.61,
+     "completed_rps": 1.6555,
+     "achieved_ok_rpm": 99.3,
+     "input_tokens": {
+      "total": 998131,
+      "per_request": {
+       "n": 104,
+       "mean": 9597.4135,
+       "p50": 9286.5,
+       "p95": 11413.25,
+       "min": 7889,
+       "max": 11864
+      }
+     },
+     "output_tokens": {
+      "total": 53248,
+      "per_request": {
+       "n": 104,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 877824,
+     "cache_hit_ratio": 0.8795,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.040531,
+     "offered_rpm": 100.0,
+     "offered_tpm_est": 1010941,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T151556Z_ratelimit-rpm100_public_Bc"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 112.0,
+       "max": 171.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "57%",
+        "58%"
+       ],
+       "min": 57.0,
+       "max": 58.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "4%",
+        "5%",
+        "6%",
+        "7%",
+        "8%"
+       ],
+       "min": 4.0,
+       "max": 8.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 997.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1944461.0,
+       "max": 1992061.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s",
+        "2s"
+       ],
+       "min": 1.0,
+       "max": 2.0
+      }
+     }
+    },
+    "rpm=150": {
+     "n_requests": 140,
+     "n_ok": 140,
+     "error_counts": {
+      "ok": 140
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 140,
+      "mean": 1.2448,
+      "p50": 1.0765,
+      "p95": 1.9365,
+      "min": 0.6225,
+      "max": 5.4076,
+      "p50_ci95": [
+       1.0269,
+       1.1554
+      ],
+      "p95_ci95": [
+       1.6428,
+       3.0704
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 140,
+      "mean": 5.0879,
+      "p50": 4.6674,
+      "p95": 7.804,
+      "min": 2.5183,
+      "max": 10.6388,
+      "p50_ci95": [
+       4.4435,
+       5.0229
+      ],
+      "p95_ci95": [
+       6.9755,
+       9.7433
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 140,
+      "mean": 146.0178,
+      "p50": 143.285,
+      "p95": 220.9495,
+      "min": 61.94,
+      "max": 274.52
+     },
+     "e2e_output_tps_per_request": {
+      "n": 140,
+      "mean": 109.4371,
+      "p50": 109.7,
+      "p95": 165.99,
+      "min": 48.13,
+      "max": 203.31
+     },
+     "wall_span_s": 63.005,
+     "aggregate_output_tps": 1137.69,
+     "completed_rps": 2.2221,
+     "achieved_ok_rpm": 133.3,
+     "input_tokens": {
+      "total": 1365536,
+      "per_request": {
+       "n": 140,
+       "mean": 9753.8286,
+       "p50": 9604.0,
+       "p95": 11600.9,
+       "min": 7864,
+       "max": 11837
+      }
+     },
+     "output_tokens": {
+      "total": 71680,
+      "per_request": {
+       "n": 140,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 1197824,
+     "cache_hit_ratio": 0.8772,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.055528,
+     "offered_rpm": 150.0,
+     "offered_tpm_est": 1539874,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T151709Z_ratelimit-rpm150_public_Bc"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 39.0,
+       "max": 97.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "58%",
+        "59%"
+       ],
+       "min": 58.0,
+       "max": 59.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "10%",
+        "11%",
+        "12%",
+        "13%",
+        "8%",
+        "9%"
+       ],
+       "min": 8.0,
+       "max": 13.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 997.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1919434.0,
+       "max": 1992070.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s",
+        "2s",
+        "3s"
+       ],
+       "min": 1.0,
+       "max": 3.0
+      }
+     }
+    },
+    "rpm=190": {
+     "n_requests": 180,
+     "n_ok": 180,
+     "error_counts": {
+      "ok": 180
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 180,
+      "mean": 1.1609,
+      "p50": 1.0067,
+      "p95": 1.7459,
+      "min": 0.6377,
+      "max": 6.021,
+      "p50_ci95": [
+       0.9357,
+       1.0653
+      ],
+      "p95_ci95": [
+       1.594,
+       2.5407
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 180,
+      "mean": 5.5068,
+      "p50": 5.2475,
+      "p95": 8.9969,
+      "min": 2.8172,
+      "max": 11.6691,
+      "p50_ci95": [
+       5.0055,
+       5.3606
+      ],
+      "p95_ci95": [
+       7.0949,
+       10.4749
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 180,
+      "mean": 128.2817,
+      "p50": 123.915,
+      "p95": 193.4915,
+      "min": 48.78,
+      "max": 265.78
+     },
+     "e2e_output_tps_per_request": {
+      "n": 180,
+      "mean": 99.3536,
+      "p50": 97.57,
+      "p95": 138.736,
+      "min": 43.88,
+      "max": 181.74
+     },
+     "wall_span_s": 65.091,
+     "aggregate_output_tps": 1415.87,
+     "completed_rps": 2.7654,
+     "achieved_ok_rpm": 165.9,
+     "input_tokens": {
+      "total": 1743434,
+      "per_request": {
+       "n": 180,
+       "mean": 9685.7444,
+       "p50": 9547.5,
+       "p95": 11694.05,
+       "min": 7844,
+       "max": 11942
+      }
+     },
+     "output_tokens": {
+      "total": 92160,
+      "per_request": {
+       "n": 180,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 1530112,
+     "cache_hit_ratio": 0.8776,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.070971,
+     "offered_rpm": 190.0,
+     "offered_tpm_est": 1937571,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T151823Z_ratelimit-rpm190_public_Bc"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 1.0,
+       "max": 900.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "0%",
+        "59%"
+       ],
+       "min": 0.0,
+       "max": 59.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "0%",
+        "1%",
+        "13%",
+        "14%",
+        "15%",
+        "2%",
+        "3%"
+       ],
+       "min": 0.0,
+       "max": 15.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 997.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1924743.0,
+       "max": 1991929.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s",
+        "2s",
+        "3s"
+       ],
+       "min": 1.0,
+       "max": 3.0
+      }
+     }
+    },
+    "rpm=300": {
+     "n_requests": 666,
+     "n_ok": 641,
+     "error_counts": {
+      "ok": 641,
+      "http_429": 24,
+      "http_5xx": 1
+     },
+     "error_rate": 0.0375,
+     "rate_429": 0.036,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 641,
+      "mean": 1.4066,
+      "p50": 1.1026,
+      "p95": 1.837,
+      "min": 0.6511,
+      "max": 11.181,
+      "p50_ci95": [
+       1.0684,
+       1.134
+      ],
+      "p95_ci95": [
+       1.7403,
+       4.9859
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 641,
+      "mean": 9.7128,
+      "p50": 8.9668,
+      "p95": 14.997,
+      "min": 4.5051,
+      "max": 18.3085,
+      "p50_ci95": [
+       8.7293,
+       9.1918
+      ],
+      "p95_ci95": [
+       14.4497,
+       15.4504
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 641,
+      "mean": 68.1417,
+      "p50": 66.63,
+      "p95": 110.01,
+      "min": 30.25,
+      "max": 255.12
+     },
+     "e2e_output_tps_per_request": {
+      "n": 641,
+      "mean": 56.9688,
+      "p50": 57.1,
+      "p95": 82.36,
+      "min": 27.97,
+      "max": 113.65
+     },
+     "wall_span_s": 136.695,
+     "aggregate_output_tps": 2400.91,
+     "completed_rps": 4.6893,
+     "achieved_ok_rpm": 281.4,
+     "input_tokens": {
+      "total": 6285954,
+      "per_request": {
+       "n": 641,
+       "mean": 9806.4805,
+       "p50": 9759.0,
+       "p95": 11686.0,
+       "min": 7828,
+       "max": 12018
+      }
+     },
+     "output_tokens": {
+      "total": 328192,
+      "per_request": {
+       "n": 641,
+       "mean": 512.0,
+       "p50": 512.0,
+       "p95": 512.0,
+       "min": 512,
+       "max": 512
+      }
+     },
+     "cached_tokens_total": 5526272,
+     "cache_hit_ratio": 0.8791,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.253512,
+     "offered_rpm": 300.0,
+     "offered_tpm_est": 3095544,
+     "latency_429_s": {
+      "n": 24,
+      "mean": 10.7691,
+      "p50": 10.7861,
+      "p95": 11.0504,
+      "min": 10.4466,
+      "max": 11.0914
+     },
+     "retry_after_values": [],
+     "first_429_at_s": 105.972,
+     "phase_ids": [
+      "20261102T151938Z_ratelimit-rpm300_public_Bc"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 725.0,
+       "max": 849.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "0%",
+        "1%",
+        "2%",
+        "3%",
+        "4%"
+       ],
+       "min": 0.0,
+       "max": 4.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": null,
+       "min": 3.0,
+       "max": 24.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "1000",
+        "996",
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 996.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 5.0,
+       "max": 1983875.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": null,
+       "min": 1.0,
+       "max": 60.0
+      }
+     }
+    }
+   },
+   "R": {
+    "rpm=100": {
+     "n_requests": 95,
+     "n_ok": 95,
+     "error_counts": {
+      "ok": 95
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 95,
+      "mean": 0.7198,
+      "p50": 0.7,
+      "p95": 1.177,
+      "min": 0.4643,
+      "max": 2.3134,
+      "p50_ci95": [
+       0.68,
+       0.7248
+      ],
+      "p95_ci95": [
+       0.8891,
+       1.3251
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 95,
+      "mean": 0.8139,
+      "p50": 0.7529,
+      "p95": 1.3676,
+      "min": 0.4988,
+      "max": 2.3708,
+      "p50_ci95": [
+       0.732,
+       0.7792
+      ],
+      "p95_ci95": [
+       1.1847,
+       1.555
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 95,
+      "mean": 4021.7958,
+      "p50": 160.3,
+      "p95": 272.203,
+      "min": 7.02,
+      "max": 133623.49
+     },
+     "e2e_output_tps_per_request": {
+      "n": 95,
+      "mean": 10.7677,
+      "p50": 10.63,
+      "p95": 15.48,
+      "min": 3.37,
+      "max": 16.04
+     },
+     "wall_span_s": 59.904,
+     "aggregate_output_tps": 12.69,
+     "completed_rps": 1.5859,
+     "achieved_ok_rpm": 95.2,
+     "input_tokens": {
+      "total": 1805,
+      "per_request": {
+       "n": 95,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 760,
+      "per_request": {
+       "n": 95,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.000465,
+     "offered_rpm": 100.0,
+     "offered_tpm_est": 2700,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150014Z_ratelimit-rpm100_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 148.0,
+       "max": 207.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "5%"
+       ],
+       "min": 5.0,
+       "max": 5.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "17%"
+       ],
+       "min": 17.0,
+       "max": 17.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "998",
+        "999"
+       ],
+       "min": 998.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": [
+        "1999980"
+       ],
+       "min": 1999980.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=250": {
+     "n_requests": 246,
+     "n_ok": 246,
+     "error_counts": {
+      "ok": 246
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 246,
+      "mean": 0.7499,
+      "p50": 0.6905,
+      "p95": 1.2857,
+      "min": 0.4443,
+      "max": 3.2776,
+      "p50_ci95": [
+       0.6825,
+       0.7043
+      ],
+      "p95_ci95": [
+       1.1172,
+       1.3375
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 246,
+      "mean": 0.8468,
+      "p50": 0.7449,
+      "p95": 1.4212,
+      "min": 0.4889,
+      "max": 3.3669,
+      "p50_ci95": [
+       0.7346,
+       0.7713
+      ],
+      "p95_ci95": [
+       1.3197,
+       1.6034
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 246,
+      "mean": 142.3985,
+      "p50": 136.55,
+      "p95": 295.4575,
+      "min": 8.4,
+      "max": 911.94
+     },
+     "e2e_output_tps_per_request": {
+      "n": 246,
+      "mean": 10.657,
+      "p50": 10.74,
+      "p95": 15.6275,
+      "min": 2.38,
+      "max": 16.36
+     },
+     "wall_span_s": 60.653,
+     "aggregate_output_tps": 32.45,
+     "completed_rps": 4.0558,
+     "achieved_ok_rpm": 243.4,
+     "input_tokens": {
+      "total": 4674,
+      "per_request": {
+       "n": 246,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 1968,
+      "per_request": {
+       "n": 246,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.001205,
+     "offered_rpm": 250.0,
+     "offered_tpm_est": 6750,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150124Z_ratelimit-rpm250_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 77.0,
+       "max": 137.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "5%",
+        "6%",
+        "7%"
+       ],
+       "min": 5.0,
+       "max": 7.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "17%"
+       ],
+       "min": 17.0,
+       "max": 17.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "996",
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 996.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": [
+        "1990517",
+        "1999961",
+        "1999980"
+       ],
+       "min": 1990517.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=500": {
+     "n_requests": 483,
+     "n_ok": 483,
+     "error_counts": {
+      "ok": 483
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 483,
+      "mean": 0.8123,
+      "p50": 0.7791,
+      "p95": 1.2469,
+      "min": 0.4498,
+      "max": 2.0304,
+      "p50_ci95": [
+       0.743,
+       0.8152
+      ],
+      "p95_ci95": [
+       1.2136,
+       1.2803
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 483,
+      "mean": 0.9818,
+      "p50": 0.9168,
+      "p95": 1.5432,
+      "min": 0.5029,
+      "max": 2.3897,
+      "p50_ci95": [
+       0.883,
+       0.9528
+      ],
+      "p95_ci95": [
+       1.4625,
+       1.6203
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 483,
+      "mean": 1079.0533,
+      "p50": 105.9,
+      "p95": 220.384,
+      "min": 4.96,
+      "max": 112312.68
+     },
+     "e2e_output_tps_per_request": {
+      "n": 483,
+      "mean": 8.9957,
+      "p50": 8.73,
+      "p95": 14.886,
+      "min": 3.35,
+      "max": 15.91
+     },
+     "wall_span_s": 61.002,
+     "aggregate_output_tps": 63.34,
+     "completed_rps": 7.9177,
+     "achieved_ok_rpm": 475.1,
+     "input_tokens": {
+      "total": 9177,
+      "per_request": {
+       "n": 483,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 3864,
+      "per_request": {
+       "n": 483,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.002367,
+     "offered_rpm": 500.0,
+     "offered_tpm_est": 13500,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150235Z_ratelimit-rpm500_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 6.0,
+       "max": 66.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "10%",
+        "7%",
+        "8%",
+        "9%"
+       ],
+       "min": 7.0,
+       "max": 10.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "17%"
+       ],
+       "min": 17.0,
+       "max": 17.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": [
+        "994",
+        "995",
+        "996",
+        "997",
+        "998",
+        "999"
+       ],
+       "min": 994.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1984352.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=750": {
+     "n_requests": 718,
+     "n_ok": 718,
+     "error_counts": {
+      "ok": 718
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 718,
+      "mean": 0.8633,
+      "p50": 0.8381,
+      "p95": 1.2984,
+      "min": 0.4514,
+      "max": 1.9574,
+      "p50_ci95": [
+       0.8126,
+       0.8589
+      ],
+      "p95_ci95": [
+       1.2565,
+       1.3364
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 718,
+      "mean": 1.2594,
+      "p50": 1.1627,
+      "p95": 2.3621,
+      "min": 0.4969,
+      "max": 3.4316,
+      "p50_ci95": [
+       1.1286,
+       1.1921
+      ],
+      "p95_ci95": [
+       2.2291,
+       2.4672
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 718,
+      "mean": 715.175,
+      "p50": 31.4,
+      "p95": 180.2185,
+      "min": 3.07,
+      "max": 138729.24
+     },
+     "e2e_output_tps_per_request": {
+      "n": 718,
+      "mean": 7.4547,
+      "p50": 6.88,
+      "p95": 13.4085,
+      "min": 2.33,
+      "max": 16.1
+     },
+     "wall_span_s": 61.179,
+     "aggregate_output_tps": 93.89,
+     "completed_rps": 11.736,
+     "achieved_ok_rpm": 704.2,
+     "input_tokens": {
+      "total": 13642,
+      "per_request": {
+       "n": 718,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 5744,
+      "per_request": {
+       "n": 718,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.003518,
+     "offered_rpm": 750.0,
+     "offered_tpm_est": 20250,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150347Z_ratelimit-rpm750_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 840.0,
+       "max": 900.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "0%",
+        "1%",
+        "10%",
+        "2%",
+        "3%",
+        "4%"
+       ],
+       "min": 0.0,
+       "max": 10.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "0%",
+        "17%"
+       ],
+       "min": 0.0,
+       "max": 17.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 988.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1990368.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=900": {
+     "n_requests": 929,
+     "n_ok": 929,
+     "error_counts": {
+      "ok": 929
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 929,
+      "mean": 0.8596,
+      "p50": 0.8251,
+      "p95": 1.2716,
+      "min": 0.4683,
+      "max": 2.1381,
+      "p50_ci95": [
+       0.8109,
+       0.8406
+      ],
+      "p95_ci95": [
+       1.2216,
+       1.3015
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 929,
+      "mean": 1.4709,
+      "p50": 1.3401,
+      "p95": 2.683,
+      "min": 0.5124,
+      "max": 4.4384,
+      "p50_ci95": [
+       1.2929,
+       1.3965
+      ],
+      "p95_ci95": [
+       2.5216,
+       2.7682
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 929,
+      "mean": 324.3062,
+      "p50": 15.78,
+      "p95": 128.418,
+      "min": 2.06,
+      "max": 120479.85
+     },
+     "e2e_output_tps_per_request": {
+      "n": 929,
+      "mean": 6.4261,
+      "p50": 5.97,
+      "p95": 11.712,
+      "min": 1.8,
+      "max": 15.61
+     },
+     "wall_span_s": 61.527,
+     "aggregate_output_tps": 120.79,
+     "completed_rps": 15.0992,
+     "achieved_ok_rpm": 906.0,
+     "input_tokens": {
+      "total": 17651,
+      "per_request": {
+       "n": 929,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 7432,
+      "per_request": {
+       "n": 929,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.004552,
+     "offered_rpm": 900.0,
+     "offered_tpm_est": 24300,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150459Z_ratelimit-rpm900_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 768.0,
+       "max": 828.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "10%",
+        "11%",
+        "4%",
+        "5%",
+        "6%",
+        "7%",
+        "8%",
+        "9%"
+       ],
+       "min": 4.0,
+       "max": 11.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "0%"
+       ],
+       "min": 0.0,
+       "max": 0.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 984.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1987494.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=1000": {
+     "n_requests": 988,
+     "n_ok": 988,
+     "error_counts": {
+      "ok": 988
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 988,
+      "mean": 0.8982,
+      "p50": 0.8459,
+      "p95": 1.2802,
+      "min": 0.4669,
+      "max": 4.8359,
+      "p50_ci95": [
+       0.8287,
+       0.859
+      ],
+      "p95_ci95": [
+       1.2327,
+       1.339
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 988,
+      "mean": 1.6867,
+      "p50": 1.5015,
+      "p95": 3.302,
+      "min": 0.5614,
+      "max": 5.3557,
+      "p50_ci95": [
+       1.4455,
+       1.5534
+      ],
+      "p95_ci95": [
+       3.1,
+       3.4627
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 988,
+      "mean": 88.1729,
+      "p50": 12.735,
+      "p95": 96.9315,
+      "min": 1.58,
+      "max": 61801.97
+     },
+     "e2e_output_tps_per_request": {
+      "n": 988,
+      "mean": 5.7797,
+      "p50": 5.33,
+      "p95": 10.549,
+      "min": 1.49,
+      "max": 14.25
+     },
+     "wall_span_s": 60.592,
+     "aggregate_output_tps": 130.45,
+     "completed_rps": 16.3058,
+     "achieved_ok_rpm": 978.3,
+     "input_tokens": {
+      "total": 18772,
+      "per_request": {
+       "n": 988,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 7904,
+      "per_request": {
+       "n": 988,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.004841,
+     "offered_rpm": 1000.0,
+     "offered_tpm_est": 27000,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150612Z_ratelimit-rpm1000_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 696.0,
+       "max": 755.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": [
+        "11%",
+        "12%",
+        "13%",
+        "14%",
+        "15%",
+        "16%",
+        "17%"
+       ],
+       "min": 11.0,
+       "max": 17.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "0%"
+       ],
+       "min": 0.0,
+       "max": 0.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 976.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": [
+        "1999961",
+        "1999980"
+       ],
+       "min": 1999961.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s",
+        "2s"
+       ],
+       "min": 1.0,
+       "max": 2.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=1100": {
+     "n_requests": 1123,
+     "n_ok": 1121,
+     "error_counts": {
+      "ok": 1121,
+      "http_5xx": 2
+     },
+     "error_rate": 0.0018,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 1121,
+      "mean": 0.8759,
+      "p50": 0.8349,
+      "p95": 1.2212,
+      "min": 0.4572,
+      "max": 5.8666,
+      "p50_ci95": [
+       0.8211,
+       0.8505
+      ],
+      "p95_ci95": [
+       1.1844,
+       1.2611
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 1121,
+      "mean": 1.9297,
+      "p50": 1.6966,
+      "p95": 3.8239,
+      "min": 0.5561,
+      "max": 12.9897,
+      "p50_ci95": [
+       1.6247,
+       1.7515
+      ],
+      "p95_ci95": [
+       3.6022,
+       4.011
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 1121,
+      "mean": 207.2792,
+      "p50": 8.61,
+      "p95": 82.95,
+      "min": 0.57,
+      "max": 98673.55
+     },
+     "e2e_output_tps_per_request": {
+      "n": 1121,
+      "mean": 5.2195,
+      "p50": 4.72,
+      "p95": 10.01,
+      "min": 0.62,
+      "max": 14.39
+     },
+     "wall_span_s": 60.752,
+     "aggregate_output_tps": 147.62,
+     "completed_rps": 18.4522,
+     "achieved_ok_rpm": 1107.1,
+     "input_tokens": {
+      "total": 21299,
+      "per_request": {
+       "n": 1121,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 8968,
+      "per_request": {
+       "n": 1121,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.005493,
+     "offered_rpm": 1100.0,
+     "offered_tpm_est": 29700,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150724Z_ratelimit-rpm1100_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 623.0,
+       "max": 683.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": null,
+       "min": 17.0,
+       "max": 25.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "0%"
+       ],
+       "min": 0.0,
+       "max": 0.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 869.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1986860.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": [
+        "1s",
+        "2s",
+        "3s",
+        "4s",
+        "5s",
+        "6s",
+        "7s",
+        "8s"
+       ],
+       "min": 1.0,
+       "max": 8.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=1250": {
+     "n_requests": 1232,
+     "n_ok": 1232,
+     "error_counts": {
+      "ok": 1232
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 1232,
+      "mean": 0.8741,
+      "p50": 0.8527,
+      "p95": 1.2261,
+      "min": 0.48,
+      "max": 1.9074,
+      "p50_ci95": [
+       0.839,
+       0.8693
+      ],
+      "p95_ci95": [
+       1.1845,
+       1.2599
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 1232,
+      "mean": 1.9799,
+      "p50": 1.7775,
+      "p95": 3.9062,
+      "min": 0.5406,
+      "max": 5.2066,
+      "p50_ci95": [
+       1.7213,
+       1.8553
+      ],
+      "p95_ci95": [
+       3.6877,
+       4.1233
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 1232,
+      "mean": 112.7862,
+      "p50": 7.96,
+      "p95": 74.892,
+      "min": 1.57,
+      "max": 117581.85
+     },
+     "e2e_output_tps_per_request": {
+      "n": 1232,
+      "mean": 4.9651,
+      "p50": 4.5,
+      "p95": 9.6645,
+      "min": 1.54,
+      "max": 14.8
+     },
+     "wall_span_s": 61.441,
+     "aggregate_output_tps": 160.41,
+     "completed_rps": 20.0518,
+     "achieved_ok_rpm": 1203.1,
+     "input_tokens": {
+      "total": 23408,
+      "per_request": {
+       "n": 1232,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 9856,
+      "per_request": {
+       "n": 1232,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.006037,
+     "offered_rpm": 1250.0,
+     "offered_tpm_est": 33750,
+     "latency_429_s": {
+      "n": 0
+     },
+     "retry_after_values": [],
+     "first_429_at_s": null,
+     "phase_ids": [
+      "20261102T150837Z_ratelimit-rpm1250_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 551.0,
+       "max": 611.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": null,
+       "min": 25.0,
+       "max": 33.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "1%"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 770.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1985506.0,
+       "max": 1999980.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": null,
+       "min": 1.0,
+       "max": 14.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    },
+    "rpm=1500": {
+     "n_requests": 3728,
+     "n_ok": 3569,
+     "error_counts": {
+      "ok": 3569,
+      "http_429": 157,
+      "http_5xx": 2
+     },
+     "error_rate": 0.0427,
+     "rate_429": 0.0421,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 3569,
+      "mean": 0.9855,
+      "p50": 0.8302,
+      "p95": 1.1885,
+      "min": 0.4803,
+      "max": 10.9509,
+      "p50_ci95": [
+       0.8202,
+       0.8365
+      ],
+      "p95_ci95": [
+       1.1658,
+       1.2151
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 3569,
+      "mean": 2.5424,
+      "p50": 2.3563,
+      "p95": 4.3313,
+      "min": 0.5629,
+      "max": 11.4,
+      "p50_ci95": [
+       2.3145,
+       2.4053
+      ],
+      "p95_ci95": [
+       4.2395,
+       4.4304
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 3569,
+      "mean": 91.3858,
+      "p50": 4.87,
+      "p95": 47.236,
+      "min": 1.33,
+      "max": 141933.13
+     },
+     "e2e_output_tps_per_request": {
+      "n": 3569,
+      "mean": 3.9808,
+      "p50": 3.4,
+      "p95": 8.27,
+      "min": 0.7,
+      "max": 14.21
+     },
+     "wall_span_s": 158.239,
+     "aggregate_output_tps": 180.44,
+     "completed_rps": 22.5545,
+     "achieved_ok_rpm": 1353.3,
+     "input_tokens": {
+      "total": 67811,
+      "per_request": {
+       "n": 3569,
+       "mean": 19.0,
+       "p50": 19.0,
+       "p95": 19.0,
+       "min": 19,
+       "max": 19
+      }
+     },
+     "output_tokens": {
+      "total": 28552,
+      "per_request": {
+       "n": 3569,
+       "mean": 8.0,
+       "p50": 8.0,
+       "p95": 8.0,
+       "min": 8,
+       "max": 8
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.017488,
+     "offered_rpm": 1500.0,
+     "offered_tpm_est": 40500,
+     "latency_429_s": {
+      "n": 157,
+      "mean": 10.513,
+      "p50": 10.5219,
+      "p95": 10.7765,
+      "min": 10.2842,
+      "max": 10.8537
+     },
+     "retry_after_values": [],
+     "first_429_at_s": 123.197,
+     "phase_ids": [
+      "20261102T150950Z_ratelimit-rpm1500_public_R"
+     ],
+     "rate_limit_headers": {
+      "x-ratelimit-dynamic-period-remaining": {
+       "distinct": null,
+       "min": 389.0,
+       "max": 537.0
+      },
+      "x-ratelimit-dynamic-period-usage-requests": {
+       "distinct": null,
+       "min": 33.0,
+       "max": 56.0
+      },
+      "x-ratelimit-dynamic-period-usage-tokens": {
+       "distinct": [
+        "1%",
+        "2%"
+       ],
+       "min": 1.0,
+       "max": 2.0
+      },
+      "x-ratelimit-dynamic-scale-requests": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-dynamic-scale-tokens": {
+       "distinct": [
+        "1.00"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      },
+      "x-ratelimit-limit-requests": {
+       "distinct": [
+        "1000"
+       ],
+       "min": 1000.0,
+       "max": 1000.0
+      },
+      "x-ratelimit-limit-tokens": {
+       "distinct": [
+        "2000000"
+       ],
+       "min": 2000000.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-remaining-requests": {
+       "distinct": null,
+       "min": 0.0,
+       "max": 999.0
+      },
+      "x-ratelimit-remaining-tokens": {
+       "distinct": null,
+       "min": 1987384.0,
+       "max": 2000000.0
+      },
+      "x-ratelimit-reset-requests": {
+       "distinct": null,
+       "min": 1.0,
+       "max": 61.0
+      },
+      "x-ratelimit-reset-tokens": {
+       "distinct": [
+        "1s"
+       ],
+       "min": 1.0,
+       "max": 1.0
+      }
+     }
+    }
+   }
+  }
+ },
  "phases": [
   {
    "endpoint": "public",
@@ -265,13 +3782,550 @@
    "stop_reason": null,
    "timeout_s": 180.0,
    "warmup_requests": 2
+  },
+  {
+   "concurrency": 5,
+   "connections_opened": 45,
+   "elapsed_s": 22.5,
+   "endpoint": "public",
+   "index_base": 50000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145108Z_scaling-c5_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.06684522,
+   "started_at": "2026-11-02T14:51:08+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 5
+  },
+  {
+   "concurrency": 10,
+   "connections_opened": 50,
+   "elapsed_s": 15.35,
+   "endpoint": "public",
+   "index_base": 100000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145136Z_scaling-c10_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.09179518,
+   "started_at": "2026-11-02T14:51:36+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 10
+  },
+  {
+   "concurrency": 20,
+   "connections_opened": 80,
+   "elapsed_s": 15.58,
+   "endpoint": "public",
+   "index_base": 200000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 60,
+   "phase_id": "20261102T145156Z_scaling-c20_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.13252594,
+   "started_at": "2026-11-02T14:51:56+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 20
+  },
+  {
+   "concurrency": 30,
+   "connections_opened": 120,
+   "elapsed_s": 20.86,
+   "endpoint": "public",
+   "index_base": 300000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 90,
+   "phase_id": "20261102T145217Z_scaling-c30_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.19319732,
+   "started_at": "2026-11-02T14:52:17+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 30
+  },
+  {
+   "concurrency": 1,
+   "connections_opened": 41,
+   "elapsed_s": 161.85,
+   "endpoint": "public",
+   "index_base": 10000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145243Z_scaling-c1_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.2584089,
+   "started_at": "2026-11-02T14:52:43+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 1
+  },
+  {
+   "concurrency": 2,
+   "connections_opened": 42,
+   "elapsed_s": 78.62,
+   "endpoint": "public",
+   "index_base": 20000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145530Z_scaling-c2_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.32491338,
+   "started_at": "2026-11-02T14:55:30+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 2
+  },
+  {
+   "concurrency": 5,
+   "connections_opened": 45,
+   "elapsed_s": 42.14,
+   "endpoint": "public",
+   "index_base": 50000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145654Z_scaling-c5_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.39597598,
+   "started_at": "2026-11-02T14:56:54+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 5
+  },
+  {
+   "concurrency": 10,
+   "connections_opened": 50,
+   "elapsed_s": 28.95,
+   "endpoint": "public",
+   "index_base": 100000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145741Z_scaling-c10_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.47413336,
+   "started_at": "2026-11-02T14:57:41+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 10
+  },
+  {
+   "concurrency": 20,
+   "connections_opened": 80,
+   "elapsed_s": 39.43,
+   "endpoint": "public",
+   "index_base": 200000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 60,
+   "phase_id": "20261102T145815Z_scaling-c20_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.59843628,
+   "started_at": "2026-11-02T14:58:15+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 20
+  },
+  {
+   "concurrency": 30,
+   "connections_opened": 120,
+   "elapsed_s": 41.97,
+   "endpoint": "public",
+   "index_base": 300000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 90,
+   "phase_id": "20261102T145900Z_scaling-c30_public_B",
+   "profile": "B",
+   "salt": "v1",
+   "spent_usd_after": 0.78406284,
+   "started_at": "2026-11-02T14:59:00+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 30
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 95,
+   "dispatch_lag_p50_s": 0.001,
+   "dispatch_lag_p99_s": 0.0035,
+   "elapsed_s": 60.34,
+   "endpoint": "public",
+   "index_base": 5000000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 100.0,
+   "phase_id": "20261102T150014Z_ratelimit-rpm100_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 95,
+   "sent_window_s": 59.8,
+   "spent_usd_after": 0.78452834,
+   "started_at": "2026-11-02T15:00:14+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 246,
+   "dispatch_lag_p50_s": 0.0009,
+   "dispatch_lag_p99_s": 0.0023,
+   "elapsed_s": 60.68,
+   "endpoint": "public",
+   "index_base": 5100000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 250.0,
+   "phase_id": "20261102T150124Z_ratelimit-rpm250_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 246,
+   "sent_window_s": 59.94,
+   "spent_usd_after": 0.78573374,
+   "started_at": "2026-11-02T15:01:24+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 483,
+   "dispatch_lag_p50_s": 0.0008,
+   "dispatch_lag_p99_s": 0.0036,
+   "elapsed_s": 61.01,
+   "endpoint": "public",
+   "index_base": 5200000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 500.0,
+   "phase_id": "20261102T150235Z_ratelimit-rpm500_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 483,
+   "sent_window_s": 59.98,
+   "spent_usd_after": 0.78810044,
+   "started_at": "2026-11-02T15:02:35+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 718,
+   "dispatch_lag_p50_s": 0.0008,
+   "dispatch_lag_p99_s": 0.0037,
+   "elapsed_s": 61.2,
+   "endpoint": "public",
+   "index_base": 5300000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 750.0,
+   "phase_id": "20261102T150347Z_ratelimit-rpm750_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 718,
+   "sent_window_s": 59.99,
+   "spent_usd_after": 0.79161864,
+   "started_at": "2026-11-02T15:03:47+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 929,
+   "dispatch_lag_p50_s": 0.0008,
+   "dispatch_lag_p99_s": 0.0035,
+   "elapsed_s": 61.7,
+   "endpoint": "public",
+   "index_base": 5400000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 900.0,
+   "phase_id": "20261102T150459Z_ratelimit-rpm900_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 929,
+   "sent_window_s": 59.95,
+   "spent_usd_after": 0.79617074,
+   "started_at": "2026-11-02T15:04:59+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 988,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0025,
+   "elapsed_s": 60.61,
+   "endpoint": "public",
+   "index_base": 5500000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 1000.0,
+   "phase_id": "20261102T150612Z_ratelimit-rpm1000_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 988,
+   "sent_window_s": 59.82,
+   "spent_usd_after": 0.80101194,
+   "started_at": "2026-11-02T15:06:12+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 1123,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0028,
+   "elapsed_s": 60.8,
+   "endpoint": "public",
+   "index_base": 5600000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 1100.0,
+   "phase_id": "20261102T150724Z_ratelimit-rpm1100_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 1123,
+   "sent_window_s": 59.93,
+   "spent_usd_after": 0.80650484,
+   "started_at": "2026-11-02T15:07:24+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 1232,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0031,
+   "elapsed_s": 61.49,
+   "endpoint": "public",
+   "index_base": 5700000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 1250.0,
+   "phase_id": "20261102T150837Z_ratelimit-rpm1250_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 1232,
+   "sent_window_s": 59.88,
+   "spent_usd_after": 0.81254164,
+   "started_at": "2026-11-02T15:08:37+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 60.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 3728,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0027,
+   "elapsed_s": 158.27,
+   "endpoint": "public",
+   "index_base": 5800000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 1500.0,
+   "phase_id": "20261102T150950Z_ratelimit-rpm1500_public_R",
+   "profile": "R",
+   "salt": "v1",
+   "scheduled": 4511,
+   "sent_window_s": 148.32,
+   "spent_usd_after": 0.83002974,
+   "started_at": "2026-11-02T15:09:50+00:00",
+   "step_seconds": 180.0,
+   "stop_reason": "sustained_429",
+   "timeout_s": 60.0
+  },
+  {
+   "endpoint": "public",
+   "exclude_from_summary": true,
+   "kind": "smoke",
+   "n": 2,
+   "phase_id": "20261102T151422Z_smoke_public_mixed",
+   "profiles": [
+    "Bc",
+    "Bc"
+   ]
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 42,
+   "dispatch_lag_p50_s": 0.0008,
+   "dispatch_lag_p99_s": 0.0021,
+   "elapsed_s": 62.51,
+   "endpoint": "public",
+   "index_base": 7000000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 50.0,
+   "phase_id": "20261102T151443Z_ratelimit-rpm50_public_Bc",
+   "profile": "Bc",
+   "salt": "v1",
+   "scheduled": 42,
+   "sent_window_s": 59.86,
+   "spent_usd_after": 0.85010714,
+   "started_at": "2026-11-02T15:14:43+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 120.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 104,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0023,
+   "elapsed_s": 63.61,
+   "endpoint": "public",
+   "index_base": 7100000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 100.0,
+   "phase_id": "20261102T151556Z_ratelimit-rpm100_public_Bc",
+   "profile": "Bc",
+   "salt": "v1",
+   "scheduled": 104,
+   "sent_window_s": 59.57,
+   "spent_usd_after": 0.8906378,
+   "started_at": "2026-11-02T15:15:56+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 120.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 140,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.002,
+   "elapsed_s": 63.18,
+   "endpoint": "public",
+   "index_base": 7200000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 150.0,
+   "phase_id": "20261102T151709Z_ratelimit-rpm150_public_Bc",
+   "profile": "Bc",
+   "salt": "v1",
+   "scheduled": 140,
+   "sent_window_s": 59.2,
+   "spent_usd_after": 0.94616612,
+   "started_at": "2026-11-02T15:17:09+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 120.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 180,
+   "dispatch_lag_p50_s": 0.0007,
+   "dispatch_lag_p99_s": 0.0025,
+   "elapsed_s": 65.12,
+   "endpoint": "public",
+   "index_base": 7300000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 190.0,
+   "phase_id": "20261102T151823Z_ratelimit-rpm190_public_Bc",
+   "profile": "Bc",
+   "salt": "v1",
+   "scheduled": 180,
+   "sent_window_s": 59.94,
+   "spent_usd_after": 1.01713712,
+   "started_at": "2026-11-02T15:18:23+00:00",
+   "step_seconds": 60.0,
+   "stop_reason": null,
+   "timeout_s": 120.0
+  },
+  {
+   "arrivals": "poisson",
+   "client_overload_skipped": 0,
+   "connections_opened": 666,
+   "dispatch_lag_p50_s": 0.0006,
+   "dispatch_lag_p99_s": 0.0033,
+   "elapsed_s": 136.72,
+   "endpoint": "public",
+   "index_base": 7400000,
+   "kind": "ratelimit",
+   "max_inflight": 256,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "offered_rpm": 300.0,
+   "phase_id": "20261102T151938Z_ratelimit-rpm300_public_Bc",
+   "profile": "Bc",
+   "salt": "v1",
+   "scheduled": 958,
+   "sent_window_s": 124.4,
+   "spent_usd_after": 1.27064908,
+   "started_at": "2026-11-02T15:19:38+00:00",
+   "step_seconds": 180.0,
+   "stop_reason": "sustained_429",
+   "timeout_s": 120.0
   }
  ],
  "totals": {
-  "requests": 83,
-  "public_requests": 83,
+  "requests": 11430,
+  "public_requests": 11430,
   "dedicated_requests": 0,
-  "est_public_cost_usd": 0.040956,
+  "est_public_cost_usd": 1.265583,
   "model_mismatches": 0
  }
 }

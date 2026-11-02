@@ -302,7 +302,10 @@ async def _read_head(reader) -> tuple[int, dict]:
         if h in (b"\r\n", b"\n", b""):
             break
         k, _, v = h.decode("latin-1").partition(":")
-        headers[k.strip().lower()] = v.strip()
+        k, v = k.strip().lower(), v.strip()
+        # Duplicate headers are joined (RFC 9110). The cloud egress proxy, for example, prepends
+        # "Connection: close" to the server's "Connection: keep-alive".
+        headers[k] = f"{headers[k]}, {v}" if k in headers else v
     return status, headers
 
 
@@ -435,7 +438,7 @@ async def do_request(pool: Pool, ep: dict, profile: str, index: int, salt: str, 
                     state["finish"] = ch.get("finish_reason") or state["finish"]
         if status != 200:
             state["error_body"] = raw.decode("utf-8", errors="replace")[:300]
-        reusable = headers.get("connection", "").lower() != "close" and (
+        reusable = "close" not in headers.get("connection", "").lower() and (
             "chunked" in headers.get("transfer-encoding", "").lower() or "content-length" in headers)
 
     try:

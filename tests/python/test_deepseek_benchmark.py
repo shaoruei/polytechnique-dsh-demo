@@ -50,7 +50,11 @@ class FakeServer:
                                  b"Content-Length: " + str(len(payload)).encode() + b"\r\n\r\n" + payload)
                     await writer.drain()
                     continue
-                writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\n"
+                if self.mode == "proxy_close":  # like the cloud egress proxy: close prepended to keep-alive
+                    writer.write(b"HTTP/1.1 200 OK\r\nConnection: close\r\nConnection: keep-alive\r\n")
+                else:
+                    writer.write(b"HTTP/1.1 200 OK\r\n")
+                writer.write(b"Content-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\n"
                              b"x-ratelimit-remaining-requests: 999\r\nx-ratelimit-limit-tokens: 2000000\r\n"
                              b"x-request-id: abc\r\nset-cookie: secret=1\r\n\r\n")
                 model = "other" if self.mode == "wrong_model" else body["model"]
@@ -72,7 +76,7 @@ class FakeServer:
                 d = b"data: [DONE]\n\n"
                 writer.write(f"{len(d):x}\r\n".encode() + d + b"\r\n0\r\n\r\n")
                 await writer.drain()
-                if self.mode == "close_after_one":
+                if self.mode in ("close_after_one", "proxy_close"):
                     break
         except (ConnectionError, asyncio.IncompleteReadError):
             pass
@@ -210,6 +214,20 @@ class TestClient(unittest.TestCase):
         self.assertEqual(a["error_category"], "ok")
         self.assertEqual(b["error_category"], "ok")
         self.assertEqual(n, 2)  # each request reached the server exactly once
+
+    def test_duplicate_connection_close_not_reused(self):
+        async def go():
+            async with FakeServer(mode="proxy_close") as srv:
+                pool = bm.Pool(srv.endpoint()["origin"])
+                a = await bm.do_request(pool, srv.endpoint(), "R", 1, "t", 0.0, 10)
+                b = await bm.do_request(pool, srv.endpoint(), "R", 2, "t", 0.0, 10)
+                pool.close()
+                return a, b, pool.opened
+        a, b, opened = self.run_async(go())
+        self.assertEqual((a["error_category"], b["error_category"]), ("ok", "ok"))
+        self.assertTrue(b["new_connection"])
+        self.assertFalse(b.get("stale_connection_reopened", False))
+        self.assertEqual(opened, 2)
 
     def test_429_and_model_mismatch_categories(self):
         async def go(mode):
