@@ -97,7 +97,9 @@ const fs = require('fs');
         await page.dispatchEvent('#a-economics-gpuHour', 'input');
         await page.waitForTimeout(300);
         const t = await page.locator('#e-tiles').innerText();
-        if (!/3,5\d\d tasks\/h/.test(t)) problems.push(`[${scheme}] economics: break-even did not follow the price (${t.replace(/\n/g, ' ')})`);
+        // break-even students = (15 $/GPU-h × 2 GPUs × 32 h) / (40 tasks × measured cost per task)
+        const expect = Math.round((15 * 2 * 32) / (40 * 0.0754 / 9)).toLocaleString('en-US');
+        if (!t.includes(`${expect.slice(0, 3)}`) || !/students/.test(t)) problems.push(`[${scheme}] economics: break-even did not follow the price (expected ≈${expect}; ${t.replace(/\n/g, ' ')})`);
         let note = await page.locator('#e-note').innerText();
         if (!/^Not a recommendation/.test(note)) problems.push(`[${scheme}] economics: infeasible break-even shown as attractive (${note})`);
         await page.fill('#a-economics-gpuHour', '8.5');
@@ -106,7 +108,7 @@ const fs = require('fs');
         await page.dispatchEvent('#a-economics-reqPerReplica', 'input');
         await page.waitForTimeout(300);
         note = await page.locator('#e-note').innerText();
-        if (!/^Dedicated is cheaper from 2,0\d\d to/.test(note)) problems.push(`[${scheme}] economics: feasible break-even not reported (${note})`);
+        if (!/^Dedicated is cheaper from 1,6\d\d to/.test(note)) problems.push(`[${scheme}] economics: feasible break-even not reported (${note})`);
         await page.selectOption('#a-economics-scenario', 'baseline');
       }
       if (view === 'classroom') {

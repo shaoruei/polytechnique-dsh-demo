@@ -121,3 +121,4 @@ Pages 3–5 compare measured Public with one scenario-modelled 2× B200 replica 
 - No element id is duplicated.
 
 A duplicate-id bug found by these checks (shared controls on pages 3 and 4) was fixed. Screenshots of all five pages at 1366 px wide, light and dark, are in `docs/screenshots/`. Firefox: not run in this session (Mozilla hosts blocked); run `firefox dashboard/dist/index.html` on the VM.
+- Cost curves now model one month of class usage: tasks per student and billed dedicated hours are inputs. Break-even students = replica-hour × billed hours ÷ (tasks × measured cost per task). One replica's limit = scenario tasks/h × billed hours ÷ tasks. Dedicated is reported as cheaper only between the two.

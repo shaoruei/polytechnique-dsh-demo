@@ -258,3 +258,4 @@ details > summary { cursor: pointer; font-weight: 600; }
 .tile .value small .dot:first-child { margin-left: 0; }
 .tile .value small { display: block; margin: 0.2rem 0 0; font-family: var(--font-body); }
 .takeaways li.minor b { font-size: 1.2rem; }
+.stack { display: grid; gap: 1rem; align-content: start; }
