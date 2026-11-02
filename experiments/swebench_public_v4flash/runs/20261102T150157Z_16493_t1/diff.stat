@@ -1,0 +1,3 @@
+ django/db/models/fields/files.py |  2 +-
+ tests/file_storage/tests.py      | 10 ++++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)

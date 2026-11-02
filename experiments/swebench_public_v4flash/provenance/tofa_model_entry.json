@@ -1,0 +1,52 @@
+{
+ "retrieved_at": "2026-11-02T14:46:40+00:00",
+ "source": "GET https://api.tokenfactory.nebius.com/v1/models?verbose=true (public endpoint; key injected by proxy, not stored)",
+ "entry": {
+  "id": "deepseek-ai/DeepSeek-V4-Flash-0731",
+  "name": "DeepSeek-V4-Flash-0731",
+  "created": 1786581299,
+  "description": "DeepSeek V4 Flash 0731 is a 1M-context reasoning model designed for coding and agentic workloads.",
+  "context_length": 1048576,
+  "architecture": {
+   "modality": "text->text",
+   "tokenizer": "Other"
+  },
+  "quantization": "fp8",
+  "pricing": {
+   "prompt": "0.00000014",
+   "input_cache_read": "0.00000001",
+   "completion": "0.00000028",
+   "image": "0",
+   "price_per_video_second": "0",
+   "request": "0",
+   "price_per_minute": "0"
+  },
+  "per_request_limits": {
+   "tokens_per_minute": 2000000.0,
+   "requests_per_minute": 1000.0,
+   "burst_ratio": 1.0
+  },
+  "object": "model",
+  "owned_by": "system",
+  "regions": [
+   {
+    "country_code": "US",
+    "name": "us-central1"
+   }
+  ],
+  "supported_features": [
+   "tools",
+   "json_mode",
+   "structured_outputs",
+   "reasoning"
+  ],
+  "supported_sampling_parameters": [
+   "temperature",
+   "top_p",
+   "top_k",
+   "repetition_penalty",
+   "frequency_penalty",
+   "presence_penalty"
+  ]
+ }
+}

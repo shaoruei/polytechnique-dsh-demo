@@ -1,0 +1,14 @@
+{"at": "2026-11-02T15:14:37+00:00", "ttft_s": 1.074, "latency_s": 2.14, "output_tokens": 287, "decode_tps": 273.2, "error": null}
+{"at": "2026-11-02T15:15:37+00:00", "ttft_s": 1.189, "latency_s": 2.313, "output_tokens": 287, "decode_tps": 257.7, "error": null}
+{"at": "2026-11-02T15:16:37+00:00", "ttft_s": 1.095, "latency_s": 3.405, "output_tokens": 287, "decode_tps": 124.8, "error": null}
+{"at": "2026-11-02T15:17:37+00:00", "ttft_s": 0.479, "latency_s": 1.829, "output_tokens": 287, "decode_tps": 215.0, "error": null}
+{"at": "2026-11-02T15:18:37+00:00", "ttft_s": 1.038, "latency_s": 2.393, "output_tokens": 293, "decode_tps": 218.1, "error": null}
+{"at": "2026-11-02T15:19:37+00:00", "ttft_s": 1.177, "latency_s": 2.033, "output_tokens": 287, "decode_tps": 334.6, "error": null}
+{"at": "2026-11-02T15:20:37+00:00", "ttft_s": 0.885, "latency_s": 4.144, "output_tokens": 287, "decode_tps": 87.8, "error": null}
+{"at": "2026-11-02T15:21:37+00:00", "ttft_s": 1.009, "latency_s": 4.172, "output_tokens": 300, "decode_tps": 94.6, "error": null}
+{"at": "2026-11-02T15:22:37+00:00", "ttft_s": 0.709, "latency_s": 1.495, "output_tokens": 287, "decode_tps": 365.5, "error": null}
+{"at": "2026-11-02T15:23:37+00:00", "ttft_s": 1.116, "latency_s": 2.978, "output_tokens": 287, "decode_tps": 153.6, "error": null}
+{"at": "2026-11-02T15:24:37+00:00", "ttft_s": 1.004, "latency_s": 3.374, "output_tokens": 300, "decode_tps": 126.5, "error": null}
+{"at": "2026-11-02T15:25:37+00:00", "ttft_s": 1.232, "latency_s": 2.11, "output_tokens": 293, "decode_tps": 339.0, "error": null}
+{"at": "2026-11-02T15:26:37+00:00", "ttft_s": 1.02, "latency_s": 1.969, "output_tokens": 287, "decode_tps": 307.1, "error": null}
+{"at": "2026-11-02T15:27:37+00:00", "ttft_s": 0.971, "latency_s": 1.739, "output_tokens": 287, "decode_tps": 379.8, "error": null}

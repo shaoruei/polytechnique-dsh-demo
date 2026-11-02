@@ -1,0 +1,33 @@
+{
+ "run_id": "20261102T152536Z_16661_t3",
+ "instance_id": "django__django-16661",
+ "alias": "task-c",
+ "trial": 3,
+ "started_at": "2026-11-02T15:25:46Z",
+ "endpoint": "public",
+ "base_url": "https://api.tokenfactory.nebius.com/v1",
+ "relay": false,
+ "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+ "reasoning_effort": "high",
+ "harness": "dsh web (stock) 0.2.1-rc.5",
+ "ui_elapsed_s": 91,
+ "turn_end_reason": [
+  "completed"
+ ],
+ "patch_bytes": 2087,
+ "official": {
+  "resolved": true,
+  "applied": true,
+  "FAIL_TO_PASS": {
+   "success": 1,
+   "failure": 0
+  },
+  "PASS_TO_PASS": {
+   "success": 36,
+   "failure": 0
+  }
+ },
+ "success": true,
+ "integrity_verdict": "CLEAN",
+ "integrity_flags": []
+}

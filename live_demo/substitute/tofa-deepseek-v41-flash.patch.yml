@@ -1,0 +1,38 @@
+# SUBSTITUTE-REHEARSAL ONLY. Not used in the live session.
+#
+# Adds ONE extra provider to the stock DSH Web profile so the same model release the
+# Web UI selects by default (DeepSeek-V4.1-Flash, release 1017) can be reached through
+# Nebius Token Factory when api.deepseek.com is unreachable (as in the cloud prep
+# sandbox). Everything else in the stock profile is untouched. This overlay talks to
+# Token Factory DIRECTLY: there is no relay (harness/tofa_relay.py is not involved).
+#
+# Live session: launch `dsh web` WITHOUT this file and use the native deepseek-official
+# provider with DEEPSEEK_API_KEY (see docs/LIVE_DEMO.md).
+- id: llm-pi-ai
+  config:
+    providers:
+      tofa:
+        displayName: Nebius Token Factory (substitute)
+        apiKeyEnv: TOFA_API_KEY
+        api: openai-completions
+        baseURL: https://api.tokenfactory.nebius.com/v1
+        compat:
+          supportsDeveloperRole: false
+          supportsStore: false
+          supportsUsageInStreaming: true
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+        models:
+          - id: deepseek-ai/DeepSeek-V4.1-Flash-1017
+            name: DeepSeek-V4.1-Flash-1017 (Token Factory)
+            contextWindow: 1048576
+            maxTokens: 65536
+            reasoningEfforts:
+              low: low
+              medium: medium
+              high: high
+- id: agent-default-model
+  config:
+    provider: tofa
+    model: deepseek-ai/DeepSeek-V4.1-Flash-1017
+    reasoningEffort: high

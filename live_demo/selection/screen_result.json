@@ -1,0 +1,3536 @@
+{
+ "salt": "ecole-polytechnique-dsh-live-demo-2026-11-03",
+ "pins": {
+  "cube": [
+   "The-AI-Alliance/cube-harness",
+   "990f6e3d2e9e9deafbfc392ec2dfc8871a43e9a1",
+   "cubes/swebench-verified-cube/src/swebench_verified_cube/task_metadata.json"
+  ],
+  "mini": [
+   "mariushobbhahn/SWEBench-verified-mini",
+   "1ce432065d9ed226017ef1ac88b5f91818383c64",
+   "data/merged_df_with_difficulties.csv"
+  ],
+  "rows": [
+   "MoracodeAI/SWE-bench-submission",
+   "68e8836c655e55ac041a1dfc38d787e1e5f1af67",
+   null
+  ]
+ },
+ "counts": {
+  "F1 version<4.0": 113,
+  "S3 statement": 30,
+  "F2 difficulty": 57,
+  "KEEP": 26,
+  "no-row": 1,
+  "S2 F2P count": 2,
+  "S1 patch size": 2
+ },
+ "ordered_survivors": [
+  "django__django-16136",
+  "django__django-16950",
+  "django__django-16493",
+  "django__django-16661",
+  "django__django-15916",
+  "django__django-14140",
+  "django__django-15695",
+  "django__django-13964",
+  "django__django-16315",
+  "django__django-15382",
+  "django__django-14170",
+  "django__django-16667",
+  "django__django-16454",
+  "django__django-15563",
+  "django__django-15375",
+  "django__django-14349",
+  "django__django-16032",
+  "django__django-14017",
+  "django__django-14034",
+  "django__django-16901",
+  "django__django-17084",
+  "django__django-15022",
+  "django__django-15252",
+  "django__django-15731",
+  "django__django-16662",
+  "django__django-15278"
+ ],
+ "stages": [
+  {
+   "id": "django__django-10097",
+   "version": "2.2",
+   "difficulty": "<15 min fix",
+   "key": "ea3911bf5f58",
+   "files": [
+    "django/core/validators.py"
+   ],
+   "changed": 2,
+   "f2p": 438,
+   "ps_len": 2656,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-10554",
+   "version": "3.0",
+   "difficulty": "1-4 hours",
+   "key": "ec27ca3948d8",
+   "files": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 11,
+   "f2p": 2,
+   "ps_len": 2909,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-10880",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "d037d1719727",
+   "files": [
+    "django/db/models/aggregates.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 278,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-10914",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "969e17cb1d15",
+   "files": [
+    "django/conf/global_settings.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1021,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-10973",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "7994170b1dd7",
+   "files": [
+    "django/db/backends/postgresql/client.py"
+   ],
+   "changed": 37,
+   "f2p": 5,
+   "ps_len": 357,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-10999",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "c83cb0bde3a4",
+   "files": [
+    "django/utils/dateparse.py"
+   ],
+   "changed": 7,
+   "f2p": 2,
+   "ps_len": 616,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11066",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "d86527329679",
+   "files": [
+    "django/contrib/contenttypes/management/__init__.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1867,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11087",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "72ee5a934e88",
+   "files": [
+    "django/db/models/deletion.py"
+   ],
+   "changed": 30,
+   "f2p": 1,
+   "ps_len": 9252,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11095",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "b44443c499b6",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 381,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11099",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "8feb8a0e8273",
+   "files": [
+    "django/contrib/auth/validators.py"
+   ],
+   "changed": 4,
+   "f2p": 3,
+   "ps_len": 764,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11119",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "94b17757db5f",
+   "files": [
+    "django/template/engine.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 369,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11133",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "18a95ffe9a9c",
+   "files": [
+    "django/http/response.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 895,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11138",
+   "version": "3.0",
+   "difficulty": "1-4 hours",
+   "key": "2c724f18defc",
+   "files": [
+    "django/db/backends/mysql/operations.py",
+    "django/db/backends/oracle/operations.py",
+    "django/db/backends/sqlite3/base.py",
+    "django/db/backends/sqlite3/operations.py"
+   ],
+   "changed": 69,
+   "f2p": 1,
+   "ps_len": 3135,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11141",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "55ee43ae36eb",
+   "files": [
+    "django/db/migrations/loader.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 829,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11149",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "057315bb6e63",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 56,
+   "f2p": 2,
+   "ps_len": 783,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11163",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "aa71ce2af643",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 408,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11179",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "36e06eea31c5",
+   "files": [
+    "django/db/models/deletion.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 283,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11206",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "b3371e01f1a0",
+   "files": [
+    "django/utils/numberformat.py"
+   ],
+   "changed": 8,
+   "f2p": 2,
+   "ps_len": 698,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11211",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "b9ddfe040351",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 959,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11239",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "a8a708f2ae2b",
+   "files": [
+    "django/db/backends/postgresql/client.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 1056,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11265",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "476db3a9f894",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 3810,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11276",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "161ed034ebc9",
+   "files": [
+    "django/utils/html.py"
+   ],
+   "changed": 26,
+   "f2p": 26,
+   "ps_len": 1120,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11292",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "1a3fdd5bba37",
+   "files": [
+    "django/core/management/base.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 401,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11299",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "cf540bcf2735",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 3040,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11333",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "64b5ad1994b7",
+   "files": [
+    "django/urls/base.py",
+    "django/urls/resolvers.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 1493,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11400",
+   "version": "3.0",
+   "difficulty": "1-4 hours",
+   "key": "aa0a24f78fe2",
+   "files": [
+    "django/contrib/admin/filters.py",
+    "django/db/models/fields/__init__.py",
+    "django/db/models/fields/reverse_related.py"
+   ],
+   "changed": 26,
+   "f2p": 6,
+   "ps_len": 799,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11433",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "69bcae4400c3",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 586,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11451",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "3a17730e24bc",
+   "files": [
+    "django/contrib/auth/backends.py"
+   ],
+   "changed": 2,
+   "f2p": 6,
+   "ps_len": 2067,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11477",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "fe9b431a6c43",
+   "files": [
+    "django/urls/resolvers.py"
+   ],
+   "changed": 2,
+   "f2p": 3,
+   "ps_len": 225,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11490",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "c92a11a41b0c",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 457,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11532",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "3e9bc0d2e4e2",
+   "files": [
+    "django/core/mail/message.py",
+    "django/core/mail/utils.py",
+    "django/core/validators.py",
+    "django/utils/encoding.py",
+    "django/utils/html.py"
+   ],
+   "changed": 26,
+   "f2p": 1,
+   "ps_len": 2666,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11551",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "93d2ed4e065a",
+   "files": [
+    "django/contrib/admin/checks.py"
+   ],
+   "changed": 42,
+   "f2p": 1,
+   "ps_len": 5413,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11555",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "a7de27d6a83c",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 748,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11603",
+   "version": "3.0",
+   "difficulty": "<15 min fix",
+   "key": "b7c20b4c1086",
+   "files": [
+    "django/db/models/aggregates.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 396,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11728",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "8c73de532fd3",
+   "files": [
+    "django/contrib/admindocs/utils.py"
+   ],
+   "changed": 22,
+   "f2p": 2,
+   "ps_len": 499,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11734",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "45c8d69070a5",
+   "files": [
+    "django/db/models/fields/__init__.py",
+    "django/db/models/fields/related_lookups.py",
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 832,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11740",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "3a26e566938a",
+   "files": [
+    "django/db/migrations/autodetector.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 1973,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11749",
+   "version": "3.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "52ba7db1f8ce",
+   "files": [
+    "django/core/management/__init__.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 1249,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11790",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "88f5520c1170",
+   "files": [
+    "django/contrib/auth/forms.py"
+   ],
+   "changed": 4,
+   "f2p": 2,
+   "ps_len": 465,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11815",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "eb3dc74b8ccc",
+   "files": [
+    "django/db/migrations/serializer.py"
+   ],
+   "changed": 7,
+   "f2p": 2,
+   "ps_len": 1601,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11820",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "f4d0facaf2ed",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 8,
+   "f2p": 2,
+   "ps_len": 343,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11848",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "0cd28836bf3c",
+   "files": [
+    "django/utils/http.py"
+   ],
+   "changed": 10,
+   "f2p": 2,
+   "ps_len": 626,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11880",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "847a12f382e9",
+   "files": [
+    "django/forms/fields.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 1078,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11885",
+   "version": "3.1",
+   "difficulty": "1-4 hours",
+   "key": "fd2506fd7ddb",
+   "files": [
+    "django/contrib/admin/utils.py",
+    "django/db/models/deletion.py"
+   ],
+   "changed": 130,
+   "f2p": 1,
+   "ps_len": 1296,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11951",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "c4a250c51d65",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 609,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11964",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "895f00991679",
+   "files": [
+    "django/db/models/enums.py"
+   ],
+   "changed": 8,
+   "f2p": 2,
+   "ps_len": 2353,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-11999",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "40478d5f9b4f",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 8,
+   "f2p": 1,
+   "ps_len": 512,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12039",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "3704c7369b8f",
+   "files": [
+    "django/db/backends/ddl_references.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 1245,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12050",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "b0762984db69",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 19,
+   "f2p": 1,
+   "ps_len": 347,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12125",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "836fd3b7dd2d",
+   "files": [
+    "django/db/migrations/serializer.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 1589,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12143",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "90a4900877ed",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1437,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12155",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "832ba87b9d11",
+   "files": [
+    "django/contrib/admindocs/utils.py",
+    "django/contrib/admindocs/views.py"
+   ],
+   "changed": 23,
+   "f2p": 1,
+   "ps_len": 777,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12193",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "7bf883686a6a",
+   "files": [
+    "django/forms/widgets.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 773,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12209",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "833ae6b2decc",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 1200,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12262",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "550c7a464db3",
+   "files": [
+    "django/template/library.py"
+   ],
+   "changed": 2,
+   "f2p": 4,
+   "ps_len": 1030,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12273",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "8c216f371e24",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 3,
+   "f2p": 2,
+   "ps_len": 926,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12276",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "6992fc8656e9",
+   "files": [
+    "django/forms/widgets.py"
+   ],
+   "changed": 6,
+   "f2p": 2,
+   "ps_len": 604,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12304",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "b02285b99a1f",
+   "files": [
+    "django/db/models/enums.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 580,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12308",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "bf9bb75f5651",
+   "files": [
+    "django/contrib/admin/utils.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 459,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12325",
+   "version": "3.1",
+   "difficulty": "1-4 hours",
+   "key": "8d2550f58b0d",
+   "files": [
+    "django/db/models/base.py",
+    "django/db/models/options.py"
+   ],
+   "changed": 8,
+   "f2p": 2,
+   "ps_len": 900,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12406",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "b1ef312d955c",
+   "files": [
+    "django/db/models/fields/related.py",
+    "django/forms/models.py"
+   ],
+   "changed": 17,
+   "f2p": 3,
+   "ps_len": 1066,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12419",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "bad80185324d",
+   "files": [
+    "django/conf/global_settings.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 680,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12663",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "295a04e36002",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 2854,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12708",
+   "version": "3.1",
+   "difficulty": "1-4 hours",
+   "key": "426a337a9fc3",
+   "files": [
+    "django/db/backends/base/schema.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 959,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12713",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "ecea90230e3e",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 30,
+   "f2p": 1,
+   "ps_len": 257,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12741",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "2ef3b08a5cb8",
+   "files": [
+    "django/core/management/commands/flush.py",
+    "django/db/backends/base/operations.py"
+   ],
+   "changed": 9,
+   "f2p": 2,
+   "ps_len": 398,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12754",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "18e1d34ecc05",
+   "files": [
+    "django/db/migrations/autodetector.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 860,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12774",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "31fc9d17a164",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 1094,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12858",
+   "version": "3.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "79871bfd33e5",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 794,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-12965",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "44f131a15891",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 2275,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13012",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "17d8e184499b",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 3,
+   "f2p": 2,
+   "ps_len": 1414,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13023",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "4057799befd4",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 522,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13028",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "40a2322bf863",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 2839,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13033",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "0fcf25aa71f8",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 3732,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13089",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "d4c9d42f0a15",
+   "files": [
+    "django/core/cache/backends/db.py"
+   ],
+   "changed": 9,
+   "f2p": 2,
+   "ps_len": 1578,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13109",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "8be43590b393",
+   "files": [
+    "django/db/models/fields/related.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 1922,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13112",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "d3ac27f9459b",
+   "files": [
+    "django/db/models/fields/related.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 1944,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13121",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "4bdeed38542b",
+   "files": [
+    "django/db/backends/base/operations.py",
+    "django/db/backends/mysql/operations.py",
+    "django/db/backends/sqlite3/operations.py",
+    "django/db/models/expressions.py"
+   ],
+   "changed": 70,
+   "f2p": 1,
+   "ps_len": 1189,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13128",
+   "version": "3.2",
+   "difficulty": "1-4 hours",
+   "key": "55c107afcfae",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 43,
+   "f2p": 7,
+   "ps_len": 422,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13158",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "c93e14477b9e",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 1176,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13195",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "bfc545f37c50",
+   "files": [
+    "django/contrib/messages/storage/cookie.py",
+    "django/contrib/sessions/middleware.py",
+    "django/http/response.py"
+   ],
+   "changed": 22,
+   "f2p": 5,
+   "ps_len": 2402,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13212",
+   "version": "3.2",
+   "difficulty": "1-4 hours",
+   "key": "294e1124651c",
+   "files": [
+    "django/core/validators.py",
+    "django/forms/fields.py"
+   ],
+   "changed": 44,
+   "f2p": 5,
+   "ps_len": 468,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13279",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "0e261f9fe37e",
+   "files": [
+    "django/contrib/sessions/backends/base.py"
+   ],
+   "changed": 9,
+   "f2p": 9,
+   "ps_len": 432,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13297",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "a0d7082a4374",
+   "files": [
+    "django/views/generic/base.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 1384,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13315",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "14875963d1ef",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 285,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13343",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "a676da7bbd4d",
+   "files": [
+    "django/db/models/fields/files.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1260,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13344",
+   "version": "3.2",
+   "difficulty": "1-4 hours",
+   "key": "02a8fce6ad20",
+   "files": [
+    "django/contrib/sessions/middleware.py",
+    "django/middleware/cache.py",
+    "django/middleware/security.py"
+   ],
+   "changed": 32,
+   "f2p": 2,
+   "ps_len": 1361,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13346",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "085860b8fb0f",
+   "files": [
+    "django/db/models/fields/json.py"
+   ],
+   "changed": 25,
+   "f2p": 2,
+   "ps_len": 620,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13363",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "4a130b0fd554",
+   "files": [
+    "django/db/models/functions/datetime.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1676,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13401",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "226a95f02d9f",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 26,
+   "f2p": 1,
+   "ps_len": 1234,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13406",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "3ae39f6bf9f6",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 2,
+   "f2p": 3,
+   "ps_len": 3084,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13410",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "b3b8a0e8b7ea",
+   "files": [
+    "django/core/files/locks.py"
+   ],
+   "changed": 11,
+   "f2p": 2,
+   "ps_len": 1242,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13417",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "f510603290a1",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 7,
+   "f2p": 2,
+   "ps_len": 940,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13449",
+   "version": "3.2",
+   "difficulty": "1-4 hours",
+   "key": "3add790f5328",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 6278,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13512",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "37be96efcb98",
+   "files": [
+    "django/contrib/admin/utils.py",
+    "django/forms/fields.py"
+   ],
+   "changed": 5,
+   "f2p": 3,
+   "ps_len": 462,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13513",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "14f15a407aee",
+   "files": [
+    "django/views/debug.py"
+   ],
+   "changed": 44,
+   "f2p": 1,
+   "ps_len": 1158,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13516",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "bd2fbc318f10",
+   "files": [
+    "django/core/management/base.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 619,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13551",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "55052bd4dada",
+   "files": [
+    "django/contrib/auth/tokens.py"
+   ],
+   "changed": 10,
+   "f2p": 2,
+   "ps_len": 603,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13568",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "f73954b1093d",
+   "files": [
+    "django/contrib/auth/checks.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 765,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13569",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "1917504312a9",
+   "files": [
+    "django/db/models/functions/math.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 1983,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13590",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "df0276c60c85",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 859,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13658",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "b1e4b321b948",
+   "files": [
+    "django/core/management/__init__.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 1237,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13670",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "ab1505a16cb7",
+   "files": [
+    "django/utils/dateformat.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 767,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13741",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "1b25397f8f35",
+   "files": [
+    "django/contrib/auth/forms.py"
+   ],
+   "changed": 15,
+   "f2p": 1,
+   "ps_len": 1020,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13786",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "d736762d0955",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 740,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13794",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "a03402016b3c",
+   "files": [
+    "django/utils/functional.py"
+   ],
+   "changed": 6,
+   "f2p": 3,
+   "ps_len": 307,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13807",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "e514cbeeb952",
+   "files": [
+    "django/db/backends/sqlite3/base.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 1501,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13809",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "91e749ef6a1d",
+   "files": [
+    "django/core/management/commands/runserver.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 457,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-13810",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "04b8c858e854",
+   "files": [
+    "django/core/handlers/base.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 2259,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13820",
+   "version": "3.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "3f7167a4a3dc",
+   "files": [
+    "django/db/migrations/loader.py"
+   ],
+   "changed": 14,
+   "f2p": 1,
+   "ps_len": 2102,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13821",
+   "version": "3.2",
+   "difficulty": "<15 min fix",
+   "key": "c0cddae27dad",
+   "files": [
+    "django/db/backends/sqlite3/base.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 538,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13837",
+   "version": "3.2",
+   "difficulty": "1-4 hours",
+   "key": "c67c54d42ba4",
+   "files": [
+    "django/utils/autoreload.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 1643,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-13925",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "ddd5dfb3aecc",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 4086,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-13933",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "3df66db28855",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 1207,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-13964",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "4e731bc7f334",
+   "files": [
+    "django/db/models/base.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1870,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14007",
+   "version": "4.0",
+   "difficulty": "1-4 hours",
+   "key": "70f2c544dd42",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 21,
+   "f2p": 1,
+   "ps_len": 1214,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14011",
+   "version": "4.0",
+   "difficulty": "1-4 hours",
+   "key": "6494377e87a9",
+   "drop": "no-row"
+  },
+  {
+   "id": "django__django-14017",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "c0f3ef3d2b43",
+   "files": [
+    "django/db/models/query_utils.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 1269,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14034",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "c80cfe582057",
+   "files": [
+    "django/forms/boundfield.py"
+   ],
+   "changed": 14,
+   "f2p": 1,
+   "ps_len": 1131,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14053",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "472beb692782",
+   "files": [
+    "django/contrib/staticfiles/storage.py"
+   ],
+   "changed": 19,
+   "f2p": 1,
+   "ps_len": 3108,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14089",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "3aec79a8090f",
+   "files": [
+    "django/utils/datastructures.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 318,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14122",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "72ccecca076a",
+   "files": [
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 463,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14140",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "410a4daa5fc9",
+   "files": [
+    "django/db/models/query_utils.py"
+   ],
+   "changed": 12,
+   "f2p": 4,
+   "ps_len": 1152,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14155",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "4058435be615",
+   "files": [
+    "django/urls/resolvers.py"
+   ],
+   "changed": 13,
+   "f2p": 3,
+   "ps_len": 553,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14170",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "7b61b11064e9",
+   "files": [
+    "django/db/backends/base/operations.py",
+    "django/db/models/lookups.py"
+   ],
+   "changed": 38,
+   "f2p": 2,
+   "ps_len": 1739,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14238",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "0318c7a795b5",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 2590,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14311",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "f09aafbd7807",
+   "files": [
+    "django/utils/autoreload.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 605,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14315",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "d12c3cbd2418",
+   "files": [
+    "django/db/backends/base/client.py",
+    "django/db/backends/postgresql/client.py"
+   ],
+   "changed": 5,
+   "f2p": 11,
+   "ps_len": 489,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14349",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "a62af58f3406",
+   "files": [
+    "django/core/validators.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 2383,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-14351",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "4d5ce521d6ba",
+   "files": [
+    "django/db/models/lookups.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 8541,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14373",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "2d8d2a145ec2",
+   "files": [
+    "django/utils/dateformat.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 220,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14376",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "3937f28aa9dc",
+   "files": [
+    "django/db/backends/mysql/base.py",
+    "django/db/backends/mysql/client.py"
+   ],
+   "changed": 13,
+   "f2p": 3,
+   "ps_len": 782,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14404",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "f0cb238c5725",
+   "files": [
+    "django/contrib/admin/sites.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 304,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14434",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "3aa9012bd747",
+   "files": [
+    "django/db/backends/base/schema.py"
+   ],
+   "changed": 8,
+   "f2p": 1,
+   "ps_len": 190,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14493",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "3b6d650b21cb",
+   "files": [
+    "django/contrib/staticfiles/storage.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 1456,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14500",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "39f9c5add236",
+   "files": [
+    "django/db/migrations/executor.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 292,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14534",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "a9013965a308",
+   "files": [
+    "django/forms/boundfield.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 1640,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14539",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "f779a029e384",
+   "files": [
+    "django/utils/html.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 353,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14559",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "ba03cdadf40b",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 6,
+   "f2p": 3,
+   "ps_len": 476,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14580",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "87dda970fb11",
+   "files": [
+    "django/db/migrations/serializer.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1576,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14608",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "fb13bffed495",
+   "files": [
+    "django/forms/formsets.py"
+   ],
+   "changed": 7,
+   "f2p": 4,
+   "ps_len": 605,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14631",
+   "version": "4.0",
+   "difficulty": "1-4 hours",
+   "key": "aa58aa395317",
+   "files": [
+    "django/forms/boundfield.py",
+    "django/forms/forms.py"
+   ],
+   "changed": 65,
+   "f2p": 2,
+   "ps_len": 1399,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14672",
+   "version": "4.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "7344d953548f",
+   "files": [
+    "django/db/models/fields/reverse_related.py"
+   ],
+   "changed": 2,
+   "f2p": 168,
+   "ps_len": 6760,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S2 F2P count"
+  },
+  {
+   "id": "django__django-14725",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "2e2742e5ef2a",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 13,
+   "f2p": 3,
+   "ps_len": 378,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14752",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "5bc2351c5370",
+   "files": [
+    "django/contrib/admin/views/autocomplete.py"
+   ],
+   "changed": 12,
+   "f2p": 1,
+   "ps_len": 2847,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14765",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "942a9ac4625a",
+   "files": [
+    "django/db/migrations/state.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 558,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14771",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "82ef883014f3",
+   "files": [
+    "django/utils/autoreload.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 994,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-14787",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "44c702b93594",
+   "files": [
+    "django/utils/decorators.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 745,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14792",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "d73469992d1f",
+   "files": [
+    "django/utils/timezone.py"
+   ],
+   "changed": 7,
+   "f2p": 2,
+   "ps_len": 1514,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14855",
+   "version": "4.0",
+   "difficulty": "<15 min fix",
+   "key": "220572e4fa84",
+   "files": [
+    "django/contrib/admin/helpers.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 1011,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14915",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "f321b7064370",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 1007,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-14999",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "acc77f3a731a",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 262,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15022",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "eedcecd61797",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 4,
+   "f2p": 3,
+   "ps_len": 1224,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15037",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "0dba8dce2dcc",
+   "files": [
+    "django/core/management/commands/inspectdb.py"
+   ],
+   "changed": 8,
+   "f2p": 1,
+   "ps_len": 502,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15098",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "3451bd899d0e",
+   "files": [
+    "django/utils/translation/trans_real.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 2598,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15103",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "1c4143e6906d",
+   "files": [
+    "django/template/defaultfilters.py",
+    "django/utils/html.py"
+   ],
+   "changed": 17,
+   "f2p": 2,
+   "ps_len": 378,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15104",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "d2280c8cd998",
+   "files": [
+    "django/db/migrations/autodetector.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 4594,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15127",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "4788b70f738f",
+   "files": [
+    "django/contrib/messages/apps.py"
+   ],
+   "changed": 11,
+   "f2p": 1,
+   "ps_len": 306,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15128",
+   "version": "4.1",
+   "difficulty": "1-4 hours",
+   "key": "5920b8b6de5b",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 28,
+   "f2p": 1,
+   "ps_len": 2662,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15161",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "b3a78990553a",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 6,
+   "f2p": 3,
+   "ps_len": 504,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15252",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "fd5a8c5bc991",
+   "files": [
+    "django/db/migrations/executor.py"
+   ],
+   "changed": 8,
+   "f2p": 2,
+   "ps_len": 1681,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15268",
+   "version": "4.1",
+   "difficulty": "1-4 hours",
+   "key": "72cb11d04c39",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 13,
+   "f2p": 3,
+   "ps_len": 1305,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15277",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "4452f5a58a69",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 3,
+   "f2p": 2,
+   "ps_len": 2748,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15278",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "ffbc05579920",
+   "files": [
+    "django/db/backends/sqlite3/schema.py"
+   ],
+   "changed": 13,
+   "f2p": 1,
+   "ps_len": 1222,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15280",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "af7519411722",
+   "files": [
+    "django/db/models/fields/related_descriptors.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 2509,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15315",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "deedb8bb414c",
+   "files": [
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 793,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15368",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "f3d77e2918bb",
+   "files": [
+    "django/db/models/query.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1180,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15375",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "9c7a45691045",
+   "files": [
+    "django/db/models/aggregates.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1613,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15380",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "36b803352376",
+   "files": [
+    "django/db/migrations/autodetector.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1608,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15382",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "58c477bc8ab0",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 19,
+   "f2p": 1,
+   "ps_len": 407,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15467",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "96ec0e622a16",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 727,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15499",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "47b28eff240c",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 13,
+   "f2p": 1,
+   "ps_len": 263,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15503",
+   "version": "4.1",
+   "difficulty": "1-4 hours",
+   "key": "b344f712d5d4",
+   "files": [
+    "django/db/models/fields/json.py"
+   ],
+   "changed": 26,
+   "f2p": 2,
+   "ps_len": 1797,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15525",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "a7659b9791c4",
+   "files": [
+    "django/core/serializers/base.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 4379,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15554",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "cee55eed4c20",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 47,
+   "f2p": 1,
+   "ps_len": 1278,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S1 patch size"
+  },
+  {
+   "id": "django__django-15561",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "4c61e55b13f2",
+   "files": [
+    "django/db/backends/base/schema.py",
+    "django/db/models/fields/__init__.py"
+   ],
+   "changed": 35,
+   "f2p": 1,
+   "ps_len": 359,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15563",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "8c5045da4511",
+   "files": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/sql/subqueries.py"
+   ],
+   "changed": 25,
+   "f2p": 2,
+   "ps_len": 1727,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15569",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "837aa4cc61bf",
+   "files": [
+    "django/db/models/query_utils.py"
+   ],
+   "changed": 1,
+   "f2p": 2,
+   "ps_len": 640,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15572",
+   "version": "4.1",
+   "difficulty": "<15 min fix",
+   "key": "25e1588a567b",
+   "files": [
+    "django/template/autoreload.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1388,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15629",
+   "version": "4.1",
+   "difficulty": "1-4 hours",
+   "key": "c64aebdc4956",
+   "files": [
+    "django/db/backends/base/schema.py",
+    "django/db/backends/oracle/features.py",
+    "django/db/backends/sqlite3/schema.py",
+    "django/db/models/fields/related.py"
+   ],
+   "changed": 42,
+   "f2p": 2,
+   "ps_len": 2395,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15695",
+   "version": "4.1",
+   "difficulty": "15 min - 1 hour",
+   "key": "451578f86881",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 3,
+   "f2p": 1,
+   "ps_len": 1259,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15731",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "fed30a92dbe5",
+   "files": [
+    "django/db/models/manager.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1179,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15732",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "385606178f96",
+   "files": [
+    "django/db/backends/base/schema.py"
+   ],
+   "changed": 32,
+   "f2p": 1,
+   "ps_len": 599,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15741",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "2dee18af222b",
+   "files": [
+    "django/utils/formats.py"
+   ],
+   "changed": 1,
+   "f2p": 2,
+   "ps_len": 365,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15814",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "2ef172ee3359",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 2646,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15851",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "9fb8b8c6b931",
+   "files": [
+    "django/db/backends/postgresql/client.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 632,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15863",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "1db9d93589f1",
+   "files": [
+    "django/template/defaultfilters.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 838,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15916",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "37332d54af8d",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 13,
+   "f2p": 2,
+   "ps_len": 1744,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-15930",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "444958d78728",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 689,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15957",
+   "version": "4.2",
+   "difficulty": "1-4 hours",
+   "key": "aad84566e2ff",
+   "files": [
+    "django/db/models/fields/related_descriptors.py"
+   ],
+   "changed": 33,
+   "f2p": 4,
+   "ps_len": 854,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-15973",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "5f6a7a2ad574",
+   "files": [
+    "django/db/migrations/autodetector.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 5339,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-15987",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "408d6b5c8fc1",
+   "files": [
+    "django/core/management/commands/loaddata.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 176,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16032",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "a8f77026b007",
+   "files": [
+    "django/db/models/fields/related_lookups.py",
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 11,
+   "f2p": 2,
+   "ps_len": 778,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16082",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "00fcc479bbd0",
+   "files": [
+    "django/db/models/expressions.py"
+   ],
+   "changed": 1,
+   "f2p": 2,
+   "ps_len": 308,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16100",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "d26ee270c70b",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 20,
+   "f2p": 1,
+   "ps_len": 281,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16116",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "45c46f703f8c",
+   "files": [
+    "django/core/management/commands/makemigrations.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 758,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16136",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "075ced00b864",
+   "files": [
+    "django/views/generic/base.py"
+   ],
+   "changed": 11,
+   "f2p": 2,
+   "ps_len": 2087,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16139",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "b5fb1a5c3d8e",
+   "files": [
+    "django/contrib/auth/forms.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 1413,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16145",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "ba9f0b907ca2",
+   "files": [
+    "django/core/management/commands/runserver.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 589,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16255",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "761e4aa29187",
+   "files": [
+    "django/contrib/sitemaps/__init__.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1566,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16256",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "a62efb6c340a",
+   "files": [
+    "django/contrib/contenttypes/fields.py",
+    "django/db/models/fields/related_descriptors.py"
+   ],
+   "changed": 55,
+   "f2p": 9,
+   "ps_len": 2110,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S1 patch size"
+  },
+  {
+   "id": "django__django-16263",
+   "version": "4.2",
+   "difficulty": "1-4 hours",
+   "key": "71fd9ae7edc9",
+   "files": [
+    "django/db/models/expressions.py",
+    "django/db/models/query_utils.py",
+    "django/db/models/sql/query.py",
+    "django/db/models/sql/where.py"
+   ],
+   "changed": 93,
+   "f2p": 3,
+   "ps_len": 656,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16315",
+   "version": "4.2",
+   "difficulty": "15 min - 1 hour",
+   "key": "539aefac707b",
+   "files": [
+    "django/db/models/query.py",
+    "django/db/models/sql/compiler.py"
+   ],
+   "changed": 13,
+   "f2p": 1,
+   "ps_len": 1298,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16333",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "3ac61e38e434",
+   "files": [
+    "django/contrib/auth/forms.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 557,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16429",
+   "version": "4.2",
+   "difficulty": "<15 min fix",
+   "key": "527e0db83884",
+   "files": [
+    "django/utils/timesince.py"
+   ],
+   "changed": 1,
+   "f2p": 4,
+   "ps_len": 964,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16454",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "84c42b72c870",
+   "files": [
+    "django/core/management/base.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 2039,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16485",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "a8fda962c12a",
+   "files": [
+    "django/template/defaultfilters.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 246,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16493",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "27934b79da48",
+   "files": [
+    "django/db/models/fields/files.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 1141,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16502",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "0afb6ae11e6b",
+   "files": [
+    "django/core/servers/basehttp.py"
+   ],
+   "changed": 27,
+   "f2p": 1,
+   "ps_len": 1676,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16527",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "f506b135b1f4",
+   "files": [
+    "django/contrib/admin/templatetags/admin_modify.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 493,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16560",
+   "version": "5.0",
+   "difficulty": "1-4 hours",
+   "key": "854d7422987f",
+   "files": [
+    "django/contrib/postgres/constraints.py",
+    "django/db/models/constraints.py"
+   ],
+   "changed": 85,
+   "f2p": 8,
+   "ps_len": 840,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16569",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "d9b3620d2db5",
+   "files": [
+    "django/forms/formsets.py"
+   ],
+   "changed": 4,
+   "f2p": 2,
+   "ps_len": 1740,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16595",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "35ec98fccdfa",
+   "files": [
+    "django/db/migrations/operations/fields.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 1540,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16612",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "8bff853bea74",
+   "files": [
+    "django/contrib/admin/sites.py"
+   ],
+   "changed": 4,
+   "f2p": 2,
+   "ps_len": 723,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16631",
+   "version": "5.0",
+   "difficulty": "1-4 hours",
+   "key": "c9e1e1a26d8a",
+   "files": [
+    "django/contrib/auth/__init__.py",
+    "django/contrib/auth/base_user.py"
+   ],
+   "changed": 33,
+   "f2p": 1,
+   "ps_len": 824,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16642",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "cf9521330212",
+   "files": [
+    "django/http/response.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 261,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16661",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "327ab63e4109",
+   "files": [
+    "django/contrib/admin/options.py"
+   ],
+   "changed": 10,
+   "f2p": 1,
+   "ps_len": 1315,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16662",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "fef2f93c76f1",
+   "files": [
+    "django/db/migrations/writer.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 740,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16667",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "833ac6e35eaf",
+   "files": [
+    "django/forms/widgets.py"
+   ],
+   "changed": 2,
+   "f2p": 2,
+   "ps_len": 1758,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16801",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "07078a7ba889",
+   "files": [
+    "django/db/models/fields/files.py"
+   ],
+   "changed": 9,
+   "f2p": 1,
+   "ps_len": 724,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16819",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "e5d4c3e2a334",
+   "files": [
+    "django/db/migrations/operations/models.py"
+   ],
+   "changed": 5,
+   "f2p": 1,
+   "ps_len": 146,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16877",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "54ed0822cc55",
+   "files": [
+    "django/template/defaultfilters.py"
+   ],
+   "changed": 10,
+   "f2p": 4,
+   "ps_len": 435,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "S3 statement"
+  },
+  {
+   "id": "django__django-16899",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "c6548c721467",
+   "files": [
+    "django/contrib/admin/checks.py"
+   ],
+   "changed": 5,
+   "f2p": 2,
+   "ps_len": 784,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-16901",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "dfcfcfece96c",
+   "files": [
+    "django/db/models/sql/where.py"
+   ],
+   "changed": 7,
+   "f2p": 1,
+   "ps_len": 1014,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-16938",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "c61409828615",
+   "files": [
+    "django/core/serializers/python.py",
+    "django/core/serializers/xml_serializer.py"
+   ],
+   "changed": 8,
+   "f2p": 23,
+   "ps_len": 4015,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "S2 F2P count"
+  },
+  {
+   "id": "django__django-16950",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "0f6712449282",
+   "files": [
+    "django/forms/models.py"
+   ],
+   "changed": 8,
+   "f2p": 1,
+   "ps_len": 1443,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-17029",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "43fc17b61751",
+   "files": [
+    "django/apps/registry.py"
+   ],
+   "changed": 1,
+   "f2p": 1,
+   "ps_len": 878,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-17084",
+   "version": "5.0",
+   "difficulty": "15 min - 1 hour",
+   "key": "ebe03ba145bf",
+   "files": [
+    "django/db/models/sql/query.py"
+   ],
+   "changed": 6,
+   "f2p": 1,
+   "ps_len": 648,
+   "has_repro": true,
+   "has_img": false
+  },
+  {
+   "id": "django__django-17087",
+   "version": "5.0",
+   "difficulty": "<15 min fix",
+   "key": "9e85cc3eba96",
+   "files": [
+    "django/db/migrations/serializer.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 1135,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F2 difficulty"
+  },
+  {
+   "id": "django__django-7530",
+   "version": "1.11",
+   "difficulty": "15 min - 1 hour",
+   "key": "aa0a620d2110",
+   "files": [
+    "django/core/management/commands/makemigrations.py"
+   ],
+   "changed": 2,
+   "f2p": 1,
+   "ps_len": 481,
+   "has_repro": false,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  },
+  {
+   "id": "django__django-9296",
+   "version": "3.1",
+   "difficulty": "<15 min fix",
+   "key": "d05f8e666465",
+   "files": [
+    "django/core/paginator.py"
+   ],
+   "changed": 4,
+   "f2p": 1,
+   "ps_len": 411,
+   "has_repro": true,
+   "has_img": false,
+   "drop": "F1 version<4.0"
+  }
+ ]
+}

@@ -1,0 +1,97 @@
+New Session
+Plugins
+Automation tasks
+More
+Workspaces
+django
+Fix lookup_allowed FK primary key
+2min
+More
+Fix lookup_allowed FK primary key
+Standard mode
+Chat
+Trajectory
+You are working in a checkout of the Django source repository (this workspace). Please resolve the issue below by changing Django's source code.
+
+Environment notes:
+- `python` on PATH is a Python 3.11 virtualenv with this checkout installed in editable mode (it is also at ../venv/bin/python).
+- Django's own test runner: `cd tests && python runtests.py --settings=test_sqlite --parallel 1 <test labels>`
+- Work only from this local checkout: do not use the internet (no web search, downloads or package installs).
+- Keep the change minimal and do not edit existing tests. You may add a regression test.
+- When you are done, briefly explain the root cause and your change.
+
+<issue>
+ModelAdmin.lookup_allowed() incorrectly raises DisallowedModelAdminLookup lookup with foreign key as primary key
+Description
+	 
+		(last modified by Tim Graham)
+	 
+Wrote a failing test for tests/modeladmin/tests.py to demonstrate - same test/code passes on 1.8
+isolate_apps('modeladmin')
+def test_lookup_allowed_foreign_primary(self):
+	class Country(models.Model):
+		name = models.CharField(max_length=256)
+	class Place(models.Model):
+		country = models.ForeignKey(Country, models.CASCADE)
+	class Restaurant(models.Model):
+		place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
+	class Waiter(models.Model):
+		restaurant = models.ForeignKey(Restaurant, models.CASCADE)
+	class WaiterAdmin(ModelAdmin):
+		list_filter = [
+			'restaurant__place__country',
+		]
+	ma = WaiterAdmin(Waiter, self.site)
+	self.assertIs(ma.lookup_allowed('restaurant__place__country', 'test_value'), True)
+I think this is caused by the admin thinking that having a foreign key field as a primary key is the same as concrete inheritance. So when you try and check lookups for restaurant__place__country it thinks 'place' is the concrete parent of 'restaurant' and shortcuts it to restaurant__country which isn't in 'list_filter'. And you can't add restaurant__country to list_filter because country isn't actually on restaurant.
+</issue>
+15:04
+Completed
+Completed in 2m 7s
+Root cause
+
+In ModelAdmin.lookup_allowed() (
+django/contrib/admin/options.py
+), the loop that decides which parts of a lookup form a real relational path has a "redundancy" shortcut. The comment explains it: a filter like employee__department__id is redundant since the value is already reachable as employee__department_id. So when the current field is already one of the previous relation's target_fields (i.e. its foreign/primary key), that part is skipped from relation_parts.
+
+The problem: when that target field is itself a relation — here Restaurant.place is a OneToOneField used as the primary key — the code wrongly treats restaurant__place__country as equivalent to filtering restaurant__country directly (which doesn't even exist). Because place is Restaurant's pk, it lands in prev_field.path_infos[-1].target_fields, so place was dropped from relation_parts, leaving just restaurant, which isn't in list_filter → DisallowedModelAdminLookup.
+
+The change
+
+In 
+django/contrib/admin/options.py
+, the skip condition now also requires that the field not be a relation:
+
+python
+if not prev_field or (
+    prev_field.is_relation
+    and (field.is_relation or field not in prev_field.path_infos[-1].target_fields)
+):
+    relation_parts.append(part)
+
+If field is itself a relation, it is not just a redundant plain key value — traversing it leads into a different model, so it must be kept in relation_parts. Plain pk/id target fields (non-relation) still short-circuit exactly as before, preserving the existing redundancy optimization (verified by test_lookup_allowed_onetoone).
+
+Regression test
+
+Added test_lookup_allowed_foreign_primary in 
+tests/modeladmin/tests.py
+, matching the issue's reproduction — a chain Waiter → Restaurant (FK) → Place (OneToOne pk) → Country (FK). All 163 modeladmin tests pass.
+
+Edited 2 files
++25
+-1
+django/contrib/admin/options.py
++1
+-1
+tests/modeladmin/tests.py
++24
+-0
+Usage 145K tok
+15:06
+Message or run a task, / commands, @ files or sessions
+Workspace Write
+DeepSeek-V4-Flash-0731 (Token Factory public)
+High
+1 turns 10 steps·54 tok/s
+145K tok·Cache hit 93%
+2%

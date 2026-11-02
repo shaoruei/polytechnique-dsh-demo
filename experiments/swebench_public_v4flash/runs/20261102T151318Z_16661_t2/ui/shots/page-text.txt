@@ -1,0 +1,111 @@
+New Session
+Plugins
+Automation tasks
+More
+Workspaces
+django
+Fix lookup_allowed foreign primary key
+4min
+More
+Fix lookup_allowed foreign primary key
+Standard mode
+Chat
+Trajectory
+You are working in a checkout of the Django source repository (this workspace). Please resolve the issue below by changing Django's source code.
+
+Environment notes:
+- `python` on PATH is a Python 3.11 virtualenv with this checkout installed in editable mode (it is also at ../venv/bin/python).
+- Django's own test runner: `cd tests && python runtests.py --settings=test_sqlite --parallel 1 <test labels>`
+- Work only from this local checkout: do not use the internet (no web search, downloads or package installs).
+- Keep the change minimal and do not edit existing tests. You may add a regression test.
+- When you are done, briefly explain the root cause and your change.
+
+<issue>
+ModelAdmin.lookup_allowed() incorrectly raises DisallowedModelAdminLookup lookup with foreign key as primary key
+Description
+	 
+		(last modified by Tim Graham)
+	 
+Wrote a failing test for tests/modeladmin/tests.py to demonstrate - same test/code passes on 1.8
+isolate_apps('modeladmin')
+def test_lookup_allowed_foreign_primary(self):
+	class Country(models.Model):
+		name = models.CharField(max_length=256)
+	class Place(models.Model):
+		country = models.ForeignKey(Country, models.CASCADE)
+	class Restaurant(models.Model):
+		place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
+	class Waiter(models.Model):
+		restaurant = models.ForeignKey(Restaurant, models.CASCADE)
+	class WaiterAdmin(ModelAdmin):
+		list_filter = [
+			'restaurant__place__country',
+		]
+	ma = WaiterAdmin(Waiter, self.site)
+	self.assertIs(ma.lookup_allowed('restaurant__place__country', 'test_value'), True)
+I think this is caused by the admin thinking that having a foreign key field as a primary key is the same as concrete inheritance. So when you try and check lookups for restaurant__place__country it thinks 'place' is the concrete parent of 'restaurant' and shortcuts it to restaurant__country which isn't in 'list_filter'. And you can't add restaurant__country to list_filter because country isn't actually on restaurant.
+</issue>
+15:13
+Completed
+Completed in 4m 9s
+
+All tests pass (667 in the primary suites, plus 176 in additional admin apps). Here's a summary.
+
+Root cause
+
+In BaseModelAdmin.lookup_allowed() (django/contrib/admin/options.py), the loop builds relation_parts — the list of relation hops — but skips appending any field that is a target field of the previous FK:
+
+python
+if not prev_field or (
+    prev_field.is_relation
+    and field not in prev_field.path_infos[-1].target_fields
+):
+    relation_parts.append(part)
+
+The idea: employee__department__id is redundant with employee__department_id because id is the plain PK the FK already reaches, so the id hop can be dropped. The problem is this drop is applied indiscriminately when a relational field is a target field — which happens whenever a FK points at a model whose primary key is itself a relation.
+
+For restaurant__place__country:
+
+restaurant FK → Restaurant, whose PK is the place OneToOne to Place.
+Because place is Restaurant's PK, it's in the FK's target_fields, so the code drops place.
+That leaves relation_parts = ['restaurant', 'country'], producing restaurant__country, which isn't in list_filter (restaurant__place__country) → DisallowedModelAdminLookup is raised.
+
+The admin wrongly treats any FK-as-PK as concrete inheritance, where the parent-link PK genuinely is redundant.
+
+The fix
+
+The drop should only happen when the relational target field is a genuine concrete-inheritance parent link — i.e. when the FK's target model is a subclass of the model being traversed to (issubclass(...), e.g. Employee → Person). A OneToOne that is primary_key=True but points at an unrelated model (Restaurant → Place) must be kept, because the following lookups (country) are only reachable through it:
+
+python
+if not prev_field or (
+    prev_field.is_relation
+    and (
+        field not in prev_field.path_infos[-1].target_fields
+        or field.is_relation
+        and not issubclass(prev_field.related_model, field.related_model)
+    )
+):
+    relation_parts.append(part)
+
+This keeps the existing drop behaviour for plain PK lookups and for concrete-inheritance parent links (so employee__person_ptr__exact still resolves to the employee filter), while preserving foreign-key-as-primary-key hops in the lookup path.
+
+I added a regression test test_lookup_allowed_foreign_primary in tests/modeladmin/tests.py exactly as described in the issue.
+
+Edited 2 files
++35
+-1
+django/contrib/admin/options.py
++11
+-1
+tests/modeladmin/tests.py
++24
+-0
+Usage 570K tok
+15:17
+Message or run a task, / commands, @ files or sessions
+Workspace Write
+DeepSeek-V4-Flash-0731 (Token Factory public)
+High
+1 turns 21 steps·184 tok/s
+570K tok·Cache hit 95%
+4%

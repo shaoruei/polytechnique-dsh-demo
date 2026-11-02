@@ -1,0 +1,1 @@
+[{"instance_id": "django__django-16661", "model_name_or_path": "baseline-noop", "model_patch": "diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py\n--- a/django/contrib/admin/options.py\n+++ b/django/contrib/admin/options.py\n@@ -1 +1,2 @@\n+# baseline: no functional change\n import copy\n"}]

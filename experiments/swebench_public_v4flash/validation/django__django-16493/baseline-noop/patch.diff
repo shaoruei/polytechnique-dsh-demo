@@ -1,0 +1,6 @@
+diff --git a/django/db/models/fields/files.py b/django/db/models/fields/files.py
+--- a/django/db/models/fields/files.py
++++ b/django/db/models/fields/files.py
+@@ -1 +1,2 @@
++# baseline: no functional change
+ import datetime

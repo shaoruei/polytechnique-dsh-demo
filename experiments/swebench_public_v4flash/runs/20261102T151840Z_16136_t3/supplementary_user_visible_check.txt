@@ -1,0 +1,6 @@
+SUPPLEMENTARY, UNOFFICIAL (does not change the official verdict: unresolved)
+Patch applied to a copy of the base workspace; live_demo/scripts/repro_issue.py (the issue's own reproduction through Django's ASGI handler):
+GET /demo -> 405 Method Not Allowed; Allow: POST, OPTIONS
+POST /demo -> 200 ok
+Public suites 'async generic_views': OK
+Why the benchmark fails it: the fix wraps async views in as_view() instead of making View.http_method_not_allowed() return a coroutine; the hidden test test_http_method_not_allowed_responds_correctly calls that method directly and asserts a coroutine.

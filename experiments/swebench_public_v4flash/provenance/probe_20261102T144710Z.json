@@ -1,0 +1,156 @@
+{
+ "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+ "endpoint": "https://api.tokenfactory.nebius.com/v1",
+ "at": "2026-11-02T14:47:10+00:00",
+ "checks": {
+  "stream_parallel_tool_calls": {
+   "latency_s": 1.8,
+   "ttft_s": 1.335,
+   "status": 200,
+   "indices": [
+    0,
+    1
+   ],
+   "calls": {
+    "0": {
+     "id": "call_3571cddbcfac4b4d88db9af4",
+     "name": "get_time",
+     "args": "{\"tz\": \"UTC\"}"
+    },
+    "1": {
+     "id": "call_a39aa356f26440228c56e5f5",
+     "name": "get_time",
+     "args": "{\"tz\": \"Europe/Paris\"}"
+    }
+   },
+   "usage_in_stream": {
+    "prompt_tokens": 307,
+    "total_tokens": 400,
+    "completion_tokens": 93,
+    "completion_tokens_details": {
+     "reasoning_tokens": 17
+    },
+    "prompt_tokens_details": null,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 307,
+    "reasoning_tokens": 17
+   },
+   "ok": true
+  },
+  "tool_result_round_trip": {
+   "latency_s": 2.317,
+   "status": 200,
+   "finish_reason": "stop",
+   "answer": "I called `get_time` twice in parallel:\n- `tz=UTC` returned **12:00**\n- `tz=Europe/Paris` returned **12:00**",
+   "usage": {
+    "completion_tokens": 38,
+    "prompt_tokens": 433,
+    "total_tokens": 471,
+    "completion_tokens_details": {
+     "accepted_prediction_tokens": null,
+     "audio_tokens": null,
+     "reasoning_tokens": 1,
+     "rejected_prediction_tokens": null
+    },
+    "prompt_tokens_details": null,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 433,
+    "reasoning_tokens": 1
+   },
+   "ok": true
+  },
+  "prompt_caching": {
+   "requests": [
+    {
+     "latency_s": 1.317,
+     "status": 200,
+     "usage": {
+      "completion_tokens": 20,
+      "prompt_tokens": 8416,
+      "total_tokens": 8436,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": null,
+       "audio_tokens": null,
+       "reasoning_tokens": 20,
+       "rejected_prediction_tokens": null
+      },
+      "prompt_tokens_details": null,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 8416,
+      "reasoning_tokens": 20
+     }
+    },
+    {
+     "latency_s": 0.944,
+     "status": 200,
+     "usage": {
+      "completion_tokens": 20,
+      "prompt_tokens": 8416,
+      "total_tokens": 8436,
+      "completion_tokens_details": {
+       "accepted_prediction_tokens": null,
+       "audio_tokens": null,
+       "reasoning_tokens": 20,
+       "rejected_prediction_tokens": null
+      },
+      "prompt_tokens_details": {
+       "audio_tokens": null,
+       "cached_tokens": 8192
+      },
+      "prompt_cache_hit_tokens": 8192,
+      "prompt_cache_miss_tokens": 224,
+      "reasoning_tokens": 20
+     }
+    }
+   ],
+   "second_cached_tokens": 8192,
+   "ok": true
+  },
+  "reasoning_effort": {
+   "low": {
+    "latency_s": 1.024,
+    "status": 200,
+    "answer": "17",
+    "reasoning_tokens": 140,
+    "usage": {
+     "completion_tokens": 142,
+     "prompt_tokens": 17,
+     "total_tokens": 159,
+     "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 140,
+      "rejected_prediction_tokens": null
+     },
+     "prompt_tokens_details": null,
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 17,
+     "reasoning_tokens": 140
+    }
+   },
+   "high": {
+    "latency_s": 0.959,
+    "status": 200,
+    "answer": "17",
+    "reasoning_tokens": 94,
+    "usage": {
+     "completion_tokens": 96,
+     "prompt_tokens": 17,
+     "total_tokens": 113,
+     "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 94,
+      "rejected_prediction_tokens": null
+     },
+     "prompt_tokens_details": null,
+     "prompt_cache_hit_tokens": 0,
+     "prompt_cache_miss_tokens": 17,
+     "reasoning_tokens": 94
+    }
+   },
+   "ok": true
+  }
+ },
+ "all_ok": true
+}

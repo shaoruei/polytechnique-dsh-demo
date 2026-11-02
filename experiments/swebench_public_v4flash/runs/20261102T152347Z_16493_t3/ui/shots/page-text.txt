@@ -1,0 +1,74 @@
+New Session
+Plugins
+Automation tasks
+More
+Workspaces
+django
+Fix FileField deconstruct with callable storage
+now
+More
+Fix FileField deconstruct with callable storage
+Standard mode
+Chat
+Trajectory
+You are working in a checkout of the Django source repository (this workspace). Please resolve the issue below by changing Django's source code.
+
+Environment notes:
+- `python` on PATH is a Python 3.11 virtualenv with this checkout installed in editable mode (it is also at ../venv/bin/python).
+- Django's own test runner: `cd tests && python runtests.py --settings=test_sqlite --parallel 1 <test labels>`
+- Work only from this local checkout: do not use the internet (no web search, downloads or package installs).
+- Keep the change minimal and do not edit existing tests. You may add a regression test.
+- When you are done, briefly explain the root cause and your change.
+
+<issue>
+Callable storage on FileField fails to deconstruct when it returns default_storage
+Description
+	
+If the storage argument on a FileField is set to a callable that returns default_storage, it is omitted from the deconstructed form of the field, rather than being included as a reference to the callable as expected.
+For example, given a model definition:
+from django.core.files.storage import FileSystemStorage, default_storage
+from django.db import models
+import random
+other_storage = FileSystemStorage(location='/media/other')
+def get_storage():
+	return random.choice([default_storage, other_storage])
+class MyModel(models.Model):
+	my_file = models.FileField(storage=get_storage)
+repeatedly running makemigrations will randomly generate a migration that alternately includes or omits storage=myapp.models.get_storage on the FileField definition.
+This case was overlooked in the fix for #31941 - the deconstruct method tests if self.storage is not default_storage to determine whether to add the storage kwarg, but at this point self.storage is the evaluated version, so it wrongly returns false for a callable that returns default_storage.
+</issue>
+15:24
+Completed
+Completed in 36s
+Summary
+
+Root cause: FileField.__init__ keeps a reference to any callable storage in _storage_callable, but immediately evaluates it and stores the result in self.storage. The deconstruct() method decided whether to emit the storage= kwarg based only on if self.storage is not default_storage. When the callable returns default_storage, self.storage becomes exactly default_storage, so that check returned False and the callable was silently dropped from the deconstructed field — causing the random include/omit behavior in makemigrations.
+
+Change in files.py: the condition now also emits storage= whenever a callable was originally given, regardless of what it evaluated to:
+
+python
+if self.storage is not default_storage or hasattr(self, "_storage_callable"):
+    kwargs["storage"] = getattr(self, "_storage_callable", self.storage)
+
+Regression test: added test_file_field_callable_storage in tests/field_deconstruction/tests.py, verifying a callable returning default_storage is preserved as the callable in the deconstructed kwargs.
+
+All 472 tests in field_deconstruction and model_fields pass.
+
+Edited 2 files
++14
+-1
+django/db/models/fields/files.py
++1
+-1
+tests/field_deconstruction/tests.py
++13
+-0
+Usage 262K tok
+15:24
+Message or run a task, / commands, @ files or sessions
+Workspace Write
+DeepSeek-V4-Flash-0731 (Token Factory public)
+High
+1 turns 15 steps·223 tok/s
+262K tok·Cache hit 92%
+2%

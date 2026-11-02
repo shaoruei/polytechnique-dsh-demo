@@ -1,0 +1,2 @@
+GET /demo -> 405 Method Not Allowed; Allow: POST, OPTIONS
+POST /demo -> 200 ok

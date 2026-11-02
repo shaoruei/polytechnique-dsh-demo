@@ -1,0 +1,6 @@
+diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -1 +1,2 @@
++# baseline: no functional change
+ import copy

@@ -1,0 +1,3 @@
+ django/views/generic/base.py |  6 ++++++
+ tests/async/tests.py         | 21 ++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)

@@ -1,0 +1,120 @@
+2026-11-02 14:28:38,187 - INFO - Creating container for django__django-16136...
+2026-11-02 14:28:39,621 - INFO - Container for django__django-16136 created: 6df399d83a7181ba2914aa900515ca51e33c3c2a914d45fab385f7acca9f5ab6
+2026-11-02 14:28:39,850 - INFO - Container for django__django-16136 started: 6df399d83a7181ba2914aa900515ca51e33c3c2a914d45fab385f7acca9f5ab6
+2026-11-02 14:28:39,850 - INFO - Intermediate patch for django__django-16136 written to logs/run_evaluation/eval-20261102T142835Z/run2-substitute/django__django-16136/patch.diff, now applying to container...
+2026-11-02 14:28:40,033 - INFO - >>>>> Applied Patch:
+Checking patch django/views/generic/base.py...
+Checking patch tests/async/tests.py...
+Applied patch django/views/generic/base.py cleanly.
+Applied patch tests/async/tests.py cleanly.
+
+2026-11-02 14:28:41,265 - INFO - Git diff before:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..3a3afb0c73 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -148,7 +148,16 @@ class View:
+             request.path,
+             extra={"status_code": 405, "request": request},
+         )
+-        return HttpResponseNotAllowed(self._allowed_methods())
++        response = HttpResponseNotAllowed(self._allowed_methods())
++
++        if self.view_is_async:
++
++            async def func():
++                return response
++
++            return func()
++        else:
++            return response
+ 
+     def options(self, request, *args, **kwargs):
+         """Handle responding to requests for the OPTIONS HTTP verb."""
+diff --git a/tests/async/tests.py b/tests/async/tests.py
+index 66eece4b97..941fc66dad 100644
+--- a/tests/async/tests.py
++++ b/tests/async/tests.py
+@@ -6,8 +6,8 @@ from asgiref.sync import async_to_sync
+ 
+ from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+ from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
+-from django.http import HttpResponse
+-from django.test import SimpleTestCase
++from django.http import HttpResponse, HttpResponseNotAllowed
++from django.test import RequestFactory, SimpleTestCase
+ from django.utils.asyncio import async_unsafe
+ from django.views.generic.base import View
+ 
+@@ -74,6 +74,11 @@ class AsyncView(View):
+         return HttpResponse("Hello (async) world!")
+ 
+ 
++class AsyncPostView(View):
++    async def post(self, request, *args, **kwargs):
++        return HttpResponse("Hello (async) world!")
++
++
+ class ViewTests(SimpleTestCase):
+     def test_views_are_correctly_marked(self):
+         tests = [
+@@ -119,6 +124,26 @@ class ViewTests(SimpleTestCase):
+ 
+                 self.assertIsInstance(response, HttpResponse)
+ 
++    def test_http_method_not_allowed_handler_responds_correctly(self):
++        tests = [
++            (SyncView, False),
++            (AsyncView, True),
++        ]
++        for view_cls, is_coroutine in tests:
++            with self.subTest(view_cls=view_cls, is_coroutine=is_coroutine):
++                instance = view_cls()
++                response = instance.http_method_not_allowed(RequestFactory().get("/"))
++                self.assertIs(asyncio.iscoroutine(response), is_coroutine)
++                if is_coroutine:
++                    response = asyncio.run(response)
++                self.assertIsInstance(response, HttpResponseNotAllowed)
++
++    def test_async_view_http_method_not_allowed(self):
++        view = AsyncPostView.as_view()
++        response = asyncio.run(view(RequestFactory().get("/")))
++        self.assertEqual(response.status_code, 405)
++        self.assertEqual(response["Allow"], "POST, OPTIONS")
++
+     def test_base_view_class_is_sync(self):
+         """
+         View and by extension any subclasses that don't define handlers are
+2026-11-02 14:28:41,265 - INFO - Eval script for django__django-16136 written to logs/run_evaluation/eval-20261102T142835Z/run2-substitute/django__django-16136/eval.sh; copying to container...
+2026-11-02 14:28:51,943 - INFO - Test runtime: 10.58 seconds
+2026-11-02 14:28:51,943 - INFO - Test output for django__django-16136 written to logs/run_evaluation/eval-20261102T142835Z/run2-substitute/django__django-16136/test_output.txt
+2026-11-02 14:28:52,048 - INFO - Git diff after:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..3a3afb0c73 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -148,7 +148,16 @@ class View:
+             request.path,
+             extra={"status_code": 405, "request": request},
+         )
+-        return HttpResponseNotAllowed(self._allowed_methods())
++        response = HttpResponseNotAllowed(self._allowed_methods())
++
++        if self.view_is_async:
++
++            async def func():
++                return response
++
++            return func()
++        else:
++            return response
+ 
+     def options(self, request, *args, **kwargs):
+         """Handle responding to requests for the OPTIONS HTTP verb."""
+2026-11-02 14:28:52,049 - INFO - Git diff changed after running eval script
+2026-11-02 14:28:52,049 - INFO - Grading answer for django__django-16136...
+2026-11-02 14:28:52,050 - INFO - report: {'django__django-16136': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_http_method_not_allowed_responds_correctly (async.tests.ViewTests)', 'test_mixed_views_raise_error (async.tests.ViewTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ["View and by extension any subclasses that don't define handlers are", 'test_options_handler_responds_correctly (async.tests.ViewTests)', 'test_views_are_correctly_marked (async.tests.ViewTests)', 'test_caches_local (async.tests.CacheTest)', 'test_async_unsafe (async.tests.AsyncUnsafeTest)', 'Utility class which turns an awaitable that only works on the thread with', 'test_get_async_connection (async.tests.DatabaseConnectionTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-16136: resolved: True
+2026-11-02 14:28:52,050 - INFO - Attempting to stop container sweb.eval.django__django-16136.eval-20261102T142835Z...
+2026-11-02 14:29:07,286 - INFO - Attempting to remove container sweb.eval.django__django-16136.eval-20261102T142835Z...
+2026-11-02 14:29:07,459 - INFO - Container sweb.eval.django__django-16136.eval-20261102T142835Z removed.

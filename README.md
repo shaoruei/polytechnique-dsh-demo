@@ -9,6 +9,10 @@
    Plus **bigger tasks**: two realistic Medium/Heavy tasks (M1, H1) to check whether T1–T3 are representative. See `docs/WORKLOAD_RESULTS.md`.
 5. **Scale to a classroom.** An interactive simulation of 20–500 students. Each simulated agent replays a real measured trajectory.
 
+**Live segment (separate):** the stock DSH Web UI with the native DeepSeek model on a real SWE-bench Verified issue (`django__django-16136`), with no Token Factory route and no relay. See [`docs/LIVE_DEMO.md`](docs/LIVE_DEMO.md) and `live_demo/`.
+
+**SWE-bench workload on Token Factory Public (separate):** 9 controlled trials of the stock DSH Web UI calling `deepseek-ai/DeepSeek-V4-Flash-0731` on the public endpoint directly (no relay), with full per-request traces and official SWE-bench evaluation. See [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) and `experiments/swebench_public_v4flash/`.
+
 Every figure in the dashboard is labelled **Measured**, **Verified** (published price or limit), **Benchmark** (third-party), **Estimate** or **Assumption**.
 
 ## Quick start (presentation laptop or this cloud environment)
