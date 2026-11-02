@@ -1,12 +1,21 @@
 {
- "spent_usd": 0.06684522,
- "requests": 134,
+ "spent_usd": 0.78406284,
+ "requests": 762,
  "phases": {
   "20261102T144747Z_smoke_public_mixed": 0.0015505,
   "20261102T144806Z_smoke_public_mixed": 0.00140628,
   "20261102T144840Z_scaling-c1_public_A": 0.02052848,
   "20261102T145014Z_scaling-c2_public_A": 0.02042726,
-  "20261102T145108Z_scaling-c5_public_A": 0.0229327
+  "20261102T145108Z_scaling-c5_public_A": 0.0229327,
+  "20261102T145136Z_scaling-c10_public_A": 0.02494996,
+  "20261102T145156Z_scaling-c20_public_A": 0.04073076,
+  "20261102T145217Z_scaling-c30_public_A": 0.06067138,
+  "20261102T145243Z_scaling-c1_public_B": 0.06521158,
+  "20261102T145530Z_scaling-c2_public_B": 0.06650448,
+  "20261102T145654Z_scaling-c5_public_B": 0.0710626,
+  "20261102T145741Z_scaling-c10_public_B": 0.07815738,
+  "20261102T145815Z_scaling-c20_public_B": 0.12430292,
+  "20261102T145900Z_scaling-c30_public_B": 0.18562656
  },
  "budget_usd": 2.0,
  "price_per_mtok": {
