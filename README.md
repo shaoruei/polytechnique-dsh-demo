@@ -21,7 +21,7 @@ npm run build                            # fold the new run into the dashboard
 
 Open `dashboard/dist/index.html` in a browser. It is a single self-contained file (data, model and charts inlined) that works offline from `file://`. If the network or API fails during the talk, use the dashboard's recorded runs (33 runs, replayable step by step).
 
-Requirements: Node ≥ 22, Python ≥ 3.11 (stdlib only; `numpy` only for `analysis/rate_limit_accounting.py`), `@deepseek-ai/dsh` 0.2.1-rc.5 on PATH (`npm i -g @deepseek-ai/dsh`). Credentials: `dsh/tofa.patch.yml` names the env var `TOFA_API_KEY`. In the Claude Code cloud environment it gets a placeholder and the egress proxy injects the real key. Elsewhere, `export TOFA_API_KEY=...`. No key is stored anywhere in this repository.
+Requirements: Node ≥ 22, Python ≥ 3.11 (stdlib only; `numpy` only for `analysis/rate_limit_accounting.py`), `@deepseek-ai/dsh` 0.2.1-rc.5 on PATH (`npm i -g @deepseek-ai/dsh`). The browser checks also need the pinned Playwright devDependency (`npm ci && npx playwright install chromium`); the dashboard itself needs nothing. Credentials: `dsh/tofa.patch.yml` names the env var `TOFA_API_KEY`. In the Claude Code cloud environment it gets a placeholder and the egress proxy injects the real key. Elsewhere, `export TOFA_API_KEY=...`. No key is stored anywhere in this repository.
 
 ## Commands
 
@@ -38,8 +38,10 @@ Requirements: Node ≥ 22, Python ≥ 3.11 (stdlib only; `numpy` only for `analy
 | Re-run the measurement plan (budget-capped, sequential) | `python3 harness/run_batch.py --plan default --budget-usd 2` |
 | Rebuild data + dashboard | `npm run build` |
 | All tests (model, harness, independent cost check) | `npm test` |
+| Browser-check setup, once (Playwright 1.63.0 pinned in `package-lock.json`) | `npm ci && npx playwright install chromium` |
 | Dashboard check in headless Chromium, network blocked | `node tests/e2e/dashboard_check.cjs` |
-| Visual check: rendered canvas pixels on every tab (+ negative controls) | `node tests/e2e/visual_check.cjs` |
+| Visual check: rendered canvas pixels on every tab (+ negative, diagnostics and recovery controls) | `node tests/e2e/visual_check.cjs` |
+| Both browser checks (`CHROMIUM_PATH=...` uses an already-installed Chromium) | `npm run test:e2e` |
 | Headline numbers used in the docs | `node analysis/key_findings.mjs` |
 | Independent Decimal re-check of every dollar | `python3 analysis/check_costs.py` |
 

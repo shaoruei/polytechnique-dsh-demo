@@ -91,16 +91,28 @@ function chartNotice(canvas, text) {
   }
   el.textContent = text;
 }
+// Chart.js registers an instance on its canvas before the first update, so a constructor that
+// throws can leave a partial chart behind that we never got a reference to. Destroy whatever is
+// registered, otherwise every later redraw fails with "Canvas is already in use".
+function releaseCanvas(id, canvas) {
+  for (const inst of new Set([charts[id], Chart.getChart(canvas)])) {
+    if (!inst) continue;
+    try {
+      inst.destroy();
+    } catch (err) {
+      reportProblem(`chart ${id} destroy`, err);
+    }
+  }
+  delete charts[id];
+}
 function chart(id, config) {
   const canvas = $(id);
-  if (charts[id]) {
-    charts[id].destroy();
-    delete charts[id];
-  }
+  releaseCanvas(id, canvas);
   chartNotice(canvas, null);
   try {
     charts[id] = new Chart(canvas, config);
   } catch (err) {
+    releaseCanvas(id, canvas);
     chartNotice(canvas, `This chart could not be drawn.\n${diagText(err)}`);
     reportProblem(`chart ${id}`, err);
     return null;

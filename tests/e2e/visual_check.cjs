@@ -9,7 +9,7 @@
 //   * every visible dataset's colour is present in the pixels (translucent colours are blended
 //     over the panel background), so axes and grid lines alone do not pass,
 // and that no chart error notice or diagnostics banner is shown. Exit code 1 on any failure.
-const { chromium } = require('playwright');
+const { launch } = require('./browser.cjs');
 const path = require('path');
 const fs = require('fs');
 
@@ -103,32 +103,52 @@ async function negativeControl(browser, root) {
 
 // Diagnostics control: make the logarithmic scale throw (as an incompatible engine might) and require
 // the page to show the error in the chart box and in the diagnostics banner, not a silent blank.
+// Then remove the fault and change an input: the charts must recover. A partially constructed chart
+// left registered on its canvas would make every retry fail with "Canvas is already in use".
 async function diagnosticsControl(browser, root) {
   const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 } });
   const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await page.route('**/*', (r) => (r.request().url().startsWith('file://') ? r.continue() : r.abort()));
   await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#run');
   await page.waitForTimeout(500);
   await page.evaluate(() => {
     const Log = window.Chart.registry.getScale('logarithmic');
+    window.__origBuildTicks = Log.prototype.buildTicks;
     Log.prototype.buildTicks = () => { throw new Error('simulated log-scale failure'); };
     location.hash = 'economics';
   });
   await page.waitForTimeout(1200);
-  const r = await page.evaluate(() => ({
+  const failed = await page.evaluate(() => ({
     notices: [...document.querySelectorAll('#view-economics .chart-error')].map((e) => e.textContent),
     banner: !document.getElementById('diag').hidden,
     note: document.getElementById('e-curve-note').textContent.length,
+    // a destroyed partial chart must not stay registered on the canvas
+    leftover: [...document.querySelectorAll('#view-economics canvas')].filter((c) => window.Chart.getChart(c)).map((c) => c.id),
   }));
+  // transient failure ends: restore the scale and redraw through a real input change
+  await page.evaluate(() => { window.Chart.registry.getScale('logarithmic').prototype.buildTicks = window.__origBuildTicks; });
+  await page.selectOption('#e-speed', '120');
+  await page.waitForTimeout(1200);
+  const recovered = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
-  return r;
+  return {
+    ...failed,
+    recovered: {
+      canvases: recovered.canvases.map((c) => ({ id: c.id, painted: c.painted, missing: c.missing })),
+      notices: recovered.notices,
+      inUse: errors.filter((e) => /already in use/i.test(e)),
+    },
+  };
 }
 
 (async () => {
   const root = path.resolve(__dirname, '../..');
   const out = process.argv[2] || path.join(root, '.cache', 'visual');
   fs.mkdirSync(out, { recursive: true });
-  const browser = await chromium.launch();
+  const browser = await launch();
   const problems = [];
   const control = await negativeControl(browser, root);
   if (control.total < 2 || control.detected.length !== control.total) {
@@ -141,6 +161,13 @@ async function diagnosticsControl(browser, root) {
     problems.push(`diagnostics control: failure not surfaced (${JSON.stringify(dc).slice(0, 300)})`);
   } else {
     console.log('diagnostics control OK: a throwing chart shows its error in place and in the banner; the rest of the view still renders');
+  }
+  const rc = dc.recovered;
+  const unrecovered = rc.canvases.filter((c) => c.painted < MIN_PAINTED || c.missing.length);
+  if (dc.leftover.length || rc.canvases.length < 2 || unrecovered.length || rc.notices.length || rc.inUse.length) {
+    problems.push(`recovery control: charts did not recover after the fault was removed (${JSON.stringify({ leftover: dc.leftover, ...rc }).slice(0, 400)})`);
+  } else {
+    console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws both charts');
   }
   let checked = 0;
   for (const viewport of [{ width: 1400, height: 1000 }, { width: 1024, height: 720 }]) {

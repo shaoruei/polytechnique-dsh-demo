@@ -7,5 +7,8 @@
     "test": "node --test tests/js/*.test.mjs && python3 -m unittest discover -s tests/python",
     "build": "python3 analysis/build_data.py && node dashboard/build.mjs",
     "test:e2e": "node tests/e2e/dashboard_check.cjs && node tests/e2e/visual_check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
   }
 }

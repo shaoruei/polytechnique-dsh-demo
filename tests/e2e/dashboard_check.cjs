@@ -1,7 +1,7 @@
 // Headless check of the built offline dashboard with ALL network blocked.
 //   node tests/e2e/dashboard_check.cjs [outDir]
 // Fails on any console error, page error, empty chart, or missing simulation output.
-const { chromium } = require('playwright');
+const { launch } = require('./browser.cjs');
 const path = require('path');
 const fs = require('fs');
 
@@ -9,7 +9,7 @@ const fs = require('fs');
   const root = path.resolve(__dirname, '../..');
   const out = process.argv[2] || path.join(root, '.cache', 'screens');
   fs.mkdirSync(out, { recursive: true });
-  const browser = await chromium.launch();
+  const browser = await launch();
   const problems = [];
   for (const scheme of ['light', 'dark']) {
     const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 }, colorScheme: scheme });
