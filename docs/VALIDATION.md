@@ -106,3 +106,18 @@ The dashboard now presents only the SWE-bench runs and the API load test of `dee
 | Firefox at 1366×768 | **Not run.** Firefox cannot be installed in this session: Ubuntu 24.04's `firefox` package is a snap shim, and `packages.mozilla.org` and `ppa.launchpadcontent.net` are refused by the network policy. Inspected instead in headless Chromium at 1366×768, light and dark, by screenshot. | not verified |
 
 Dedicated: the `ecole-demo-ds-flash` endpoint (2× B200) never became ready (14:35–16:23 UTC), so page 3 marks it pending and page 4's dedicated price is an assumption. No GPT-OSS dedicated measurement is used in its place.
+
+### Simplified build (same branch, later)
+
+The dashboard is now five pages built from `dashboard/src/js/{core,run,measure,endpoints,cost,classroom,main}.js` by `node dashboard/build.mjs`. The build reads the existing exports directly and runs no Python. Dedicated speed, requests per replica, GPU-hour price and GPUs per replica are adjustable assumptions shared by pages 3–5. The checks above still pass (40 canvas checks, all controls). Firefox is still not verified: the Mozilla download hosts remain blocked in this session.
+
+### Dedicated scenarios (same branch)
+
+Pages 3–5 compare measured Public with one scenario-modelled 2× B200 replica (Conservative / Baseline / Optimistic; inputs listed in the README). Model: request latency = TTFT + output ÷ (speed × min(1, rated requests ÷ concurrent requests)); replica capacity in SWE-bench tasks/h = rated requests ÷ (share of task time spent in LLM requests, measured) × 3600 ÷ mean measured task time. `dashboard_check.cjs` verifies the following:
+- Conservative is slower than public for a single request, and its latency equals 1.5 + 512/120 s.
+- The break-even follows the GPU-hour price.
+- An infeasible break-even is labelled "Not a recommendation", and a feasible one is reported.
+- 120 students exceed one Baseline replica.
+- No element id is duplicated.
+
+A duplicate-id bug found by these checks (shared controls on pages 3 and 4) was fixed. Screenshots of all five pages at 1366 px wide, light and dark, are in `docs/screenshots/`. Firefox: not run in this session (Mozilla hosts blocked); run `firefox dashboard/dist/index.html` on the VM.

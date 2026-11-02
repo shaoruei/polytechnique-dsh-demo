@@ -15,7 +15,7 @@ const fs = require('fs');
 
 const MIN_PAINTED = 0.01; // 1% of canvas pixels
 const MIN_COLOR_PIXELS = 25; // pixels that must match a dataset colour
-const VIEWS = ['run', 'measure', 'endpoints', 'economics', 'classroom', 'method'];
+const VIEWS = ['run', 'measure', 'endpoints', 'economics', 'classroom'];
 
 function inspectCanvases(MIN_COLOR_PIXELS) {
   // runs in the page (constants are passed in as arguments)
@@ -138,8 +138,8 @@ async function diagnosticsControl(browser, root) {
   }));
   // transient failure ends: restore the scale and redraw through a real input change
   await page.evaluate(() => { window.Chart.registry.getScale('linear').prototype.buildTicks = window.__origBuildTicks; });
-  await page.fill('#e-price', '20');
-  await page.dispatchEvent('#e-price', 'input');
+  await page.fill('#a-economics-gpuHour', '10');
+  await page.dispatchEvent('#a-economics-gpuHour', 'input');
   await page.waitForTimeout(1200);
   const recovered = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
@@ -240,7 +240,7 @@ async function interactionControl(browser, root) {
     console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws the chart again');
   }
   const ic = await interactionControl(browser, root);
-  if (ic.errors.length || ic.blank.length || ic.canvases < 7 || // every chart of the presentation
+  if (ic.errors.length || ic.blank.length || ic.canvases < 5 || // every chart of the presentation
       ic.anim.ticks || ic.anim.global !== false || ic.anim.perChart.length) {
     problems.push(`interaction control: ${JSON.stringify(ic).slice(0, 600)}`);
   } else {

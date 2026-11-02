@@ -4,12 +4,25 @@
 
 1. **Run an agent.** Replay any of 9 recorded SWE-bench Verified runs (3 Django issues × 3 trials, stock DSH Web UI): the issue, every agent action and tool call, code edits as diffs, and the official result (8/9 resolved).
 2. **Measure it.** Task overview, token usage and caching, and latency and decode speed, including the per-run public decode speed over time (23–404 tok/s; TTFT stable at 1.1–1.3 s).
-3. **Public vs Dedicated.** The separate API load test of the same model: throughput and latency against concurrency, and the public rate limits. **Dedicated is pending:** the 2× B200 endpoint never became ready, so there are no dedicated measurements.
+3. **Public vs Dedicated.** Measured public per-request speed under load (separate API load test) against a hypothetical dedicated replica set by adjustable assumptions, plus the public rate limits.
 4. **Cost curves.** Public cost per measured SWE-bench task against an *assumed* dedicated hourly price, with the break-even and the public default-limit ceiling.
 5. **Classroom simulation.** Students replay the 9 recorded runs against the public rate limits (DeepSeek prices and limits).
-6. **Method & sources.**
 
-Sources: [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) (agent runs) and [`docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md`](docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md) (API load test). Build inputs: `data/swebench.json` (`analysis/build_swebench.py`) and `data/endpoint_bench.json` (`analysis/build_endpoint_bench.py`). Labels used: **Measured**, **Verified**, **Estimate**, **Assumption**, **Pending**.
+Sources: [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) (agent runs) and [`docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md`](docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md) (API load test). Build: `npm run build` (= `node dashboard/build.mjs`) inlines `dashboard/src/` (`index.html` shell, `style.css`, `js/core.js` plus one module per page) and the existing exports `data/swebench.json` and `data/deepseek_v4_endpoint_load/summary.json` into one offline `dashboard/dist/index.html`. `npm run export:swebench` regenerates `data/swebench.json` only when new runs are added. Dedicated speed, capacity and GPU-hour price are adjustable **Assumptions** (the dedicated endpoint was never measured). Scenarios for one 2× B200 replica:
+
+| Scenario | Speed per request | TTFT | Requests at that speed | GPU-hour |
+|---|---|---|---|---|
+| Conservative | 120 tok/s | 1.5 s | 10 | $9.00 |
+| Baseline | 200 tok/s | 1.0 s | 20 | $8.50 |
+| Optimistic | 300 tok/s | 0.6 s | 40 | $7.15 |
+
+Public reference (measured, ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s, so Conservative is slower than public. Dedicated is called attractive only when it is cheaper **and** the replica's scenario capacity covers the traffic (Cost curves and Classroom verdicts).
+
+Check locally in Firefox (the build is self-contained):
+
+```bash
+git checkout dash/deepseek-swebench && git pull && firefox dashboard/dist/index.html
+```
 
 **Archived, not presented:** the earlier GPT-OSS-120B experiments (T1–T3 baseline, Medium/Heavy workloads, the `ecole-demo` 4× H100 benchmark) remain in `runs/`, `data/` and their docs for reference. The dashboard neither shows nor computes anything from them.
 

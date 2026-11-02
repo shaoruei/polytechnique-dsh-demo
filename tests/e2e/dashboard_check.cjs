@@ -23,7 +23,7 @@ const fs = require('fs');
     page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_FAILED/.test(m.text())) problems.push(`[${scheme}] console: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`[${scheme}] pageerror: ${e.message}`));
     await page.goto('file://' + path.join(root, 'dashboard/dist/index.html'));
-    for (const view of ['run', 'measure', 'endpoints', 'economics', 'classroom', 'method']) {
+    for (const view of ['run', 'measure', 'endpoints', 'economics', 'classroom']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 700);
       // presentation content: only the DeepSeek / SWE-bench story, no legacy workloads or model
@@ -32,6 +32,8 @@ const fs = require('fs');
         if (bad.test(visible)) problems.push(`[${scheme}] ${view}: visible legacy content ${bad}`);
       }
       if (/NaN|undefined/.test(visible)) problems.push(`[${scheme}] ${view}: NaN/undefined in the page`);
+      const dupIds = await page.evaluate(() => { const ids = [...document.querySelectorAll('[id]')].map((e) => e.id); return ids.filter((x, i) => ids.indexOf(x) !== i); });
+      if (dupIds.length) problems.push(`[${scheme}] ${view}: duplicate element ids ${[...new Set(dupIds)].join(',')}`);
       if (view === 'run') {
         // every one of the 9 real runs can be selected and replayed
         const ids = await page.evaluate(() => [...document.querySelectorAll('#run-select option')].map((o) => o.value));
@@ -80,25 +82,42 @@ const fs = require('fs');
       }
       if (view === 'endpoints') {
         const t = await page.locator('#view-endpoints').innerText();
-        if (!/Pending/i.test(t) || !/never served a request/.test(t)) problems.push(`[${scheme}] endpoints: dedicated not marked pending`);
+        if (!/MEASURED/i.test(t) || !/SCENARIO/i.test(t)) problems.push(`[${scheme}] endpoints: measured/scenario labels missing`);
+        const series = () => page.evaluate(() => window.Chart.getChart(document.getElementById('c-ep-speed')).data.datasets.map((d) => d.data));
+        const [pub, base] = await series();
+        await page.selectOption('#a-endpoints-scenario', 'conservative');
+        await page.waitForTimeout(200);
+        const [, cons] = await series();
+        // dedicated is not assumed faster: conservative is slower than public for a request alone (1.5 + 512/120 s vs measured)
+        if (!(cons[0] > pub[0]) || Math.abs(cons[0] - (1.5 + 512 / 120)) > 1e-9 || cons[0] === base[0]) problems.push(`[${scheme}] endpoints: scenario model wrong (${pub[0]}, ${base[0]}, ${cons[0]})`);
+        await page.selectOption('#a-endpoints-scenario', 'baseline');
       }
       if (view === 'economics') {
-        await page.fill('#e-price', '30');
-        await page.dispatchEvent('#e-price', 'input');
+        await page.fill('#a-economics-gpuHour', '15');
+        await page.dispatchEvent('#a-economics-gpuHour', 'input');
         await page.waitForTimeout(300);
         const t = await page.locator('#e-tiles').innerText();
         if (!/3,5\d\d tasks\/h/.test(t)) problems.push(`[${scheme}] economics: break-even did not follow the price (${t.replace(/\n/g, ' ')})`);
-        await page.fill('#e-price', '17');
-        await page.dispatchEvent('#e-price', 'input');
+        let note = await page.locator('#e-note').innerText();
+        if (!/^Not a recommendation/.test(note)) problems.push(`[${scheme}] economics: infeasible break-even shown as attractive (${note})`);
+        await page.fill('#a-economics-gpuHour', '8.5');
+        await page.dispatchEvent('#a-economics-gpuHour', 'input');
+        await page.fill('#a-economics-reqPerReplica', '100');
+        await page.dispatchEvent('#a-economics-reqPerReplica', 'input');
+        await page.waitForTimeout(300);
+        note = await page.locator('#e-note').innerText();
+        if (!/^Dedicated is cheaper from 2,0\d\d to/.test(note)) problems.push(`[${scheme}] economics: feasible break-even not reported (${note})`);
+        await page.selectOption('#a-economics-scenario', 'baseline');
       }
       if (view === 'classroom') {
         const before = await page.locator('#s-tiles').innerText();
         await page.click('.presets button[data-n="120"]');
-        await page.waitForTimeout(2500);
+        await page.waitForTimeout(3000);
         const after = await page.locator('#s-tiles').innerText();
         if (before === after) problems.push(`[${scheme}] classroom: preset did not re-run the simulation`);
+        if (!/over capacity/i.test(after)) problems.push(`[${scheme}] classroom: 120 students should exceed one baseline replica (${after.replace(/\n/g, ' ')})`);
         await page.click('.presets button[data-n="30"]');
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(2000);
       }
       // every visible canvas must have a Chart instance with data
       const empty = await page.evaluate(() => [...document.querySelectorAll('.view:not([hidden]) canvas')]
