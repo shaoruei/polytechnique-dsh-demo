@@ -98,7 +98,11 @@ main { padding-block: 1.4rem 3rem; }
 .grid { display: grid; gap: 1rem; }
 .grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr)); }
 .run-grid { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); align-items: start; }
-.run-grid .verdict { grid-column: 1 / -1; }
+.run-grid .verdict, .run-grid .patch-panel { grid-column: 1 / -1; }
+.diff { margin: 0; background: var(--surface-2); border-radius: 8px; padding: 0.6rem 0.7rem; max-height: 26rem; overflow: auto; font-size: 0.78rem; line-height: 1.45; white-space: pre; }
+.diff .add { color: var(--good); } .diff .del { color: var(--bad); } .diff .hunk { color: var(--muted); } .diff .file { font-weight: 700; color: var(--fg); }
+.events .edit { display: grid; gap: 0.2rem; }
+.events .edit .diff { max-height: 14rem; font-size: 0.74rem; padding: 0.4rem 0.5rem; }
 .econ-grid { grid-template-columns: minmax(0, 19rem) minmax(0, 1fr); align-items: start; }
 .econ-out { display: grid; gap: 1rem; min-width: 0; }
 @media (max-width: 900px) { .run-grid, .econ-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -140,6 +144,18 @@ button:disabled { opacity: 0.55; cursor: progress; }
 .tile .value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
 .tile .detail { font-size: 0.78rem; color: var(--muted); }
 .tile.key { border-color: var(--accent); }
+.msec { margin: 0.6rem 0 0; font-size: 1.05rem; display: flex; gap: 0.5rem; align-items: baseline; }
+.msec b { font-family: var(--font-mono); color: var(--accent); }
+.msec-grid { grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .msec-grid { grid-template-columns: minmax(0, 1fr); } }
+.tiles-3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.msec-grid .tiles-3 { grid-template-columns: minmax(0, 1fr); }
+.tile .value small { font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-left: 0.3rem; }
+.tile .agg { font-size: 0.8rem; color: var(--fg); border-top: 1px solid var(--line); padding-top: 0.3rem; margin-top: 0.25rem; font-variant-numeric: tabular-nums; }
+.scope { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.05rem 0.4rem; border-radius: 4px; margin-right: 0.3rem; white-space: nowrap; }
+.scope.sel { background: var(--accent); color: var(--accent-ink); }
+.scope.agg { background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+.scope-key { font-size: 0.8rem; color: var(--muted); }
 
 .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1rem; }
 .side { border-top: 4px solid var(--line); }

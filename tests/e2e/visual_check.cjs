@@ -52,7 +52,14 @@ function inspectCanvases(MIN_COLOR_PIXELS) {
     res.painted = painted / (data.length / 4);
     chart.data.datasets.forEach((ds, i) => {
       if (!chart.isDatasetVisible(i) || !ds.data || !ds.data.some((v) => v !== null && v !== undefined)) return;
-      const candidates = [ds.borderColor, ds.backgroundColor].flat().filter((c) => typeof c === 'string' && c !== 'transparent');
+      // colours as Chart.js resolved them for the drawn elements (covers scriptable / per-point colours)
+      const resolved = new Set();
+      for (const el of chart.getDatasetMeta(i).data.slice(0, 400)) {
+        const o = el.options || {};
+        if (o.borderWidth !== 0) resolved.add(o.borderColor);
+        resolved.add(o.backgroundColor);
+      }
+      const candidates = [ds.borderColor, ds.backgroundColor, ...resolved].flat().filter((c) => typeof c === 'string' && c !== 'transparent');
       const targets = candidates.map(toRgba).filter((t) => t[3] > 0);
       let hits = 0;
       for (let p = 0; p < data.length && hits < MIN_COLOR_PIXELS; p += 4) {

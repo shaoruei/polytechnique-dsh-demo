@@ -38,6 +38,30 @@ const fs = require('fs');
         await page.click('#replay-all');
         const n = await page.locator('#events li').count();
         if (n < 10) problems.push(`[${scheme}] run: only ${n} trajectory events`);
+        // SWE-bench trials: 9 runs, the task, edit diffs, official verdict and the patch are shown
+        const r = await page.evaluate(() => ({
+          options: document.querySelectorAll('#run-select option').length,
+          prompt: document.getElementById('run-prompt').textContent,
+          edits: document.querySelectorAll('#events .edit .diff').length,
+          verdict: document.getElementById('verdict').innerText,
+          patch: document.getElementById('run-patch').textContent,
+        }));
+        if (r.options !== 9) problems.push(`[${scheme}] run: ${r.options} runs in the selector, expected the 9 SWE-bench trials`);
+        if (!/<issue>/.test(r.prompt)) problems.push(`[${scheme}] run: task prompt missing`);
+        if (!r.edits) problems.push(`[${scheme}] run: no source-change (edit) diffs in the trajectory`);
+        if (!/RESOLVED|UNRESOLVED/.test(r.verdict) || !/fail-to-pass/.test(r.verdict)) problems.push(`[${scheme}] run: official verdict missing`);
+        if (!/^diff --git/.test(r.patch)) problems.push(`[${scheme}] run: resulting patch missing`);
+        await page.selectOption('#run-select', { index: 6 }); // the unresolved trial; must carry over to section 2
+      }
+      if (view === 'measure') {
+        const m = await page.evaluate(() => ({
+          sel: document.getElementById('m-run').value, run: document.getElementById('run-select').value,
+          sections: [...document.querySelectorAll('#view-measure h3.msec')].map((h) => h.textContent),
+          tiles: document.getElementById('view-measure').innerText,
+        }));
+        if (m.sel !== m.run) problems.push(`[${scheme}] measure: selected run ${m.sel} differs from section 1 (${m.run})`);
+        if (m.sections.length !== 3) problems.push(`[${scheme}] measure: ${m.sections.length} sections, expected 3`);
+        if (/NaN|undefined/.test(m.tiles)) problems.push(`[${scheme}] measure: NaN/undefined in the page`);
       }
       if (view === 'classroom') {
         await page.click('#s-sweep');

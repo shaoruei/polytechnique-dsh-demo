@@ -36,18 +36,18 @@
   <section id="view-run" class="view" aria-labelledby="h-run">
     <div class="section-head">
       <h2 id="h-run">1 · A coding agent at work</h2>
-      <p>DSH runs headless and talks to the Token Factory public endpoint. It reads code, edits it and runs the tests. Afterwards the harness judges the result with <em>hidden</em> tests the agent never saw.</p>
+      <p>The stock DSH Web UI runs <code>DeepSeek-V4-Flash-0731</code> on the Token Factory public endpoint against real Django issues from SWE-bench Verified. The agent reads the code, edits it and runs tests. Afterwards the <em>official</em> SWE-bench harness applies its patch and runs hidden tests the agent never saw: the tests that must start passing (fail-to-pass) and the existing tests that must keep passing (pass-to-pass).</p>
     </div>
     <div class="grid run-grid">
       <div class="panel">
-        <label class="field" for="run-select">Recorded run</label>
+        <label class="field" for="run-select">Recorded run (9 trials: 3 issues × 3)</label>
         <select id="run-select"></select>
         <div class="run-meta" id="run-meta"></div>
-        <h3>The task given to the agent</h3>
+        <h3 id="run-task-title">The task given to the agent</h3>
         <pre class="prompt" id="run-prompt"></pre>
         <h3>Run it live</h3>
-        <div class="cmd"><code id="live-cmd">python3 harness/run_task.py t3 --live</code><button type="button" class="ghost" id="copy-cmd">Copy</button></div>
-        <p class="hint">A live run takes about 10–30 s and costs under $0.01. Rebuild with <code>npm run build</code> to add it here. The recorded runs below are the fallback if the network is down.</p>
+        <div class="cmd"><code id="live-cmd">~/dsh-kit/scripts/launch_web.sh ~/dsh-live --patch ~/dsh-kit/config/tofa-public-deepseek-v4-flash-0731.patch.yml</code><button type="button" class="ghost" id="copy-cmd">Copy</button></div>
+        <p class="hint">Starts the stock Web UI on the prepared workspace (see <code>docs/LIVE_DEMO.md</code>). A run took 33–250 s and $0.003–0.018 here. The recorded runs are the fallback if the network is down.</p>
       </div>
       <div class="panel wide">
         <div class="panel-head">
@@ -63,6 +63,10 @@
         <ol class="events" id="events"></ol>
       </div>
       <div class="panel verdict" id="verdict"></div>
+      <div class="panel patch-panel">
+        <div class="panel-head"><h3>Resulting patch <span class="ev ev-measured">Measured</span></h3><span class="hint" id="patch-stat"></span></div>
+        <pre class="diff" id="run-patch"></pre>
+      </div>
     </div>
   </section>
 
@@ -70,23 +74,34 @@
   <section id="view-measure" class="view" aria-labelledby="h-measure" hidden>
     <div class="section-head">
       <h2 id="h-measure">2 · What one task actually costs</h2>
-      <p>Public endpoint, measured across <span id="m-nruns"></span> DSH runs on 30 October (the historical baseline; dedicated results are in section 3). Token counts are the provider's own <code>usage</code> fields, recorded per request at the loopback relay. Cost = tokens × the verified public prices.</p>
+      <p>The 9 SWE-bench trials from section 1, measured per LLM request from DSH's own session log: provider-reported tokens (uncached, cached, output), time to first token, latency and decode speed. Cost = tokens × the verified public list price ($0.14 / $0.01 cached / $0.28 per 1M tokens).</p>
       <div class="filters">
-        <label for="m-effort">Reasoning effort</label>
-        <select id="m-effort"><option value="medium" selected>medium (demo default)</option><option value="low">low</option><option value="high">high</option><option value="all">all</option></select>
+        <label for="m-run">Selected run</label>
+        <select id="m-run"></select>
+        <span class="scope-key"><span class="scope sel">this run</span> selected trial <span class="scope agg">all 9</span> across the nine trials</span>
       </div>
     </div>
-    <div class="tiles" id="m-tiles"></div>
-    <div class="grid two">
-      <figure class="panel"><figcaption>Cost vs completion time per run <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-scatter"></canvas></div><p class="note">Filled = hidden tests passed; ✕ = failed. Across all efforts, T2 fails on one spec edge case each time (<code>"1h&nbsp;&nbsp;30m"</code> must be rejected), even though the agent's own tests passed.</p></figure>
-      <figure class="panel"><figcaption>Where the money goes, per task <span class="ev ev-measured">Measured</span> <span class="ev ev-verified">Verified</span></figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div><p class="note" id="cost-split-note"></p></figure>
-      <figure class="panel"><figcaption>Prompt size grows with every step <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-context"></canvas></div><p class="note">Each request resends the whole conversation, so the prefix cache matters. Cache hits are not guaranteed: some requests get only the 80-token system prefix cached.</p></figure>
-      <figure class="panel"><figcaption>Where the time goes, per task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-time"></canvas></div><p class="note">The agent loop spends most of its time waiting on the LLM. Tool execution (reads, edits, test runs) is a few hundred milliseconds per task.</p></figure>
-      <figure class="panel"><figcaption>Per-request latency on the public endpoint <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-ttft"></canvas></div><p class="note">TTFT = request received at the relay → first streamed token (reasoning included). Decode = output tokens ÷ streaming time.</p></figure>
-      <figure class="panel"><figcaption>Reasoning effort: cost vs success <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-effort"></canvas></div><p class="note">Higher effort costs more tokens. It did not fix T2's spec miss.</p></figure>
+
+    <h3 class="msec"><b>1</b> Task overview</h3>
+    <div class="grid msec-grid">
+      <div class="tiles tiles-3" id="m-tiles-task"></div>
+      <figure class="panel"><figcaption>Where the time goes, all 9 trials <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-time"></canvas></div><p class="note" id="m-time-note"></p></figure>
     </div>
+
+    <h3 class="msec"><b>2</b> Token usage &amp; caching</h3>
+    <div class="tiles tiles-3" id="m-tiles-tokens"></div>
+    <div class="grid two">
+      <figure class="panel"><figcaption>Cost breakdown per trial <span class="ev ev-measured">Measured</span> <span class="ev ev-verified">Verified</span></figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div><p class="note" id="cost-split-note"></p></figure>
+      <figure class="panel"><figcaption>Context growth, selected run <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-context"></canvas></div><p class="note" id="m-context-note"></p></figure>
+    </div>
+
+    <h3 class="msec"><b>3</b> Latency &amp; generation speed</h3>
+    <div class="tiles tiles-3" id="m-tiles-speed"></div>
+    <figure class="panel"><figcaption>Public decode speed over the measurement window, every request of all 9 trials <span class="ev ev-measured">Measured</span></figcaption><div class="chart tall"><canvas id="c-decode-time"></canvas></div><p class="note" id="m-decode-note"></p></figure>
+    <figure class="panel"><figcaption>Request latency, selected run: waiting for the first token, generating, stalled <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-ttft"></canvas></div><p class="note">TTFT = request sent → first streamed token (reasoning included). Decode = output tokens ÷ time from first to last token. Stall = a pause of more than 1 s between streamed chunks.</p></figure>
+
     <details class="panel">
-      <summary>All runs (table)</summary>
+      <summary>All 9 trials (table)</summary>
       <div class="table-wrap"><table id="runs-table"></table></div>
     </details>
   </section>

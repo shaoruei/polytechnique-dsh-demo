@@ -35,6 +35,7 @@ const data = {
   tasks: json('data/tasks.json').tasks,
   rateLimitInference: json('data/rate_limit_inference.json'),
   dedicatedBenchmark: json('data/dedicated_benchmark.json'),
+  swe: json('data/swebench.json'),
   workloadComparison: (() => { const w = json('data/workload_comparison.json'); delete w.groups.pilot?.context_growth; return w; })(),
   apiSnapshot: { retrieved_at: provenance.retrieved_at, pricing: provenance.entry.pricing, limits: provenance.entry.per_request_limits },
 };
