@@ -63,13 +63,78 @@ function themeDefaults() {
   Chart.defaults.maintainAspectRatio = false;
   Chart.defaults.animation = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : { duration: 250 };
 }
+// ------------------------------------------------------------------ diagnostics
+// A chart that fails must say so on screen. A blank canvas cannot be diagnosed from a projector.
+function diagText(err) {
+  return `${err && err.message ? err.message : String(err)}\n${navigator.userAgent}`;
+}
+function reportProblem(where, err) {
+  console.error(`[dashboard] ${where}:`, err);
+  const box = $('diag');
+  if (!box) return;
+  box.hidden = false;
+  const line = document.createElement('pre');
+  line.textContent = `${where}: ${diagText(err)}`;
+  box.append(line);
+}
+function chartNotice(canvas, text) {
+  const host = canvas.parentElement;
+  let el = host.querySelector('.chart-error');
+  if (!text) {
+    if (el) el.remove();
+    return;
+  }
+  if (!el) {
+    el = document.createElement('pre');
+    el.className = 'chart-error';
+    host.append(el);
+  }
+  el.textContent = text;
+}
 function chart(id, config) {
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart($(id), config);
-  return charts[id];
+  const canvas = $(id);
+  if (charts[id]) {
+    charts[id].destroy();
+    delete charts[id];
+  }
+  chartNotice(canvas, null);
+  try {
+    charts[id] = new Chart(canvas, config);
+  } catch (err) {
+    chartNotice(canvas, `This chart could not be drawn.\n${diagText(err)}`);
+    reportProblem(`chart ${id}`, err);
+    return null;
+  }
+  const instance = charts[id];
+  // after the first frame: a chart with no plot area or a zero-size canvas is broken; try one resize, then say so
+  setTimeout(() => {
+    if (charts[id] !== instance || canvas.closest('.view')?.hidden) return;
+    const area = instance.chartArea;
+    const ok = () => canvas.width > 0 && canvas.height > 0 && area && area.right - area.left > 0 && area.bottom - area.top > 0;
+    if (ok()) return;
+    try {
+      instance.resize();
+      instance.update('none');
+    } catch (err) {
+      reportProblem(`chart ${id} resize`, err);
+    }
+    if (!(canvas.width > 0 && canvas.height > 0 && instance.chartArea && instance.chartArea.right > instance.chartArea.left)) {
+      chartNotice(canvas, `This chart has no drawing area (canvas ${canvas.width}x${canvas.height}).\n${navigator.userAgent}`);
+    }
+  }, 600);
+  return instance;
 }
 const TASK_COLORS = () => ({ 't1-grade-average': css('--accent'), 't2-duration-parser': css('--bad'), 't3-schedule-conflicts': css('--dedicated') });
-const alpha = (color, a) => `color-mix(in srgb, ${color} ${Math.round(a * 100)}%, transparent)`;
+// Canvas colours must be plain CSS colours: color-mix() is not accepted by every engine's canvas
+// colour parser, nor by Chart.js's colour helper. Tokens are hex, so build rgba() directly.
+function alpha(color, a) {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(color).trim());
+  if (!m) return color;
+  let h = m[1];
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
 
 // ------------------------------------------------------------------ router
 const VIEWS = ['run', 'measure', 'workloads', 'dedicated', 'economics', 'classroom', 'method'];
@@ -88,13 +153,17 @@ function show(view) {
     if (a.dataset.view === view) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  if (!inited[view]) {
-    inited[view] = true;
-    stale[view] = false;
-    INIT[view]();
-  } else if (stale[view]) {
-    stale[view] = false;
-    DRAW[view]();
+  try {
+    if (!inited[view]) {
+      inited[view] = true;
+      stale[view] = false;
+      INIT[view]();
+    } else if (stale[view]) {
+      stale[view] = false;
+      DRAW[view]();
+    }
+  } catch (err) {
+    reportProblem(`view ${view}`, err);
   }
 }
 window.addEventListener('hashchange', () => show(location.hash.slice(1)));
@@ -626,8 +695,15 @@ function econInputs() {
 function renderEconomics() {
   fillGpuSelect($('e-gpu'), $('e-price'));
   const form = $('econ-form');
-  form.addEventListener('input', drawEconomics);
-  form.addEventListener('change', drawEconomics);
+  const safeDraw = () => {
+    try {
+      drawEconomics();
+    } catch (err) {
+      reportProblem('view economics', err);
+    }
+  };
+  form.addEventListener('input', safeDraw);
+  form.addEventListener('change', safeDraw);
   $('e-sched').addEventListener('change', () => {
     for (const d of document.querySelectorAll('#econ-form .sched')) d.hidden = d.dataset.s !== $('e-sched').value;
   });
@@ -1023,8 +1099,47 @@ function renderMethod() {
 }
 
 // ------------------------------------------------------------------ boot
+window.addEventListener('error', (e) => reportProblem('uncaught error', e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => reportProblem('unhandled promise rejection', e.reason));
+// In-browser chart check (for the presentation machine): visits every chart view and measures
+// each canvas. Reading pixels can be blocked by privacy settings; that is reported, not hidden.
+async function selfCheck() {
+  const btn = $('self-check');
+  const box = $('self-check-out');
+  btn.disabled = true;
+  const back = currentView();
+  const rows = [];
+  for (const v of ['measure', 'workloads', 'dedicated', 'economics', 'classroom']) {
+    location.hash = v;
+    await new Promise((r) => setTimeout(r, v === 'classroom' ? 2500 : 1200));
+    for (const c of document.querySelectorAll(`#view-${v} canvas`)) {
+      const inst = Chart.getChart(c);
+      let painted = 'n/a';
+      try {
+        if (c.width && c.height) {
+          const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+          let n = 0;
+          for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
+          painted = `${((100 * n) / (d.length / 4)).toFixed(1)}%`;
+        }
+      } catch (err) {
+        painted = `unreadable (${err.name})`;
+      }
+      const area = inst && inst.chartArea ? `${Math.round(inst.chartArea.right - inst.chartArea.left)}x${Math.round(inst.chartArea.bottom - inst.chartArea.top)}` : '-';
+      const note = c.parentElement.querySelector('.chart-error');
+      rows.push([v, c.id, inst ? 'yes' : (c.dataset.onDemand !== undefined ? 'on demand' : 'NO'), `${c.width}x${c.height}`, area, painted, note ? note.textContent.split('\n')[0] : '']);
+    }
+  }
+  location.hash = back;
+  box.hidden = false;
+  box.innerHTML = `<p class="note">${esc(navigator.userAgent)}</p><div class="table-wrap"><table><thead><tr><th>view</th><th>chart</th><th>created</th><th>canvas</th><th>plot area</th><th>painted</th><th>error</th></tr></thead><tbody>${
+    rows.map((r) => `<tr>${r.map((x) => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  btn.disabled = false;
+}
+
 function boot() {
   themeDefaults();
+  $('self-check').addEventListener('click', () => selfCheck().catch((err) => reportProblem('self-check', err)));
   $('dsh-version').textContent = D.runs[0]?.dsh_version ?? '';
   $('foot').textContent = `Built ${D.builtAt.slice(0, 16).replace('T', ' ')} UTC from ${D.runs.length} recorded runs. Model: openai/gpt-oss-120b via https://api.tokenfactory.nebius.com/v1. Offline-capable: all data and code are inside this file.`;
   show(currentView());

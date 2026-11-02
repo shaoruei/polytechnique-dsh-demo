@@ -39,6 +39,7 @@ Requirements: Node ≥ 22, Python ≥ 3.11 (stdlib only; `numpy` only for `analy
 | Rebuild data + dashboard | `npm run build` |
 | All tests (model, harness, independent cost check) | `npm test` |
 | Dashboard check in headless Chromium, network blocked | `node tests/e2e/dashboard_check.cjs` |
+| Visual check: rendered canvas pixels on every tab (+ negative controls) | `node tests/e2e/visual_check.cjs` |
 | Headline numbers used in the docs | `node analysis/key_findings.mjs` |
 | Independent Decimal re-check of every dollar | `python3 analysis/check_costs.py` |
 

@@ -7,7 +7,9 @@ python3 harness/check_env.py --smoke     # must print READY
 npm run build                            # fresh dashboard/dist/index.html
 ```
 
-Open `dashboard/dist/index.html` in the browser and keep a terminal beside it at the repository root. If `check_env` is NOT READY, skip the live run and use the recorded runs. Everything else works offline.
+Open `dashboard/dist/index.html` in the browser. Use **Chrome or Chromium** if you can: the automated visual check runs in Chromium. In Firefox, click **Check charts in this browser** (page footer) once before the talk. It visits every tab and lists each chart's size and painted pixels. If any chart fails, the page now shows the error in the chart box and in a red banner, instead of a blank canvas.
+
+Then, in the same window, and keep a terminal beside it at the repository root. If `check_env` is NOT READY, skip the live run and use the recorded runs. Everything else works offline.
 
 ---
 

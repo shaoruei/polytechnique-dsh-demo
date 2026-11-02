@@ -58,3 +58,18 @@ The $0.000002 difference between the wire-log total and the ledger is rounding o
 | Endpoint stopped | PATCH `enabled:false` → HTTP 200; poll shows `stopped`, `not_ready`, 0 ready replicas at 10:59:39 UTC | `data/provenance/dedicated_endpoint_stopped_2026-11-02.json` |
 
 Last results: `node --test` 22/22 pass · `python3 -m unittest` 19 OK · `check_costs.py` 36 public runs OK · dashboard headless check OK, with network blocked, in light and dark, including the new Dedicated view.
+
+## Rendering check (2026-11-02, fix/cost-curves-blank-charts)
+
+The original dashboard check only verified that Chart.js datasets were populated. A report from the Ubuntu VM showed blank Cost Curves charts, so a pixel-level check was added:
+
+- `tests/e2e/visual_check.cjs` opens `dashboard/dist/index.html` over `file://` with all network blocked, in light/dark × 1400/1024 px, loading each tab both directly (`#view`) and by in-page navigation. For every visible canvas it checks:
+  - non-zero size;
+  - ≥ 1% painted pixels;
+  - that each visible dataset's colour is present, with translucent fills matched by un-premultiplied RGBA.
+
+  It also requires no chart error notice and no diagnostics banner.
+- **Negative control:** with canvas drawing suppressed in the Cost Curves view (the reported symptom), the check must flag both charts.
+- **Diagnostics control:** with Chart.js's logarithmic scale made to throw, the page must show the error in both Cost Curves chart boxes and in the banner, and the rest of the view must still render.
+- Last result: 148 canvas checks OK, both controls OK (Chromium 153 headless).
+- Not verified here: Firefox. The session's network policy blocks Mozilla's download hosts, and running a Firefox build obtained from conda-forge was not permitted. On the VM, use the footer button **Check charts in this browser**.

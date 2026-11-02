@@ -200,3 +200,8 @@ details > summary { cursor: pointer; font-weight: 600; }
 .method ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
 .method li { overflow-wrap: anywhere; }
 .foot { color: var(--muted); font-size: 0.78rem; padding-block: 0 2rem; }
+
+/* diagnostics: visible failure instead of a silent blank chart */
+.diag { border: 1px solid var(--bad); border-left-width: 4px; background: var(--surface); color: var(--fg); padding: 0.6rem 0.9rem; border-radius: var(--radius); display: grid; gap: 0.3rem; font-size: 0.85rem; }
+.diag pre, .chart-error { white-space: pre-wrap; margin: 0; font-family: var(--font-mono); font-size: 0.75rem; color: var(--bad); }
+.chart-error { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 1rem; background: var(--surface); border: 1px dashed var(--bad); border-radius: 8px; }

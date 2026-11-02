@@ -5,6 +5,7 @@
   "description": "DSH x Nebius Token Factory performance & cost demo (Ecole polytechnique, 2026-11-03)",
   "scripts": {
     "test": "node --test tests/js/*.test.mjs && python3 -m unittest discover -s tests/python",
-    "build": "python3 analysis/build_data.py && node dashboard/build.mjs"
+    "build": "python3 analysis/build_data.py && node dashboard/build.mjs",
+    "test:e2e": "node tests/e2e/dashboard_check.cjs && node tests/e2e/visual_check.cjs"
   }
 }

@@ -31,6 +31,7 @@
 </header>
 
 <main>
+  <div class="diag" id="diag" role="alert" hidden><b>Something on this page failed to render.</b> The details below help diagnose it (also in the browser console).</div>
   <!-- ======================================================== 1. RUN -->
   <section id="view-run" class="view" aria-labelledby="h-run">
     <div class="section-head">
@@ -227,7 +228,7 @@
         </div>
         <figure class="panel"><figcaption>Cost per month vs class size, with capacity-aware GPU sizing <span class="ev ev-estimate">Simulated</span></figcaption>
           <div class="panel-head"><p class="hint">Re-runs the simulation for 6 class sizes with the settings on the left.</p><button type="button" id="s-sweep">Run sweep</button></div>
-          <div class="chart tall"><canvas id="c-sweep"></canvas></div><p class="note" id="s-sweep-note"></p></figure>
+          <div class="chart tall"><canvas id="c-sweep" data-on-demand></canvas></div><p class="note" id="s-sweep-note"></p></figure>
       </div>
     </div>
   </section>
@@ -241,5 +242,5 @@
     <div class="grid two method" id="method"></div>
   </section>
 </main>
-<footer class="foot"><p id="foot"></p></footer>
+<footer class="foot"><p id="foot"></p><p><button type="button" class="ghost" id="self-check">Check charts in this browser</button></p><div class="panel" id="self-check-out" hidden></div></footer>
 <!--__SCRIPTS__-->
