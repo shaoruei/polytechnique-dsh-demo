@@ -1,0 +1,19 @@
+{
+ "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+ "provider": "tofa",
+ "reasoningEffort": "high",
+ "turn_end_reasons": [
+  "completed"
+ ],
+ "wall_seconds": 249.6,
+ "steps": 21,
+ "tool_calls": 24,
+ "tool_call_counts": {
+  "bash": 10,
+  "edit": 3,
+  "grep": 5,
+  "read": 6
+ },
+ "integrity_flags": [],
+ "integrity_verdict": "CLEAN"
+}

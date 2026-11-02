@@ -2,6 +2,8 @@
 
 École polytechnique, 3 November 2026. This live segment uses the **stock DeepSeek Harness Web UI** (`dsh web`, `@deepseek-ai/dsh` 0.2.1-rc.5) with the **native DeepSeek provider** (`deepseek-official`, default model DeepSeek-V4.1-Flash release 1017, reasoning effort High). It does **not** use `harness/tofa_relay.py`, `dsh/tofa.patch.yml` or any Token Factory route. The GPT-OSS-120B Token Factory benchmark (`runs/`, `data/`, `dashboard/`) is separate and was not modified.
 
+> **Update (2 Nov, later):** the SWE-bench workload experiment now runs on **Token Factory Public with `deepseek-ai/DeepSeek-V4-Flash-0731`**, using the same stock Web UI, isolation, reset scripts and official evaluation. See [`SWEBENCH_PUBLIC_V4FLASH.md`](SWEBENCH_PUBLIC_V4FLASH.md). The rehearsals in section 7 below used DeepSeek-V4.1-Flash-1017 and remain a separate, older result. To present the live segment on that public configuration instead of the native DeepSeek API, first copy the overlay into the kit as admin: `sudo install -o presenter -m 644 /opt/dsh-demo-prep/experiments/swebench_public_v4flash/config/tofa-public-deepseek-v4-flash-0731.patch.yml ~presenter/dsh-kit/config/`. Then put `TOFA_API_KEY=...` in `~/.config/dsh-live.env` and launch with `~/dsh-kit/scripts/launch_web.sh ~/dsh-live --patch ~/dsh-kit/config/tofa-public-deepseek-v4-flash-0731.patch.yml`. The integrity scanner (`live_demo/scripts/summarize_session.py`) now ignores searches inside the session's own workspace, which removes a false positive.
+
 Everything for this segment lives in `live_demo/`:
 
 ```

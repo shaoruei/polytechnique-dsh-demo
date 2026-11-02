@@ -1,0 +1,1 @@
+{"model": "deepseek-ai/DeepSeek-V4-Flash-0731", "wall_time_s": 109.088, "llm_requests": 17, "tool_calls": 16, "prompt_tokens": 244493, "cached_input_tokens": 230400, "output_tokens": 2998, "cache_hit_rate": 0.9424, "cost_usd": 0.005116, "ttft_s_p50": 1.241, "decode_tps_p50": 63.8}

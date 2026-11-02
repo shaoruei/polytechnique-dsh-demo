@@ -1,0 +1,104 @@
+New Session
+Plugins
+Automation tasks
+More
+Workspaces
+django
+Fix lookup_allowed foreign primary key
+1min
+More
+Fix lookup_allowed foreign primary key
+Standard mode
+Chat
+Trajectory
+You are working in a checkout of the Django source repository (this workspace). Please resolve the issue below by changing Django's source code.
+
+Environment notes:
+- `python` on PATH is a Python 3.11 virtualenv with this checkout installed in editable mode (it is also at ../venv/bin/python).
+- Django's own test runner: `cd tests && python runtests.py --settings=test_sqlite --parallel 1 <test labels>`
+- Work only from this local checkout: do not use the internet (no web search, downloads or package installs).
+- Keep the change minimal and do not edit existing tests. You may add a regression test.
+- When you are done, briefly explain the root cause and your change.
+
+<issue>
+ModelAdmin.lookup_allowed() incorrectly raises DisallowedModelAdminLookup lookup with foreign key as primary key
+Description
+	 
+		(last modified by Tim Graham)
+	 
+Wrote a failing test for tests/modeladmin/tests.py to demonstrate - same test/code passes on 1.8
+isolate_apps('modeladmin')
+def test_lookup_allowed_foreign_primary(self):
+	class Country(models.Model):
+		name = models.CharField(max_length=256)
+	class Place(models.Model):
+		country = models.ForeignKey(Country, models.CASCADE)
+	class Restaurant(models.Model):
+		place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
+	class Waiter(models.Model):
+		restaurant = models.ForeignKey(Restaurant, models.CASCADE)
+	class WaiterAdmin(ModelAdmin):
+		list_filter = [
+			'restaurant__place__country',
+		]
+	ma = WaiterAdmin(Waiter, self.site)
+	self.assertIs(ma.lookup_allowed('restaurant__place__country', 'test_value'), True)
+I think this is caused by the admin thinking that having a foreign key field as a primary key is the same as concrete inheritance. So when you try and check lookups for restaurant__place__country it thinks 'place' is the concrete parent of 'restaurant' and shortcuts it to restaurant__country which isn't in 'list_filter'. And you can't add restaurant__country to list_filter because country isn't actually on restaurant.
+</issue>
+15:25
+Completed
+Completed in 1m 17s
+
+Done. Here's a summary of the change.
+
+Root cause
+
+In ModelAdmin.lookup_allowed() (
+django/contrib/admin/options.py
+), the loop that builds relation_parts drops a lookup part whenever it matches one of the target fields of the previous relation. That logic exists to collapse harmless leaf lookups — e.g. employee__department__id collapses to employee__department, since the id value is already reachable via employee__department_id.
+
+The bug is that this drop was applied to any target field, including relational ones. When a OneToOneField is used as a model's primary key, the target field of a relation to that model is itself a relation. In the example:
+
+restaurant (FK → Restaurant) has target field place (Restaurant's PK, a OneToOneField),
+so the loop dropped place … and then country (which is Place's PK),
+collapsing restaurant__place__country to just restaurant, which doesn't match restaurant__place__country in list_filter, so the lookup returned False (→ DisallowedModelAdminLookup by the caller).
+Fix
+
+Only drop the trailing part when the target field is a non-relational leaf value (like a plain id); genuine relational path segments must always be kept:
+
+python
+if not prev_field or (
+    prev_field.is_relation
+    and (
+        field.is_relation
+        or field not in prev_field.path_infos[-1].target_fields
+    )
+):
+    relation_parts.append(part)
+
+This preserves the existing __id-style collapsing while no longer mistaking a FK-as-PK for concrete inheritance.
+
+Test
+
+Added test_lookup_allowed_foreign_primary to 
+tests/modeladmin/tests.py
+ reproducing the issue scenario, which failed before the fix and now passes. The full modeladmin and admin_filters suites (218 tests) pass.
+
+Edited 2 files
++28
+-1
+django/contrib/admin/options.py
++4
+-1
+tests/modeladmin/tests.py
++24
+-0
+Usage 432K tok
+15:27
+Message or run a task, / commands, @ files or sessions
+Workspace Write
+DeepSeek-V4-Flash-0731 (Token Factory public)
+High
+1 turns 25 steps·201 tok/s
+432K tok·Cache hit 94%
+2%

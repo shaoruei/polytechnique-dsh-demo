@@ -1,0 +1,3 @@
+ django/contrib/admin/options.py |  5 ++++-
+ tests/modeladmin/tests.py       | 24 ++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 1 deletion(-)

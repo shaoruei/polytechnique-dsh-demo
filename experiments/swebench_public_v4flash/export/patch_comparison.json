@@ -1,0 +1,164 @@
+[
+ {
+  "run_id": "20261102T145418Z_16136_t1",
+  "instance_id": "django__django-16136",
+  "official_resolved": true,
+  "source_files": [
+   "django/views/generic/base.py"
+  ],
+  "gold_files": [
+   "django/views/generic/base.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 6,
+  "gold_lines_changed": 11,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/async/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T150157Z_16493_t1",
+  "instance_id": "django__django-16493",
+  "official_resolved": true,
+  "source_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "gold_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 2,
+  "gold_lines_changed": 5,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/file_storage/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T150352Z_16661_t1",
+  "instance_id": "django__django-16661",
+  "official_resolved": true,
+  "source_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "gold_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 2,
+  "gold_lines_changed": 10,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/modeladmin/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T150710Z_16136_t2",
+  "instance_id": "django__django-16136",
+  "official_resolved": true,
+  "source_files": [
+   "django/views/generic/base.py"
+  ],
+  "gold_files": [
+   "django/views/generic/base.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 10,
+  "gold_lines_changed": 11,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/async/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T151013Z_16493_t2",
+  "instance_id": "django__django-16493",
+  "official_resolved": true,
+  "source_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "gold_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 2,
+  "gold_lines_changed": 5,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/file_storage/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T151318Z_16661_t2",
+  "instance_id": "django__django-16661",
+  "official_resolved": true,
+  "source_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "gold_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 12,
+  "gold_lines_changed": 10,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/modeladmin/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T151840Z_16136_t3",
+  "instance_id": "django__django-16136",
+  "official_resolved": false,
+  "source_files": [
+   "django/views/generic/base.py"
+  ],
+  "gold_files": [
+   "django/views/generic/base.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 23,
+  "gold_lines_changed": 11,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/async/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T152347Z_16493_t3",
+  "instance_id": "django__django-16493",
+  "official_resolved": true,
+  "source_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "gold_files": [
+   "django/db/models/fields/files.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 2,
+  "gold_lines_changed": 5,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/field_deconstruction/tests.py"
+  ]
+ },
+ {
+  "run_id": "20261102T152536Z_16661_t3",
+  "instance_id": "django__django-16661",
+  "official_resolved": true,
+  "source_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "gold_files": [
+   "django/contrib/admin/options.py"
+  ],
+  "same_files_as_gold": true,
+  "source_lines_changed": 5,
+  "gold_lines_changed": 10,
+  "byte_identical_to_gold": false,
+  "test_files_changed": [
+   "tests/modeladmin/tests.py"
+  ]
+ }
+]

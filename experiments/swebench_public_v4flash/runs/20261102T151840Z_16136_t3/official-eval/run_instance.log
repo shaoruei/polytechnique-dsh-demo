@@ -1,0 +1,134 @@
+2026-11-02 15:23:19,035 - INFO - Creating container for django__django-16136...
+2026-11-02 15:23:19,253 - INFO - Container for django__django-16136 created: 3848e52761924ef0ffe93a634383c632edce1df8e23742c30f3241f008c5d117
+2026-11-02 15:23:19,412 - INFO - Container for django__django-16136 started: 3848e52761924ef0ffe93a634383c632edce1df8e23742c30f3241f008c5d117
+2026-11-02 15:23:19,413 - INFO - Intermediate patch for django__django-16136 written to logs/run_evaluation/eval-20261102T152316Z-19496/dsh-v4flash-public-20261102T151840Z_16136_t3/django__django-16136/patch.diff, now applying to container...
+2026-11-02 15:23:19,569 - INFO - >>>>> Applied Patch:
+Checking patch django/views/generic/base.py...
+Checking patch tests/async/tests.py...
+Applied patch django/views/generic/base.py cleanly.
+Applied patch tests/async/tests.py cleanly.
+
+2026-11-02 15:23:20,416 - INFO - Git diff before:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..1e907959d7 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -102,6 +102,25 @@ class View:
+                 )
+             return self.dispatch(request, *args, **kwargs)
+ 
++        async def async_view(request, *args, **kwargs):
++            self = cls(**initkwargs)
++            self.setup(request, *args, **kwargs)
++            if not hasattr(self, "request"):
++                raise AttributeError(
++                    "%s instance has no 'request' attribute. Did you override "
++                    "setup() and forget to call super()?" % cls.__name__
++                )
++            response = self.dispatch(request, *args, **kwargs)
++            # dispatch() may return a plain (non-awaited) response, e.g. when
++            # the sync http_method_not_allowed handler is invoked on an async
++            # view, so only await when the result is actually awaitable.
++            if asyncio.iscoroutine(response):
++                return await response
++            return response
++
++        if cls.view_is_async:
++            view = async_view
++
+         view.view_class = cls
+         view.view_initkwargs = initkwargs
+ 
+@@ -115,10 +134,6 @@ class View:
+         # the dispatch method.
+         view.__dict__.update(cls.dispatch.__dict__)
+ 
+-        # Mark the callback if the view class is async.
+-        if cls.view_is_async:
+-            view._is_coroutine = asyncio.coroutines._is_coroutine
+-
+         return view
+ 
+     def setup(self, request, *args, **kwargs):
+diff --git a/tests/async/tests.py b/tests/async/tests.py
+index 66eece4b97..56f4c5f872 100644
+--- a/tests/async/tests.py
++++ b/tests/async/tests.py
+@@ -7,7 +7,7 @@ from asgiref.sync import async_to_sync
+ from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+ from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
+ from django.http import HttpResponse
+-from django.test import SimpleTestCase
++from django.test import RequestFactory, SimpleTestCase
+ from django.utils.asyncio import async_unsafe
+ from django.views.generic.base import View
+ 
+@@ -119,6 +119,16 @@ class ViewTests(SimpleTestCase):
+ 
+                 self.assertIsInstance(response, HttpResponse)
+ 
++    def test_async_view_returns_405_when_method_not_allowed(self):
++        class AsyncOnlyPostView(View):
++            async def post(self, request, *args, **kwargs):
++                return HttpResponse("ok")
++
++        request = RequestFactory().get("/")
++        response = async_to_sync(AsyncOnlyPostView.as_view())(request)
++        self.assertEqual(response.status_code, 405)
++        self.assertEqual(response["Allow"], "POST, OPTIONS")
++
+     def test_base_view_class_is_sync(self):
+         """
+         View and by extension any subclasses that don't define handlers are
+2026-11-02 15:23:20,417 - INFO - Eval script for django__django-16136 written to logs/run_evaluation/eval-20261102T152316Z-19496/dsh-v4flash-public-20261102T151840Z_16136_t3/django__django-16136/eval.sh; copying to container...
+2026-11-02 15:23:30,808 - INFO - Test runtime: 10.31 seconds
+2026-11-02 15:23:30,809 - INFO - Test output for django__django-16136 written to logs/run_evaluation/eval-20261102T152316Z-19496/dsh-v4flash-public-20261102T151840Z_16136_t3/django__django-16136/test_output.txt
+2026-11-02 15:23:30,910 - INFO - Git diff after:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..1e907959d7 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -102,6 +102,25 @@ class View:
+                 )
+             return self.dispatch(request, *args, **kwargs)
+ 
++        async def async_view(request, *args, **kwargs):
++            self = cls(**initkwargs)
++            self.setup(request, *args, **kwargs)
++            if not hasattr(self, "request"):
++                raise AttributeError(
++                    "%s instance has no 'request' attribute. Did you override "
++                    "setup() and forget to call super()?" % cls.__name__
++                )
++            response = self.dispatch(request, *args, **kwargs)
++            # dispatch() may return a plain (non-awaited) response, e.g. when
++            # the sync http_method_not_allowed handler is invoked on an async
++            # view, so only await when the result is actually awaitable.
++            if asyncio.iscoroutine(response):
++                return await response
++            return response
++
++        if cls.view_is_async:
++            view = async_view
++
+         view.view_class = cls
+         view.view_initkwargs = initkwargs
+ 
+@@ -115,10 +134,6 @@ class View:
+         # the dispatch method.
+         view.__dict__.update(cls.dispatch.__dict__)
+ 
+-        # Mark the callback if the view class is async.
+-        if cls.view_is_async:
+-            view._is_coroutine = asyncio.coroutines._is_coroutine
+-
+         return view
+ 
+     def setup(self, request, *args, **kwargs):
+2026-11-02 15:23:30,910 - INFO - Git diff changed after running eval script
+2026-11-02 15:23:30,910 - INFO - Grading answer for django__django-16136...
+2026-11-02 15:23:30,911 - INFO - report: {'django__django-16136': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_mixed_views_raise_error (async.tests.ViewTests)'], 'failure': ['test_http_method_not_allowed_responds_correctly (async.tests.ViewTests)']}, 'PASS_TO_PASS': {'success': ["View and by extension any subclasses that don't define handlers are", 'test_options_handler_responds_correctly (async.tests.ViewTests)', 'test_views_are_correctly_marked (async.tests.ViewTests)', 'test_caches_local (async.tests.CacheTest)', 'test_async_unsafe (async.tests.AsyncUnsafeTest)', 'Utility class which turns an awaitable that only works on the thread with', 'test_get_async_connection (async.tests.DatabaseConnectionTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-16136: resolved: False
+2026-11-02 15:23:30,912 - INFO - Attempting to stop container sweb.eval.django__django-16136.eval-20261102T152316Z-19496...
+2026-11-02 15:23:46,140 - INFO - Attempting to remove container sweb.eval.django__django-16136.eval-20261102T152316Z-19496...
+2026-11-02 15:23:46,222 - INFO - Container sweb.eval.django__django-16136.eval-20261102T152316Z-19496 removed.

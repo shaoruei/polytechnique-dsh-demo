@@ -1,0 +1,71 @@
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e..1e90795 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -102,6 +102,25 @@ class View:
+                 )
+             return self.dispatch(request, *args, **kwargs)
+ 
++        async def async_view(request, *args, **kwargs):
++            self = cls(**initkwargs)
++            self.setup(request, *args, **kwargs)
++            if not hasattr(self, "request"):
++                raise AttributeError(
++                    "%s instance has no 'request' attribute. Did you override "
++                    "setup() and forget to call super()?" % cls.__name__
++                )
++            response = self.dispatch(request, *args, **kwargs)
++            # dispatch() may return a plain (non-awaited) response, e.g. when
++            # the sync http_method_not_allowed handler is invoked on an async
++            # view, so only await when the result is actually awaitable.
++            if asyncio.iscoroutine(response):
++                return await response
++            return response
++
++        if cls.view_is_async:
++            view = async_view
++
+         view.view_class = cls
+         view.view_initkwargs = initkwargs
+ 
+@@ -115,10 +134,6 @@ class View:
+         # the dispatch method.
+         view.__dict__.update(cls.dispatch.__dict__)
+ 
+-        # Mark the callback if the view class is async.
+-        if cls.view_is_async:
+-            view._is_coroutine = asyncio.coroutines._is_coroutine
+-
+         return view
+ 
+     def setup(self, request, *args, **kwargs):
+diff --git a/tests/async/tests.py b/tests/async/tests.py
+index 66eece4..56f4c5f 100644
+--- a/tests/async/tests.py
++++ b/tests/async/tests.py
+@@ -7,7 +7,7 @@ from asgiref.sync import async_to_sync
+ from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+ from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
+ from django.http import HttpResponse
+-from django.test import SimpleTestCase
++from django.test import RequestFactory, SimpleTestCase
+ from django.utils.asyncio import async_unsafe
+ from django.views.generic.base import View
+ 
+@@ -119,6 +119,16 @@ class ViewTests(SimpleTestCase):
+ 
+                 self.assertIsInstance(response, HttpResponse)
+ 
++    def test_async_view_returns_405_when_method_not_allowed(self):
++        class AsyncOnlyPostView(View):
++            async def post(self, request, *args, **kwargs):
++                return HttpResponse("ok")
++
++        request = RequestFactory().get("/")
++        response = async_to_sync(AsyncOnlyPostView.as_view())(request)
++        self.assertEqual(response.status_code, 405)
++        self.assertEqual(response["Allow"], "POST, OPTIONS")
++
+     def test_base_view_class_is_sync(self):
+         """
+         View and by extension any subclasses that don't define handlers are

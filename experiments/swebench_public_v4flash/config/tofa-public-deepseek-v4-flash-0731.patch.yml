@@ -1,0 +1,35 @@
+# SWE-bench workload experiment: route the stock DSH Web UI to Token Factory PUBLIC.
+# Direct HTTPS to api.tokenfactory.nebius.com (no relay, no proxy of ours, no dedicated endpoint).
+# Everything else in the stock `web` profile is unchanged. Used together with
+# live_demo/config/offline-web-tools.patch.yml (web search/fetch backends removed).
+# No secret here: `apiKeyEnv` names an env var (the cloud egress proxy injects the real key).
+- id: llm-pi-ai
+  config:
+    providers:
+      tofa:
+        displayName: Nebius Token Factory (public)
+        apiKeyEnv: TOFA_API_KEY
+        api: openai-completions
+        baseURL: https://api.tokenfactory.nebius.com/v1
+        # Token Factory chat-completions: no "developer" role, no `store` field.
+        compat:
+          supportsDeveloperRole: false
+          supportsStore: false
+          supportsUsageInStreaming: true
+          supportsReasoningEffort: true
+          maxTokensField: max_tokens
+        models:
+          - id: deepseek-ai/DeepSeek-V4-Flash-0731
+            name: DeepSeek-V4-Flash-0731 (Token Factory public)
+            contextWindow: 1048576
+            maxTokens: 65536
+            reasoningEfforts:
+              low: low
+              medium: medium
+              high: high
+- id: agent-default-model
+  config:
+    provider: tofa
+    model: deepseek-ai/DeepSeek-V4-Flash-0731
+    # Same effort the stock Web UI selects by default for its native DeepSeek model.
+    reasoningEffort: high

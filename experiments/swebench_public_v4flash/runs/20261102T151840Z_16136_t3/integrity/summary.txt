@@ -1,0 +1,1 @@
+{"model": "deepseek-ai/DeepSeek-V4-Flash-0731", "wall_seconds": 230.0, "steps": 34, "tool_calls": 33, "integrity_verdict": "CLEAN"}

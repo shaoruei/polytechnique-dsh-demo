@@ -1,0 +1,1 @@
+[{"instance_id": "django__django-16493", "model_name_or_path": "baseline-noop", "model_patch": "diff --git a/django/db/models/fields/files.py b/django/db/models/fields/files.py\n--- a/django/db/models/fields/files.py\n+++ b/django/db/models/fields/files.py\n@@ -1 +1,2 @@\n+# baseline: no functional change\n import datetime\n"}]
