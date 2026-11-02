@@ -10,7 +10,13 @@ Tests: `tests/python/test_deepseek_benchmark.py`.
 Evidence labels: **[M]** measured here · **[V]** verified from the provider API (control plane, `/v1/models`,
 response headers) · **[E]** estimate derived from [M]/[V] · **[A]** assumption or unverified input.
 
-<!-- DEDICATED-STATUS -->
+> **Status: Public fully measured. Dedicated NOT measured.** The dedicated endpoint `ecole-demo-ds-flash`
+> (2× B200) was enabled at 14:35 UTC, before this session started. It stayed in `status: starting`,
+> `readiness: not_ready`, 0 ready replicas, for the whole session: polled every 30 s from 14:41 to 16:23 UTC
+> (`provenance/dedicated_readiness_poll_2026-11-02.log`, `provenance/verify_20261102T162351Z.json`).
+> Its routing key was never listed in `/v1/models`. No dedicated request was sent, and this session made no
+> control-plane change: no restart, no scaling, no stop. Every Dedicated cell below is therefore empty or labelled
+> **[A]/[E]**. The dedicated runs are one command each (§9) and need no code change once the endpoint is ready.
 
 ## 1. What was verified before paid traffic [V]
 
@@ -98,7 +104,30 @@ was not the bottleneck.
 
 ## 3. Experiment A: concurrency scaling [M]
 
-<!-- TABLES-SCALING -->
+#### Profile A: Lightweight chat
+
+| Endpoint | C | n ok/sent | TTFT p50 | TTFT p95 [95% CI] | Latency p50 | Latency p95 [95% CI] | Decode tok/s p50 (per req) | Aggregate out tok/s | Req/s | Errors | In tok p50 | Out tok p50 | Cache hit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| public | 1 | 40/40 | 0.83 | 1.39 [0.91–1.95] | 2.12 | 2.73 [2.58–3.55] | 196 | 120 | 0.47 | 0 | 3054 | 256 | 0.000 |
+| public | 2 | 40/40 | 0.72 | 1.17 [0.91–4.66] | 2.16 | 3.33 [2.62–5.35] | 186 | 220 | 0.86 | 0 | 2890 | 256 | 0.000 |
+| public | 5 | 40/40 | 0.82 | 1.19 [0.95–1.72] | 2.19 | 2.94 [2.80–4.16] | 180 | 504 | 1.97 | 0 | 3143 | 256 | 0.000 |
+| public | 10 | 40/40 | 0.90 | 1.21 [1.09–1.32] | 2.67 | 3.51 [3.40–4.05] | 150 | 798 | 3.12 | 0 | 3084 | 256 | 0.000 |
+| public | 20 | 60/60 | 0.97 | 1.80 [1.65–1.97] | 3.41 | 4.62 [4.32–4.66] | 113 | 1317 | 5.14 | 0 | 3319 | 256 | 0.000 |
+| public | 30 | 90/90 | 1.37 | 2.36 [2.13–3.48] | 4.31 | 7.89 [7.59–8.03] | 88 | 1395 | 5.45 | 0 | 3067 | 256 | 0.000 |
+
+#### Profile B: Agent-like API workload
+
+| Endpoint | C | n ok/sent | TTFT p50 | TTFT p95 [95% CI] | Latency p50 | Latency p95 [95% CI] | Decode tok/s p50 (per req) | Aggregate out tok/s | Req/s | Errors | In tok p50 | Out tok p50 | Cache hit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| public | 1 | 40/40 | 1.21 | 1.52 [1.45–1.93] | 3.88 | 5.14 [4.44–6.74] | 203 | 131 | 0.26 | 0 | 10259 | 512 | 0.000 |
+| public | 2 | 40/40 | 1.24 | 1.54 [1.45–1.71] | 3.53 | 5.42 [4.29–7.85] | 226 | 272 | 0.53 | 0 | 10120 | 512 | 0.000 |
+| public | 5 | 40/40 | 1.38 | 2.01 [1.62–3.87] | 4.52 | 5.66 [5.20–6.03] | 173 | 529 | 1.03 | 0 | 9940 | 512 | 0.000 |
+| public | 10 | 40/40 | 1.82 | 2.46 [2.31–2.95] | 4.89 | 6.66 [5.99–9.37] | 151 | 861 | 1.68 | 0 | 10395 | 512 | 0.000 |
+| public | 20 | 60/60 | 1.51 | 2.53 [2.09–4.35] | 9.39 | 13.61 [13.08–13.73] | 77 | 955 | 1.86 | 0 | 9984 | 512 | 0.000 |
+| public | 30 | 90/90 | 1.71 | 3.00 [2.74–3.16] | 10.17 | 13.23 [12.84–13.93] | 63 | 1402 | 2.74 | 0 | 10124 | 512 | 0.000 |
+
+Dedicated rows: not measured (endpoint never became ready, see status above).
+† fewer than 40 successful samples: p95 is close to the sample maximum; read the CI, not the point value.
 
 Charts: `docs/img/dsv4_scaling_profile_A.png`, `docs/img/dsv4_scaling_profile_B.png` (p50/p95 latency and aggregate
 throughput against concurrency).
@@ -124,7 +153,29 @@ throughput against concurrency).
 
 ## 4. Experiment B: Public rate-limit behaviour [M]
 
-<!-- TABLES-RATELIMIT -->
+#### Open-loop ramp: public, profile Bc (Agent-like, 90% shared (cacheable) prefix)
+
+| Offered RPM | Offered TPM (est.) | Step s | Sent | OK | 429 | 429 rate | First 429 at | Retry-After | Achieved OK RPM | Latency p50/p95 (OK) | Min remaining req | Min remaining tok | Dyn. scale req/tok |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 50 | 518567 | 60 | 42 | 42 | 0 | 0.000 | – | – | 41 | 3.54/5.00 | 998 | 1969238 | 1.0/1.0 |
+| 100 | 1010941 | 60 | 104 | 104 | 0 | 0.000 | – | – | 99 | 4.62/6.28 | 997 | 1944461 | 1.0/1.0 |
+| 150 | 1539874 | 60 | 140 | 140 | 0 | 0.000 | – | – | 133 | 4.67/7.80 | 997 | 1919434 | 1.0/1.0 |
+| 190 | 1937571 | 60 | 180 | 180 | 0 | 0.000 | – | – | 166 | 5.25/9.00 | 997 | 1924743 | 1.0/1.0 |
+| 300 | 3095544 | 180 | 666 | 641 | 24 | 0.036 | 106.0 | – | 281 | 8.97/15.00 | 996 | 5 | 1.0/1.0 |
+
+#### Open-loop ramp: public, profile R (Rate-limit probe (tiny))
+
+| Offered RPM | Offered TPM (est.) | Step s | Sent | OK | 429 | 429 rate | First 429 at | Retry-After | Achieved OK RPM | Latency p50/p95 (OK) | Min remaining req | Min remaining tok | Dyn. scale req/tok |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 100 | 2700 | 60 | 95 | 95 | 0 | 0.000 | – | – | 95 | 0.75/1.37 | 998 | 1999980 | 1.0/1.0 |
+| 250 | 6750 | 60 | 246 | 246 | 0 | 0.000 | – | – | 243 | 0.74/1.42 | 996 | 1990517 | 1.0/1.0 |
+| 500 | 13500 | 60 | 483 | 483 | 0 | 0.000 | – | – | 475 | 0.92/1.54 | 994 | 1984352 | 1.0/1.0 |
+| 750 | 20250 | 60 | 718 | 718 | 0 | 0.000 | – | – | 704 | 1.16/2.36 | 988 | 1990368 | 1.0/1.0 |
+| 900 | 24300 | 60 | 929 | 929 | 0 | 0.000 | – | – | 906 | 1.34/2.68 | 984 | 1987494 | 1.0/1.0 |
+| 1000 | 27000 | 60 | 988 | 988 | 0 | 0.000 | – | – | 978 | 1.50/3.30 | 976 | 1999961 | 1.0/1.0 |
+| 1100 | 29700 | 60 | 1123 | 1121 | 0 | 0.000 | – | – | 1107 | 1.70/3.82 | 869 | 1986860 | 1.0/1.0 |
+| 1250 | 33750 | 60 | 1232 | 1232 | 0 | 0.000 | – | – | 1203 | 1.78/3.91 | 770 | 1985506 | 1.0/1.0 |
+| 1500 | 40500 | 180 | 3728 | 3569 | 157 | 0.042 | 123.2 | – | 1353 | 2.36/4.33 | 0 | 1987384 | 1.0/1.0 |
 
 Chart: `docs/img/dsv4_ratelimit_429.png`.
 
@@ -161,19 +212,104 @@ Chart: `docs/img/dsv4_ratelimit_429.png`.
 
 ## 5. Observed sustainable range [M][E]
 
-<!-- SUSTAINABLE -->
+Conditions: this account's default limits (1,000 RPM / 2M TPM, dynamic scale 1.00), Public pool in us-central1, a
+single client in a cloud container behind an HTTPS proxy, 2 Nov 2026 14:48–15:22 UTC, thinking disabled, fixed
+output length.
+
+| Bound | Public, measured | What sets it |
+|---|---|---|
+| Hard request rate | **≤ 1,000 RPM sustained.** A burst above it is absorbed until the 1,000-request bucket is empty (≈2 min at 1.5×) | request limiter [M][V] |
+| Hard token rate | **≤ 2M TPM sustained**, counting prompt (cached included) + `max_tokens`. ≈ **185 agent-like (B/Bc) requests/min**, or ≈ 600 profile-A requests/min | token limiter [M][V] |
+| Latency-bounded concurrency, chat (A) | **≤ 20 concurrent streams** for p95 ≤ 2× the single-request p95 (4.6 s vs 2.7 s). At 30: p95 7.9 s, aggregate +6% only | serving capacity [M] |
+| Latency-bounded concurrency, agent (B) | **≤ 10 concurrent streams** for p95 ≤ 1.5× single (6.7 s vs 5.1 s). At 20: p95 13.6 s (2.6×) | serving capacity [M] |
+| Error-free range | 0 errors up to 30 concurrent (A and B) and up to 1,000 RPM. First serving errors (502/529, 0.04%) at ≥ 1,100 RPM or above the TPM limit | [M] |
+
+- **First observed degradation range:**
+  - Per-stream decode speed starts falling at **5–10 concurrent streams**: −25% at 10.
+  - End-to-end latency degrades clearly at **20 (B) to 30 (A)** concurrent streams.
+  - Both happen well before any rate limit. Explicit rate limiting starts only beyond 1,000 RPM or 2M TPM.
+- **Not reached in the permitted range:** a throughput plateau for profile B (it still rose at 30), Public behaviour
+  above 30 concurrent streams, and any dynamic limit increase.
+- **Classroom reading [E]:**
+  - An agent step of profile B shape sent by 10 students at once stays near single-user latency.
+  - 20–30 simultaneous steps double the step time, but do not fail.
+  - A class sustaining more than ≈ 185 agent-like steps per minute (for example 60 students × 3 steps/min) hits the
+    token limit. Requests then stall ~10 s and some get 429s, unless the limits are raised.
 
 ## 6. Cost: Public per token vs Dedicated per GPU-hour
 
-<!-- COST -->
+**Public [M] [V]:** cost per request from provider usage × verified list prices.
+
+| Profile | Mean input / cached / output tokens | Cost per request | Cost per 1M output tokens (incl. input) |
+|---|---|---|---|
+| A | 3,080 / 0 / 256 | $0.00050 | $1.95 |
+| B | 10,200 / 0 / 512 | $0.00157 | $3.07 |
+| Bc (88% of prompt cached) | ≈10,300 / ≈9,040 / 512 | $0.00040 | $0.77 |
+
+- **Hourly Public cost at the measured throughput [E]:**
+  - B at 10 concurrent (1.68 req/s): $9.5/h. B at 30 concurrent (2.74 req/s): $15.3/h.
+  - Running B flat out at the account's token limit (≈ 187 req/min): **≈ $17.6/h**. The same for Bc (cached agent
+    traffic): **≈ $4.6/h**.
+- **Dedicated [A]: price not verified.**
+  - The control plane exposes no price. The pricing pages (nebius.com, docs.tokenfactory.nebius.com) are not
+    reachable from this session, and no invoice was available. The actual billing for `ecole-demo-ds-flash` must
+    be read from the Nebius console or invoice.
+  - Proxy used here: Nebius AI Cloud B200 list prices already in `data/pricing.json` ($8.50 on-demand, $7.15
+    docs line item, per GPU-hour). For 2× B200 that gives **$14.30–$17.00/h**. With the ~4% premium seen on the
+    Token Factory 4× H100 rate in the GPT-OSS test ($4.70 vs $4.50 per GPU-hour), it gives ≈ $17.70/h.
+  - Billing model (from the GPT-OSS test, `data/pricing.json`): per replica-minute while ≥ 1 replica is ready,
+    with provisioning not billed. If that holds, the ~108 minutes `starting` should not have been billed. **[A] —
+    verify on the invoice.**
+- **Break-even [E]:** the aggregate output throughput a dedicated replica must sustain *during every billed hour* to
+  match Public cost.
+
+| Profile | at $14.30/h | at $17.00/h | at $17.70/h |
+|---|---|---|---|
+| A | 2,030 tok/s (477 req/min) | 2,420 tok/s (567 req/min) | 2,520 tok/s (590 req/min) |
+| B | 1,300 tok/s (152 req/min) | 1,540 tok/s (180 req/min) | 1,600 tok/s (188 req/min) |
+| Bc (cached agent) | 5,130 tok/s (602 req/min) | 6,100 tok/s (715 req/min) | 6,360 tok/s (745 req/min) |
+
+- **Reading:**
+  - For uncached agent-like traffic, a dedicated replica breaks even only if it is kept busy at about the Public
+    account's own token limit (~180 B requests/min) **all hour**.
+  - For realistic cached agent traffic, break-even needs ~4× more than the Public limits allow (~715 req/min).
+  - Public at the measured 30 concurrent streams delivered 1,400 tok/s. Whether 2× B200 can sustain 1,500–6,000
+    tok/s is unknown: **the dedicated capacity was not measured.** Classroom traffic is bursty, so average
+    utilisation of billed hours would be far below peak.
+  - Same conclusion as for GPT-OSS-120B: Dedicated buys isolation and freedom from rate limits, not a lower cost
+    per token. This remains an estimate until the price and the replica's throughput are measured.
 
 ## 7. Spend and endpoint state
 
-<!-- SPEND -->
+| Item | Value |
+|---|---|
+| Public spend (ledger, provider usage × list price) | **$1.271** of the $2.00 cap: smoke $0.005, Exp. A $0.781 (A $0.190, B $0.591), Exp. B $0.485 (R $0.046, Bc $0.439) |
+| Not in the ledger | 6 manual parameter-check calls with curl (< 100 tokens each, < $0.0001) |
+| Public requests | 11,430 measured + 9 smoke, 0 retries. 181 got 429, 5 got 5xx, 0 timeouts |
+| Dedicated requests | 0 |
+| Dedicated billing state | `enabled: true`, `status: starting`, `readiness: not_ready`, 0 ready replicas at 16:23:51 UTC. Left unchanged: it was enabled outside this session. **It is still enabled and will start billing once a replica becomes ready**: whoever enabled it should decide whether to keep it |
+| Control-plane writes by this session | none |
 
 ## 8. Limitations
 
-<!-- LIMITATIONS -->
+- **Dedicated endpoint not measured** (never ready). The Public vs Dedicated comparison and the Dedicated GPU-hour
+  price remain open. Every Dedicated statement here is [A] or [E].
+- **One window, one client, one region path.** The Public pool is multi-tenant: its latency depends on other
+  customers' load at the time. Each scaling level is a single run (40–90 samples). p95 values have bootstrap 95%
+  CIs, typically ±10–30% (wider at C = 1–2). The irregular B curve at C = 20 shows run-to-run variance.
+- **Connection setup is inside TTFT.** This session's egress proxy forces `Connection: close`, so every request
+  opened a new CONNECT + TLS connection: p50 ≈ 0.05 s, p95 up to ≈ 0.3 s at C = 30 (`t_conn` in every record).
+  Applied equally to all phases (and would apply equally to Dedicated). A client with keep-alive, or on campus,
+  will see slightly lower TTFT. Latency also includes the proxy hop.
+- **Synthetic prompts.** Deterministic code-review text, thinking disabled, `ignore_eos` forcing exact output
+  lengths. Real agent requests (DSH/SWE-bench) use reasoning, tools and variable outputs, and reuse prefixes heavily
+  (cache hit ~90% in the GPT-OSS DSH runs). Bc approximates the cache effect only for the rate-limit test. Replace
+  the profiles with measured SWE-bench token distributions when available (§9).
+- **Rate-limit tests used one shape per limiter** (tiny requests for RPM, cached agent requests for TPM), with
+  Poisson arrivals and 60 s steps. The bucket model (capacity = 1 min of quota, continuous refill) fits both, but
+  was not probed with sharp bursts. Dynamic limit scaling (+20% per 15 min at ≥ 80% usage) was not triggered.
+- **Over-limit hold time** (~10 s before a 429) is inferred from client timing. The server did not state it.
+- **Public cost** uses list prices × provider-reported usage, not an invoice.
 
 ## 9. Reproduce
 
