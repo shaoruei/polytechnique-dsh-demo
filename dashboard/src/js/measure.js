@@ -95,7 +95,10 @@ function drawMeasure() {
       layout: { padding: { top: 28 } },
       scales: {
         y: { min: 0, suggestedMax: 450, title: { display: true, text: 'tokens / second' }, ticks: { font: { size: 15 } } },
-        x: { offset: true, title: { display: true, text: 'runs in the order they ran (A, B, C = the three issues)' }, ticks: { font: { size: 16, weight: '600' } } },
+        x: { offset: true, title: { display: true, text: 'runs in the order they ran (A, B, C = the three issues) · start time on 2 November' },
+          // run label, then its start time in UTC and New York time (EST, UTC−5)
+          ticks: { font: { size: 15, weight: '600' }, callback: (v, i) => { const t = new Date(runs[i].metrics.turn_started_at_utc);
+            return [runs[i].label, `${t.toISOString().slice(11, 16)} UTC`, `${t.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' })} ET`]; } } },
       },
       plugins: {
         legend: { display: false },
