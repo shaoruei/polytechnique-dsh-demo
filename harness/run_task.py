@@ -65,6 +65,16 @@ def git(cwd: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout
 
 
+def fixture_hash(task_dir: Path) -> str:
+    """sha256 over task.md, workspace/ and hidden/: proves which frozen fixture a run used."""
+    import hashlib
+    h = hashlib.sha256()
+    for f in sorted(p for p in task_dir.rglob("*") if p.is_file() and "__pycache__" not in p.parts
+                    and p.relative_to(task_dir).parts[0] in ("task.md", "workspace", "hidden")):
+        h.update(str(f.relative_to(task_dir)).encode() + b"\0" + f.read_bytes() + b"\0")
+    return h.hexdigest()
+
+
 def init_workspace(task_dir: Path, work: Path) -> None:
     shutil.copytree(task_dir / "workspace", work)
     git(work, "init", "-q", "-b", "main")
@@ -200,6 +210,8 @@ def main() -> int:
     ap.add_argument("--cohort", default="", help="experiment cohort, e.g. dedicated-seq, conc-3, public-control")
     ap.add_argument("--wave", default="", help="concurrency wave id (runs started together)")
     ap.add_argument("--suffix", default="", help="extra run-id suffix (unique names for concurrent runs)")
+    ap.add_argument("--max-cost-usd", type=float, default=None,
+                    help="per-run spending cap enforced by the relay (public prices; see harness/tofa_relay.py)")
     ap.add_argument("--no-relay", action="store_true",
                     help="talk to Token Factory directly (tool calls break on the current stream bug)")
     ap.add_argument("--keep-workdir", action="store_true", help="keep the scratch workspace and DSH home")
@@ -223,7 +235,8 @@ def main() -> int:
     (out / "prompt.md").write_text(prompt)
 
     # Loopback relay (stream repair + wire-level measurement), see harness/tofa_relay.py.
-    relay = tofa_relay.serve(0, str(out / "requests.jsonl"), ep["origin"], ep["model"], ep["name"])
+    relay = tofa_relay.serve(0, str(out / "requests.jsonl"), ep["origin"], ep["model"], ep["name"],
+                             max_cost_usd=args.max_cost_usd)
     threading.Thread(target=relay.serve_forever, daemon=True).start()
     relay_url = f"http://127.0.0.1:{relay.server_address[1]}/v1"
 
@@ -293,6 +306,8 @@ def main() -> int:
         "timeout_s": args.timeout, "timed_out": timed_out, "dsh_exit_code": code,
         "dsh_stderr_tail": sanitize_text(stderr[-2000:]), "turn_end_reason": turn_end, "agent_final_answer": final,
         "session_id": session_id, "wall_time_source": "harness wall clock",
+        "max_cost_usd": args.max_cost_usd, "relay_spent_usd": round(relay.spent_usd, 6),
+        "fixture_sha256": fixture_hash(task_dir),
     }
     (scratch / "meta.json").write_text(json.dumps(meta, indent=1))
     try:
@@ -379,7 +394,7 @@ def finalize(meta: dict, scratch: Path, out: Path) -> dict:
         },
         "metrics": run_metrics,
     }
-    for k in ("finalized_offline", "events_lines_unparseable"):
+    for k in ("finalized_offline", "events_lines_unparseable", "max_cost_usd", "relay_spent_usd", "fixture_sha256"):
         if meta.get(k) is not None:
             result[k] = meta[k]
     (out / "result.json").write_text(json.dumps(result, indent=2) + "\n")

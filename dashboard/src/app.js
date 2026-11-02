@@ -932,7 +932,7 @@ function renderMethod() {
     ${li('DSH compat settings needed for Token Factory: no <code>developer</code> role, no <code>store</code>, <code>max_tokens</code> (see <code>dsh/tofa.patch.yml</code>). DSH telemetry is disabled.')}
     ${li('Small sample: 2–6 runs per task × effort. Treat success rates as indicative. T2 fails every time on the same spec clause.')}
     ${li('Public latency in the simulation is the measured latency. It assumes the shared endpoint does not slow down under our own traffic.')}
-    ${li('Dedicated latency, throughput and queueing are <b>simulated</b> from third-party benchmark data, not measured. The benchmark mix is 8k input / 1k output tokens, while agent requests carry fewer uncached tokens per output token, so capacity is likely conservative. The efficiency slider covers serving optimisations.')}
+    ${li('Dedicated 4× H100 latency and throughput are <b>measured</b> at 1–5 concurrent agents (section 3). Above 5 requests per replica, and for the other GPU rows, they are <b>simulated</b> from third-party benchmark data. The benchmark mix is 8k input / 1k output tokens, while agent requests carry fewer uncached tokens per output token, so capacity is likely conservative. The efficiency slider covers serving optimisations.')}
     ${li('Not modelled: cold starts and capacity availability of dedicated endpoints, failed or retried HTTP requests (none occurred in the measured runs), network differences between campus and this container, and the student-side review time distribution.')}
     ${li('Simulation: time step 0.1 s (0.5 s for day-long windows), deterministic for a seed; every backend sees identical demand (common random numbers).')}</ul></div>`;
 }

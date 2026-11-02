@@ -80,3 +80,20 @@ class OverlayTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RelaySpendingCapTest(unittest.TestCase):
+    def test_requests_refused_once_cap_reached(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "r.jsonl"
+            relay = tofa_relay.serve(0, str(log), "http://127.0.0.1:9", "openai/gpt-oss-120b", "public", max_cost_usd=0.01)
+            relay.spent_usd = 0.01  # as if earlier requests had already cost the cap
+            threading.Thread(target=relay.serve_forever, daemon=True).start()
+            body = json.dumps({"model": "openai/gpt-oss-120b", "messages": []}).encode()
+            req = urllib.request.Request(f"http://127.0.0.1:{relay.server_address[1]}/v1/chat/completions", data=body,
+                                         headers={"Content-Type": "application/json"}, method="POST")
+            with self.assertRaises(urllib.error.HTTPError) as ctx:
+                urllib.request.urlopen(req, timeout=10)
+            self.assertEqual(ctx.exception.code, 400)
+            relay.shutdown()
+            self.assertTrue(json.loads(log.read_text().splitlines()[0])["cap_rejected"])

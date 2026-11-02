@@ -94,6 +94,15 @@ class Relay(BaseHTTPRequestHandler):
         pass
 
     def _record(self, rec: dict) -> None:
+        usage = rec.get("usage") or {}
+        if usage and rec.get("path", "").endswith("/chat/completions"):
+            p = self.server.prices
+            cached = (usage.get("prompt_tokens_details") or {}).get("cached_tokens") or 0
+            cost = ((usage.get("prompt_tokens", 0) - cached) * p["input_per_mtok"] + cached * p["cached_input_per_mtok"]
+                    + usage.get("completion_tokens", 0) * p["output_per_mtok"]) / 1e6
+            with self.log_lock:
+                self.server.spent_usd += cost
+            rec["relay_cumulative_cost_usd"] = round(self.server.spent_usd, 6)
         if rec.get("response_model") is not None:
             want = rec.get("expected_model") or rec.get("model")
             rec["endpoint_verified"] = rec["response_model"] == want
@@ -123,6 +132,18 @@ class Relay(BaseHTTPRequestHandler):
             rec.update(status=400, error="relay endpoint guard: model mismatch", t_end=time.time(), guard_rejected=True)
             self._record(rec)
             payload = json.dumps({"error": {"message": f"relay guard: expected model {srv.expected_model}"}}).encode()
+            self.send_response(400)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
+        # Spending cap: once the provider-reported cost of this relay's traffic reaches the cap,
+        # further chat requests are refused locally (non-retryable 400) and never reach the provider.
+        if srv.max_cost_usd is not None and path.endswith("/chat/completions") and srv.spent_usd >= srv.max_cost_usd:
+            rec.update(status=400, error="relay spending cap reached", t_end=time.time(), cap_rejected=True)
+            self._record(rec)
+            payload = json.dumps({"error": {"message": f"relay spending cap ${srv.max_cost_usd} reached"}}).encode()
             self.send_response(400)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(payload)))
@@ -246,7 +267,7 @@ class _Server(ThreadingHTTPServer):
 
 
 def serve(port: int, log_path: str | None, upstream: str = UPSTREAM, expected_model: str | None = None,
-          endpoint_label: str | None = None, repair: bool = True) -> ThreadingHTTPServer:
+          endpoint_label: str | None = None, repair: bool = True, max_cost_usd: float | None = None) -> ThreadingHTTPServer:
     """Start a relay. `upstream` is an origin (scheme://host), `expected_model` enables the guard."""
     server = _Server(("127.0.0.1", port), Relay)
     server.daemon_threads = True
@@ -255,6 +276,10 @@ def serve(port: int, log_path: str | None, upstream: str = UPSTREAM, expected_mo
     server.expected_model = expected_model  # type: ignore[attr-defined]
     server.endpoint_label = endpoint_label  # type: ignore[attr-defined]
     server.repair = repair  # type: ignore[attr-defined]
+    server.max_cost_usd = max_cost_usd  # type: ignore[attr-defined]
+    server.spent_usd = 0.0  # type: ignore[attr-defined]
+    from pathlib import Path
+    server.prices = json.loads((Path(__file__).resolve().parents[1] / "data" / "pricing.json").read_text())["public"]  # type: ignore[attr-defined]
     return server
 
 

@@ -24,8 +24,9 @@ def judge(task: Path, with_reference: bool) -> bool:
 
 
 class FixtureTest(unittest.TestCase):
-    def test_three_tasks_present(self):
-        self.assertEqual([t.name for t in TASKS], ["t1-grade-average", "t2-duration-parser", "t3-schedule-conflicts"])
+    def test_all_tasks_present(self):
+        self.assertEqual([t.name for t in TASKS], ["h1-usage-budgets", "m1-late-penalties", "t1-grade-average",
+                                                  "t2-duration-parser", "t3-schedule-conflicts"])
 
     def test_fixture_fails_and_reference_passes(self):
         for task in TASKS:
@@ -36,3 +37,13 @@ class FixtureTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FixtureIsolationTest(unittest.TestCase):
+    def test_workspaces_contain_no_hidden_tests_or_reference(self):
+        for task in TASKS:
+            names = {p.name for p in (task / "workspace").rglob("*") if p.is_file()}
+            for hidden in (task / "hidden").glob("*.py"):
+                self.assertNotIn(hidden.name, names, task.name)
+            text = "\n".join(p.read_text() for p in (task / "workspace").rglob("*.py"))
+            self.assertNotIn("hidden", text.lower(), task.name)

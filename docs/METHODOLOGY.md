@@ -10,7 +10,7 @@
 | Estimate | Calculated from the above by the model in `model/` | dashboard sections 3–4, `data/findings.json` |
 | Assumption | An adjustable input without a verified value | dashboard controls, listed below |
 
-No dedicated latency, throughput or task success was measured. Everything about Dedicated endpoints is benchmark plus assumption.
+Dedicated **was measured** on 2026-11-02: `ecole-demo`, a 4× H100 replica, with 29 DSH runs at 1–5 concurrent agents (`docs/DEDICATED_BENCHMARK.md`). Dedicated behaviour **beyond 5 concurrent requests per replica**, other GPU configurations, and any workload other than T1–T3 remain benchmark-based extrapolations or assumptions.
 
 ## Task fixtures (`tasks/`)
 
@@ -131,7 +131,7 @@ Timing is observed from this cloud container (Token Factory region eu-north1) th
 
 - **Small samples:** 2–7 runs per task × effort. Success rates are indicative, and T2 is a single systematic failure mode.
 - **Three small Python tasks.** Real student tasks vary more (longer contexts, more steps). Use the effort selector and the *tasks per student* slider as sensitivity checks.
-- **Dedicated numbers are not measured.** The benchmark conditions (8k/1k, best serving config per point, fp4) differ from agent traffic. The H100 TP1 KV estimate is approximate. Cold starts, capacity availability and autoscaling delays are not modelled.
+- **Dedicated is measured only for the 4× H100 replica at 1–5 concurrent agents on T1–T3** (2026-11-02). Above that load, and for the other GPU rows, numbers come from benchmark conditions (8k/1k, best serving config per point, fp4) that differ from agent traffic. The H100 TP1 KV estimate is approximate. Cold starts, capacity availability and autoscaling delays are not modelled.
 - **Public endpoint:** latency is assumed independent of our load. TPM accounting of cached tokens is inferred, not documented. Account limits differ per organisation.
 - The 15-minute dynamic rate-limit rule is applied as documented. The real controller may differ.
 - Client-side timing includes proxy hops in the cloud container.
