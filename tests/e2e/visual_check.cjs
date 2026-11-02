@@ -144,6 +144,67 @@ async function diagnosticsControl(browser, root) {
   };
 }
 
+// Interaction control (the failure reproduced on the Ubuntu VM, Firefox 155): with motion allowed,
+// move the pointer over every chart on every tab and toggle legend entries, switch theme, then
+// require every chart on every tab to still be drawn, with no page error. Before the fix, hovering
+// the Measure cost-split bars threw "this._fn is not a function" inside Chart.js's shared animation
+// loop and every chart drawn afterwards (e.g. Cost Curves) stayed blank. Also requires animations to
+// be off, globally and per chart, and that no Chart.js animation ever ticks.
+async function interactionControl(browser, root) {
+  const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 }, reducedMotion: 'no-preference' });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|fonts\.g/.test(m.text())) errors.push(m.text()); });
+  await page.route('**/*', (r) => (r.request().url().startsWith('file://') ? r.continue() : r.abort()));
+  await page.addInitScript(() => {
+    window.__animTicks = 0;
+    const hook = () => {
+      if (!window.Chart || !window.Chart.Animation) return setTimeout(hook, 0);
+      const tick = window.Chart.Animation.prototype.tick;
+      window.Chart.Animation.prototype.tick = function patched(date) { window.__animTicks++; return tick.call(this, date); };
+      return undefined;
+    };
+    hook();
+  });
+  await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#measure');
+  await page.waitForTimeout(900);
+  const hoverAll = async () => {
+    for (const c of await page.$$('.view:not([hidden]) canvas')) {
+      const bb = await c.boundingBox();
+      if (!bb || !bb.width) continue;
+      for (let i = 1; i < 16; i++) {
+        await page.mouse.move(bb.x + (bb.width * i) / 16, bb.y + bb.height * 0.7);
+        await page.waitForTimeout(25);
+      }
+      for (let k = 0; k < 2; k++) { await page.mouse.click(bb.x + bb.width / 2, bb.y + 12); await page.waitForTimeout(60); }
+    }
+    await page.mouse.move(2, 2);
+  };
+  const checks = [];
+  for (const pass of ['hover', 'after']) {
+    for (const view of ['measure', 'run', 'workloads', 'dedicated', 'economics', 'classroom']) {
+      await page.evaluate((v) => { location.hash = v; }, view);
+      await page.waitForTimeout(view === 'classroom' ? 2500 : 900);
+      if (pass === 'hover') await hoverAll();
+      else checks.push({ view, ...(await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS)) });
+    }
+    if (pass === 'hover') { await page.emulateMedia({ colorScheme: 'dark' }); await page.waitForTimeout(600); }
+  }
+  const anim = await page.evaluate(() => ({
+    ticks: window.__animTicks,
+    global: window.Chart.defaults.animation,
+    perChart: Object.values(window.Chart.instances).filter((c) => c.options.animation !== false).map((c) => c.canvas.id),
+  }));
+  await ctx.close();
+  const blank = [];
+  for (const r of checks) {
+    for (const c of r.canvases) if (!c.onDemand && (c.painted < MIN_PAINTED || c.missing.length)) blank.push(`#${r.view} ${c.id}`);
+    for (const n of r.notices) blank.push(`#${r.view} notice: ${n.slice(0, 80)}`);
+  }
+  return { errors: [...new Set(errors)], blank, anim, canvases: checks.reduce((n, r) => n + r.canvases.length, 0) };
+}
+
 (async () => {
   const root = path.resolve(__dirname, '../..');
   const out = process.argv[2] || path.join(root, '.cache', 'visual');
@@ -169,10 +230,16 @@ async function diagnosticsControl(browser, root) {
   } else {
     console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws both charts');
   }
+  const ic = await interactionControl(browser, root);
+  if (ic.errors.length || ic.blank.length || ic.canvases < 10 || ic.anim.ticks || ic.anim.global !== false || ic.anim.perChart.length) {
+    problems.push(`interaction control: ${JSON.stringify(ic).slice(0, 600)}`);
+  } else {
+    console.log(`interaction control OK: after hovering and legend clicks on every chart and a theme switch, ${ic.canvases} canvases on all tabs still drawn; animations off globally and per chart, 0 animation ticks, no page errors`);
+  }
   let checked = 0;
   for (const viewport of [{ width: 1400, height: 1000 }, { width: 1024, height: 720 }]) {
     for (const scheme of ['light', 'dark']) {
-      const ctx = await browser.newContext({ viewport, colorScheme: scheme });
+      const ctx = await browser.newContext({ viewport, colorScheme: scheme, reducedMotion: 'no-preference' });
       const page = await ctx.newPage();
       const tag = `${scheme} ${viewport.width}px`;
       page.on('pageerror', (e) => problems.push(`[${tag}] pageerror: ${e.message}`));

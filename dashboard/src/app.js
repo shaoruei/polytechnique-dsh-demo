@@ -61,7 +61,13 @@ function themeDefaults() {
   Chart.defaults.font.size = 12;
   Chart.defaults.plugins.legend.labels.boxWidth = 12;
   Chart.defaults.maintainAspectRatio = false;
-  Chart.defaults.animation = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : { duration: 250 };
+  // No animations. Assigning a partial object here (formerly { duration: 250 }) replaced Chart.js's
+  // animation defaults: Animations.configure() copies only the keys of defaults.animation, so colour
+  // properties lost their 'color' interpolator. The first animated colour change (hovering a bar,
+  // whose hover colour differs) threw "this._fn is not a function" inside Chart.js's shared animation
+  // loop, which stopped it, and every chart drawn afterwards stayed blank. Static charts also suit a
+  // projector. Set globally here and again per chart in chart().
+  Chart.defaults.animation = false;
 }
 // ------------------------------------------------------------------ diagnostics
 // A chart that fails must say so on screen. A blank canvas cannot be diagnosed from a projector.
@@ -109,6 +115,7 @@ function chart(id, config) {
   const canvas = $(id);
   releaseCanvas(id, canvas);
   chartNotice(canvas, null);
+  config.options = { ...(config.options || {}), animation: false };
   try {
     charts[id] = new Chart(canvas, config);
   } catch (err) {
