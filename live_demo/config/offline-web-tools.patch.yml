@@ -1,0 +1,11 @@
+# Benchmark hygiene for the live demo: keep the stock DSH Web UI, harness, prompts and
+# DeepSeek provider exactly as shipped, but remove the web search / web fetch BACKENDS.
+# The model still sees web_search / web_fetch and gets a structured
+# WEB_PROVIDER_UNAVAILABLE error if it calls them, so it cannot download the upstream
+# fix for this (public, 2022) issue. Rehearsal 1 fetched the fixed file from GitHub.
+- id: web-fetch-http
+  disabled: true
+- id: web-search-deepseek
+  disabled: true
+- id: web-deepseek-api
+  disabled: true

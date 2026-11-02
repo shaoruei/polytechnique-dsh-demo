@@ -1,0 +1,65 @@
+2026-11-02 14:09:47,440 - INFO - Creating container for django__django-16136...
+2026-11-02 14:09:48,558 - INFO - Container for django__django-16136 created: 0eb2cc417a775e1acbb9f29dc6b2d4e91f3c0afc99ae7bf79152416d633f737f
+2026-11-02 14:09:48,730 - INFO - Container for django__django-16136 started: 0eb2cc417a775e1acbb9f29dc6b2d4e91f3c0afc99ae7bf79152416d633f737f
+2026-11-02 14:09:48,730 - INFO - Intermediate patch for django__django-16136 written to logs/run_evaluation/gold-validation/gold/django__django-16136/patch.diff, now applying to container...
+2026-11-02 14:09:48,925 - INFO - >>>>> Applied Patch:
+Checking patch django/views/generic/base.py...
+Applied patch django/views/generic/base.py cleanly.
+
+2026-11-02 14:09:50,172 - INFO - Git diff before:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..3a3afb0c73 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -148,7 +148,16 @@ class View:
+             request.path,
+             extra={"status_code": 405, "request": request},
+         )
+-        return HttpResponseNotAllowed(self._allowed_methods())
++        response = HttpResponseNotAllowed(self._allowed_methods())
++
++        if self.view_is_async:
++
++            async def func():
++                return response
++
++            return func()
++        else:
++            return response
+ 
+     def options(self, request, *args, **kwargs):
+         """Handle responding to requests for the OPTIONS HTTP verb."""
+2026-11-02 14:09:50,172 - INFO - Eval script for django__django-16136 written to logs/run_evaluation/gold-validation/gold/django__django-16136/eval.sh; copying to container...
+2026-11-02 14:10:01,194 - INFO - Test runtime: 10.94 seconds
+2026-11-02 14:10:01,194 - INFO - Test output for django__django-16136 written to logs/run_evaluation/gold-validation/gold/django__django-16136/test_output.txt
+2026-11-02 14:10:01,284 - INFO - Git diff after:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..3a3afb0c73 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -148,7 +148,16 @@ class View:
+             request.path,
+             extra={"status_code": 405, "request": request},
+         )
+-        return HttpResponseNotAllowed(self._allowed_methods())
++        response = HttpResponseNotAllowed(self._allowed_methods())
++
++        if self.view_is_async:
++
++            async def func():
++                return response
++
++            return func()
++        else:
++            return response
+ 
+     def options(self, request, *args, **kwargs):
+         """Handle responding to requests for the OPTIONS HTTP verb."""
+2026-11-02 14:10:01,284 - INFO - Grading answer for django__django-16136...
+2026-11-02 14:10:01,288 - INFO - report: {'django__django-16136': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_http_method_not_allowed_responds_correctly (async.tests.ViewTests)', 'test_mixed_views_raise_error (async.tests.ViewTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ["View and by extension any subclasses that don't define handlers are", 'test_options_handler_responds_correctly (async.tests.ViewTests)', 'test_views_are_correctly_marked (async.tests.ViewTests)', 'test_caches_local (async.tests.CacheTest)', 'test_async_unsafe (async.tests.AsyncUnsafeTest)', 'Utility class which turns an awaitable that only works on the thread with', 'test_get_async_connection (async.tests.DatabaseConnectionTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-16136: resolved: True
+2026-11-02 14:10:01,288 - INFO - Attempting to stop container sweb.eval.django__django-16136.gold-validation...
+2026-11-02 14:10:16,526 - INFO - Attempting to remove container sweb.eval.django__django-16136.gold-validation...
+2026-11-02 14:10:16,621 - INFO - Container sweb.eval.django__django-16136.gold-validation removed.
+2026-11-02 14:10:16,621 - INFO - Attempting to remove image swebench/sweb.eval.x86_64.django_1776_django-16136:latest...
+2026-11-02 14:10:30,509 - INFO - Image swebench/sweb.eval.x86_64.django_1776_django-16136:latest removed.

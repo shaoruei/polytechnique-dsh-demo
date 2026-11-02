@@ -8,6 +8,8 @@
 4. **Compare deployment economics.** Public pay-per-token against Dedicated pay-per-replica-hour ($18.80/h for 4× H100), with capacity-aware sizing and break-even curves.
 5. **Scale to a classroom.** An interactive simulation of 20–500 students. Each simulated agent replays a real measured trajectory.
 
+**Live segment (separate):** the stock DSH Web UI with the native DeepSeek model on a real SWE-bench Verified issue (`django__django-16136`), with no Token Factory route and no relay. See [`docs/LIVE_DEMO.md`](docs/LIVE_DEMO.md) and `live_demo/`.
+
 Every figure in the dashboard is labelled **Measured**, **Verified** (published price or limit), **Benchmark** (third-party), **Estimate** or **Assumption**.
 
 ## Quick start (presentation laptop or this cloud environment)

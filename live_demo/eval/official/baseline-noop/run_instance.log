@@ -1,0 +1,37 @@
+2026-11-02 14:11:23,622 - INFO - Creating container for django__django-16136...
+2026-11-02 14:11:24,628 - INFO - Container for django__django-16136 created: 7b51f739dc913b1849d1ecb05bb60ffe80162ac85eec2e543c499d08bbb8c4c8
+2026-11-02 14:11:24,891 - INFO - Container for django__django-16136 started: 7b51f739dc913b1849d1ecb05bb60ffe80162ac85eec2e543c499d08bbb8c4c8
+2026-11-02 14:11:24,892 - INFO - Intermediate patch for django__django-16136 written to logs/run_evaluation/baseline-noop/baseline-noop/django__django-16136/patch.diff, now applying to container...
+2026-11-02 14:11:25,095 - INFO - >>>>> Applied Patch:
+Checking patch django/views/generic/base.py...
+Applied patch django/views/generic/base.py cleanly.
+
+2026-11-02 14:11:26,101 - INFO - Git diff before:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..8ca0ee3281 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -1,3 +1,4 @@
++# baseline: no functional change
+ import asyncio
+ import logging
+2026-11-02 14:11:26,102 - INFO - Eval script for django__django-16136 written to logs/run_evaluation/baseline-noop/baseline-noop/django__django-16136/eval.sh; copying to container...
+2026-11-02 14:11:36,636 - INFO - Test runtime: 10.37 seconds
+2026-11-02 14:11:36,636 - INFO - Test output for django__django-16136 written to logs/run_evaluation/baseline-noop/baseline-noop/django__django-16136/test_output.txt
+2026-11-02 14:11:36,723 - INFO - Git diff after:
+diff --git a/django/views/generic/base.py b/django/views/generic/base.py
+index db1842e3e5..8ca0ee3281 100644
+--- a/django/views/generic/base.py
++++ b/django/views/generic/base.py
+@@ -1,3 +1,4 @@
++# baseline: no functional change
+ import asyncio
+ import logging
+2026-11-02 14:11:36,723 - INFO - Grading answer for django__django-16136...
+2026-11-02 14:11:36,724 - INFO - report: {'django__django-16136': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_http_method_not_allowed_responds_correctly (async.tests.ViewTests)', 'test_mixed_views_raise_error (async.tests.ViewTests)']}, 'PASS_TO_PASS': {'success': ["View and by extension any subclasses that don't define handlers are", 'test_options_handler_responds_correctly (async.tests.ViewTests)', 'test_views_are_correctly_marked (async.tests.ViewTests)', 'test_caches_local (async.tests.CacheTest)', 'test_async_unsafe (async.tests.AsyncUnsafeTest)', 'Utility class which turns an awaitable that only works on the thread with', 'test_get_async_connection (async.tests.DatabaseConnectionTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-16136: resolved: False
+2026-11-02 14:11:36,724 - INFO - Attempting to stop container sweb.eval.django__django-16136.baseline-noop...
+2026-11-02 14:11:51,937 - INFO - Attempting to remove container sweb.eval.django__django-16136.baseline-noop...
+2026-11-02 14:11:52,082 - INFO - Container sweb.eval.django__django-16136.baseline-noop removed.
+2026-11-02 14:11:52,082 - INFO - Attempting to remove image swebench/sweb.eval.x86_64.django_1776_django-16136:latest...
+2026-11-02 14:12:06,212 - INFO - Image swebench/sweb.eval.x86_64.django_1776_django-16136:latest removed.
