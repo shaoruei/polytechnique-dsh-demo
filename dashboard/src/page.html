@@ -1,4 +1,4 @@
-<title>DSH × Token Factory Performance &amp; Cost Demo</title>
+<title>Coding Agents on Token Factory</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -9,12 +9,11 @@
     <div class="brand">
       <p class="eyebrow">École polytechnique · 3 November 2026</p>
       <h1>Coding agents on Token Factory, from one task to a whole classroom</h1>
-      <p class="sub">DeepSeek Harness (<code>dsh</code> <span id="dsh-version"></span>) driving <code>openai/gpt-oss-120b</code> on Nebius Token Factory. Every figure carries a label saying where it comes from.</p>
+      <p class="sub">DeepSeek Harness (<code>dsh</code> <span id="dsh-version"></span>) running <code>deepseek-ai/DeepSeek-V4-Flash-0731</code> on Nebius Token Factory Public.</p>
     </div>
     <ul class="legend" aria-label="Evidence labels">
-      <li><span class="ev ev-measured">Measured</span> real DSH runs in this project</li>
+      <li><span class="ev ev-measured">Measured</span> recorded in this project</li>
       <li><span class="ev ev-verified">Verified</span> published price or limit</li>
-      <li><span class="ev ev-benchmark">Benchmark</span> third-party historical data</li>
       <li><span class="ev ev-estimate">Estimate</span> calculated from the above</li>
       <li><span class="ev ev-assumption">Assumption</span> adjustable input</li>
     </ul>
@@ -22,39 +21,40 @@
   <nav class="tabs" aria-label="Storyline">
     <a href="#run" data-view="run"><b>1</b> Run an agent</a>
     <a href="#measure" data-view="measure"><b>2</b> Measure it</a>
-    <a href="#workloads" data-view="workloads"><b>3</b> Bigger tasks</a>
-    <a href="#dedicated" data-view="dedicated"><b>4</b> Dedicated, measured</a>
-    <a href="#economics" data-view="economics"><b>5</b> Cost curves</a>
-    <a href="#classroom" data-view="classroom"><b>6</b> Scale to a classroom</a>
-    <a href="#method" data-view="method" class="aside">Method &amp; sources</a>
+    <a href="#endpoints" data-view="endpoints"><b>3</b> Public vs Dedicated</a>
+    <a href="#economics" data-view="economics"><b>4</b> Cost curves</a>
+    <a href="#classroom" data-view="classroom"><b>5</b> Classroom simulation</a>
+    <a href="#method" data-view="method" class="aside"><b>6</b> Method &amp; sources</a>
   </nav>
 </header>
 
 <main>
   <div class="diag" id="diag" role="alert" hidden><b>Something on this page failed to render.</b> The details below help diagnose it (also in the browser console).</div>
-  <!-- ======================================================== 1. RUN -->
+
   <section id="view-run" class="view" aria-labelledby="h-run">
     <div class="section-head">
-      <h2 id="h-run">1 · A coding agent at work</h2>
-      <p>The stock DSH Web UI runs <code>DeepSeek-V4-Flash-0731</code> on the Token Factory public endpoint against real Django issues from SWE-bench Verified. The agent reads the code, edits it and runs tests. Afterwards the <em>official</em> SWE-bench harness applies its patch and runs hidden tests the agent never saw: the tests that must start passing (fail-to-pass) and the existing tests that must keep passing (pass-to-pass).</p>
+      <h2 id="h-run">1 · Watch an agent fix a real Django bug</h2>
+      <p>Real issues from SWE-bench Verified. The agent reads the code, edits it and runs tests; the official SWE-bench tests decide whether it worked.</p>
     </div>
     <div class="grid run-grid">
-      <div class="panel">
-        <label class="field" for="run-select">Recorded run (9 trials: 3 issues × 3)</label>
+      <div class="panel run-side">
+        <label class="field" for="run-select">Recorded run · 3 issues × 3 trials</label>
         <select id="run-select"></select>
-        <div class="run-meta" id="run-meta"></div>
-        <h3 id="run-task-title">The task given to the agent</h3>
-        <pre class="prompt" id="run-prompt"></pre>
-        <h3>Run it live</h3>
-        <div class="cmd"><code id="live-cmd">~/dsh-kit/scripts/launch_web.sh ~/dsh-live --patch ~/dsh-kit/config/tofa-public-deepseek-v4-flash-0731.patch.yml</code><button type="button" class="ghost" id="copy-cmd">Copy</button></div>
-        <p class="hint">Starts the stock Web UI on the prepared workspace (see <code>docs/LIVE_DEMO.md</code>). A run took 33–250 s and $0.003–0.018 here. The recorded runs are the fallback if the network is down.</p>
+        <div class="issue">
+          <p class="issue-id" id="issue-id"></p>
+          <h3 id="issue-title"></h3>
+          <p id="issue-summary"></p>
+          <details><summary>Full issue as given to the agent</summary><pre class="prompt" id="run-prompt"></pre></details>
+        </div>
+        <div class="mini3" id="run-metrics"></div>
+        <p class="result" id="run-result"></p>
       </div>
       <div class="panel wide">
         <div class="panel-head">
-          <h3>Trajectory <span class="ev ev-measured">Measured</span></h3>
+          <h3>Agent trajectory</h3>
           <div class="btns">
             <button type="button" id="replay-play">Replay</button>
-            <select id="replay-speed" aria-label="Replay speed"><option value="1">1×</option><option value="3" selected>3×</option><option value="10">10×</option></select>
+            <select id="replay-speed" aria-label="Replay speed"><option value="1">1×</option><option value="3">3×</option><option value="10" selected>10×</option></select>
             <button type="button" class="ghost" id="replay-all">Show all</button>
           </div>
         </div>
@@ -62,199 +62,102 @@
         <div class="lane-key"><span class="k k-llm"></span>LLM request<span class="k k-tool"></span>tool execution<span class="k k-gap"></span>harness</div>
         <ol class="events" id="events"></ol>
       </div>
-      <div class="panel verdict" id="verdict"></div>
-      <div class="panel patch-panel">
-        <div class="panel-head"><h3>Resulting patch <span class="ev ev-measured">Measured</span></h3><span class="hint" id="patch-stat"></span></div>
-        <pre class="diff" id="run-patch"></pre>
-      </div>
     </div>
   </section>
 
-  <!-- ======================================================== 2. MEASURE -->
   <section id="view-measure" class="view" aria-labelledby="h-measure" hidden>
-    <div class="section-head">
-      <h2 id="h-measure">2 · What one task actually costs</h2>
-      <p>The 9 SWE-bench trials from section 1, measured per LLM request from DSH's own session log: provider-reported tokens (uncached, cached, output), time to first token, latency and decode speed. Cost = tokens × the verified public list price ($0.14 / $0.01 cached / $0.28 per 1M tokens).</p>
+    <div class="section-head row">
+      <h2 id="h-measure">2 · Measure it</h2>
       <div class="filters">
         <label for="m-run">Selected run</label>
         <select id="m-run"></select>
-        <span class="scope-key"><span class="scope sel">this run</span> selected trial <span class="scope agg">all 9</span> across the nine trials</span>
       </div>
     </div>
 
-    <h3 class="msec"><b>1</b> Task overview</h3>
+    <h3 class="msec"><b>A</b> Task overview</h3>
+    <div class="tiles tiles-3" id="m-tiles-task"></div>
+
+    <h3 class="msec"><b>B</b> Token usage &amp; caching</h3>
     <div class="grid msec-grid">
-      <div class="tiles tiles-3" id="m-tiles-task"></div>
-      <figure class="panel"><figcaption>Where the time goes, all 9 trials <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-time"></canvas></div><p class="note" id="m-time-note"></p></figure>
+      <div class="tiles tiles-stack" id="m-tiles-tokens"></div>
+      <figure class="panel"><figcaption>Cost per run by token type <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div></figure>
     </div>
 
-    <h3 class="msec"><b>2</b> Token usage &amp; caching</h3>
-    <div class="tiles tiles-3" id="m-tiles-tokens"></div>
-    <div class="grid two">
-      <figure class="panel"><figcaption>Cost breakdown per trial <span class="ev ev-measured">Measured</span> <span class="ev ev-verified">Verified</span></figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div><p class="note" id="cost-split-note"></p></figure>
-      <figure class="panel"><figcaption>Context growth, selected run <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-context"></canvas></div><p class="note" id="m-context-note"></p></figure>
-    </div>
-
-    <h3 class="msec"><b>3</b> Latency &amp; generation speed</h3>
-    <div class="tiles tiles-3" id="m-tiles-speed"></div>
-    <figure class="panel"><figcaption>Public decode speed over the measurement window, every request of all 9 trials <span class="ev ev-measured">Measured</span></figcaption><div class="chart tall"><canvas id="c-decode-time"></canvas></div><p class="note" id="m-decode-note"></p></figure>
-    <figure class="panel"><figcaption>Request latency, selected run: waiting for the first token, generating, stalled <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-ttft"></canvas></div><p class="note">TTFT = request sent → first streamed token (reasoning included). Decode = output tokens ÷ time from first to last token. Stall = a pause of more than 1 s between streamed chunks.</p></figure>
-
-    <details class="panel">
-      <summary>All 9 trials (table)</summary>
-      <div class="table-wrap"><table id="runs-table"></table></div>
-    </details>
+    <h3 class="msec"><b>C</b> Latency &amp; generation speed</h3>
+    <figure class="panel headline"><figcaption>Public decode speed over time · median of each run <span class="ev ev-measured">Measured</span></figcaption><div class="chart xl"><canvas id="c-decode-time"></canvas></div>
+      <ul class="takeaways" id="m-takeaways"></ul>
+      <p class="note" id="m-decode-note"></p>
+    </figure>
   </section>
 
-  <!-- ======================================================== 3. WORKLOADS -->
-  <section id="view-workloads" class="view" aria-labelledby="h-wl" hidden>
+  <section id="view-endpoints" class="view" aria-labelledby="h-endpoints" hidden>
     <div class="section-head">
-      <h2 id="h-wl">3 · Are the small tasks representative?</h2>
-      <p>Two more realistic tasks on the public endpoint (2 Nov), with the same DSH setup, medium effort and independent hidden tests. <b>M1</b> (medium): fix a CSV importer and implement a late-penalty grading policy across four modules. <b>H1</b> (heavy): add per-user token accounting and budget enforcement to a small university LLM gateway. 3 formal runs each, plus 2 pilot runs reported separately. With n = 3, read these as examples, not statistics.</p>
+      <h2 id="h-endpoints">3 · Public vs Dedicated</h2>
+      <p>A separate API load test of the same model, sent straight to the endpoint (no agent): how far concurrency and request rates can go.</p>
     </div>
-    <div class="tiles" id="w-tiles"></div>
-    <div class="panel table-wrap"><table id="w-table"></table></div>
+    <div class="grid two status-cards">
+      <div class="panel status public"><h3>Public endpoint <span class="ev ev-measured">Measured</span></h3><p id="ep-public-status"></p></div>
+      <div class="panel status pending"><h3>Dedicated endpoint <span class="ev ev-pending">Pending</span></h3><p id="ep-dedicated-status"></p></div>
+    </div>
     <div class="grid two">
-      <figure class="panel"><figcaption>Tokens per task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-tokens"></canvas></div><p class="note">Provider-reported usage. Bigger tasks resend a longer, mostly cached context on every one of ~30 requests.</p></figure>
-      <figure class="panel"><figcaption>Context growth within a task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-context"></canvas></div><p class="note">Prompt tokens per LLM request, one line per run.</p></figure>
-      <figure class="panel"><figcaption>Time and cost per task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-cost"></canvas></div><p class="note">Bars: mean public cost per task. Line: median task time.</p></figure>
-      <div class="panel callout" id="w-econ"></div>
+      <figure class="panel"><figcaption>Throughput grows with concurrent requests <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-ep-throughput"></canvas></div></figure>
+      <figure class="panel"><figcaption>…while each request gets slower (p95 latency) <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-ep-latency"></canvas></div></figure>
     </div>
+    <h3 class="msec">Public rate limits</h3>
+    <div class="tiles tiles-3" id="ep-limits"></div>
   </section>
 
-  <!-- ======================================================== 4. DEDICATED (measured) -->
-  <section id="view-dedicated" class="view" aria-labelledby="h-ded" hidden>
-    <div class="section-head">
-      <h2 id="h-ded">4 · The same agent on a dedicated endpoint</h2>
-      <p>Real DSH runs on <code>ecole-demo</code>, a Token Factory dedicated endpoint: <span id="d-hw"></span>. It ran the same tasks, hidden tests, DSH version and reasoning effort as the public runs, plus paired public controls in the same window. Every request was checked against the endpoint it is labelled with.</p>
-    </div>
-    <div class="tiles" id="d-tiles"></div>
-    <div class="grid two">
-      <figure class="panel"><figcaption>Task time, same tasks <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-task"></canvas></div><p class="note">Medians per task. Public historical: 30 Oct. Public control and dedicated: 2 Nov, same measurement window.</p></figure>
-      <figure class="panel"><figcaption>Per-request speed <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-speed"></canvas></div><p class="note" id="d-speed-note"></p></figure>
-      <figure class="panel"><figcaption>Concurrency: agents running at once on one 4× H100 replica <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-conc"></canvas></div><p class="note" id="d-conc-note"></p></figure>
-      <figure class="panel"><figcaption>Per-user decode speed vs requests in flight <span class="ev ev-measured">Measured</span> <span class="ev ev-benchmark">Extrapolated</span></figcaption><div class="chart"><canvas id="c-d-curve"></canvas></div><p class="note">Dots: measured requests (in-flight load averaged over each request). Line: the capacity curve used in sections 4–5, measured up to 5 concurrent requests and extrapolated from the benchmark shape beyond.</p></figure>
-    </div>
-    <div class="grid two">
-      <div class="panel callout" id="d-cost"></div>
-      <div class="panel callout" id="d-compat"></div>
-    </div>
-  </section>
-
-  <!-- ======================================================== 4. ECONOMICS -->
   <section id="view-economics" class="view" aria-labelledby="h-econ" hidden>
     <div class="section-head">
-      <h2 id="h-econ">5 · Pay per token or pay per GPU-hour?</h2>
-      <p>Public endpoint: measured tokens per task × verified prices. Dedicated endpoint: GPU-hours × an assumed price. The number of GPUs is sized from benchmark throughput, so <strong>bigger volume means more GPUs</strong>, not one GPU that absorbs everything.</p>
+      <h2 id="h-econ">4 · Pay per token or pay per GPU-hour?</h2>
+      <p>Public cost scales with every SWE-bench task; a dedicated replica costs the same every billed hour, busy or idle.</p>
     </div>
     <div class="grid econ-grid">
       <form class="panel controls" id="econ-form" autocomplete="off">
-        <h3>Workload <span class="ev ev-measured">Measured</span></h3>
-        <label class="field" for="e-effort">Workload</label>
-        <select id="e-effort"><option value="medium" selected>Small T1–T3, medium effort (33-run baseline)</option><option value="low">Small, low effort</option><option value="high">Small, high effort</option><option value="wl-medium">Medium M1 (3 measured traces)</option><option value="wl-heavy">Heavy H1 (3 measured traces)</option></select>
-        <h3>Dedicated endpoint <span class="ev ev-measured">Measured</span> <span class="ev ev-assumption">Assumption</span></h3>
-        <label class="field" for="e-gpu">Replica configuration</label>
-        <select id="e-gpu"></select>
-        <label class="field" for="e-price">Price per replica-hour (USD)</label>
-        <input id="e-price" type="number" step="0.05" min="0.1">
-        <p class="hint" id="e-price-hint"></p>
-        <label class="field" for="e-speed">Per-user speed to guarantee (tok/s)</label>
-        <select id="e-speed"><option value="90" selected>90 (throughput)</option><option value="120">120</option><option value="143">143 (balanced)</option><option value="197">197 (low latency)</option></select>
-        <label class="field" for="e-util">Target peak utilisation <output id="e-util-o"></output></label>
-        <input id="e-util" type="range" min="0.3" max="0.95" step="0.05" value="0.7">
-        <label class="field" for="e-peak">Peak-to-average traffic <output id="e-peak-o"></output></label>
-        <input id="e-peak" type="range" min="1" max="10" step="0.5" value="3">
-        <label class="field" for="e-eff">Serving efficiency vs benchmark <output id="e-eff-o"></output></label>
-        <input id="e-eff" type="range" min="0.5" max="2" step="0.1" value="1">
-        <h3>Operating schedule</h3>
-        <select id="e-sched" aria-label="Operating schedule"><option value="class-only" selected>Only during class sessions</option><option value="business-hours">Business hours</option><option value="always-on">Always on (24/7)</option></select>
-        <div class="sched" data-s="class-only">
-          <label class="field" for="e-sessions">Sessions per month</label><input id="e-sessions" type="number" min="1" max="120" value="8">
-          <label class="field" for="e-shours">Hours per session</label><input id="e-shours" type="number" min="0.5" max="8" step="0.5" value="2">
-          <label class="field" for="e-warm">Warm-up hours billed per session</label><input id="e-warm" type="number" min="0" max="2" step="0.25" value="0.25">
-        </div>
-        <div class="sched" data-s="business-hours" hidden>
-          <label class="field" for="e-bh">Hours per day</label><input id="e-bh" type="number" min="1" max="24" value="10">
-          <label class="field" for="e-bd">Days per month</label><input id="e-bd" type="number" min="1" max="31" value="22">
-        </div>
+        <label class="field" for="e-price">Dedicated price per replica-hour <output id="e-price-o"></output></label>
+        <input id="e-price" type="range" min="5" max="40" step="0.5" value="17">
+        <p class="hint"><span class="ev ev-assumption">Assumption</span> 2× B200 replica. Not verified: the report's proxy range is $14.30–17.70 per hour.</p>
+        <label class="field" for="e-task">Public cost per task</label>
+        <select id="e-task"></select>
+        <p class="hint"><span class="ev ev-measured">Measured</span> at the verified list price.</p>
       </form>
       <div class="econ-out">
-        <div class="tiles" id="e-tiles"></div>
-        <figure class="panel"><figcaption>Monthly cost vs monthly agent tasks <span class="ev ev-estimate">Estimate</span></figcaption><div class="chart tall"><canvas id="c-curve"></canvas></div>
-          <p class="note" id="e-curve-note"></p></figure>
-        <div class="grid two">
-          <figure class="panel"><figcaption>Dedicated cost per task vs utilisation <span class="ev ev-estimate">Estimate</span></figcaption><div class="chart"><canvas id="c-util"></canvas></div><p class="note">A dedicated GPU is only cheaper per task when it stays busy. The public price per task does not depend on utilisation.</p></figure>
-          <div class="panel callout" id="e-feasibility"></div>
-        </div>
+        <div class="tiles tiles-3" id="e-tiles"></div>
+        <figure class="panel"><figcaption>Cost per billed hour vs SWE-bench tasks per hour <span class="ev ev-estimate">Estimate</span></figcaption><div class="chart tall"><canvas id="c-curve"></canvas></div><p class="note" id="e-note"></p></figure>
       </div>
     </div>
   </section>
 
-  <!-- ======================================================== 4. CLASSROOM -->
   <section id="view-classroom" class="view" aria-labelledby="h-class" hidden>
     <div class="section-head">
-      <h2 id="h-class">6 · A classroom of agents</h2>
-      <p>Every simulated student runs real recorded DSH trajectories: the same sequence of LLM requests, token counts and tool gaps that we measured. The simulation then asks whether each backend keeps up, and at what cost.</p>
+      <h2 id="h-class">5 · A classroom of agents</h2>
+      <p>Every simulated student replays one of the 9 recorded SWE-bench runs: the same requests, tokens and tool gaps. Can the public endpoint keep up, and what does the session cost?</p>
     </div>
     <div class="grid econ-grid">
       <form class="panel controls" id="sim-form" autocomplete="off">
-        <h3>Students</h3>
-        <div class="presets" role="group" aria-label="Student count presets"><button type="button" data-n="20">20</button><button type="button" data-n="100">100</button><button type="button" data-n="200">200</button><button type="button" data-n="500">500</button></div>
+        <div class="presets" role="group" aria-label="Student count presets"><button type="button" data-n="10">10</button><button type="button" data-n="30">30</button><button type="button" data-n="60">60</button><button type="button" data-n="120">120</button></div>
         <label class="field" for="s-students">Students <output id="s-students-o"></output></label>
-        <input id="s-students" type="range" min="5" max="600" step="5" value="100">
+        <input id="s-students" type="range" min="5" max="200" step="5" value="30">
         <label class="field" for="s-tasks">Agent tasks per student <output id="s-tasks-o"></output></label>
-        <input id="s-tasks" type="range" min="1" max="15" step="1" value="6">
-        <label class="field" for="s-pattern">Usage pattern</label>
-        <select id="s-pattern"><option value="class" selected>Classroom session</option><option value="day">Spread over the day</option></select>
-        <label class="field" for="s-hours">Window length (hours) <output id="s-hours-o"></output></label>
-        <input id="s-hours" type="range" min="1" max="14" step="0.5" value="2">
+        <input id="s-tasks" type="range" min="1" max="6" step="1" value="3">
+        <label class="field" for="s-hours">Session length <output id="s-hours-o"></output></label>
+        <input id="s-hours" type="range" min="1" max="3" step="0.5" value="2">
         <label class="field" for="s-sync">Start spread after each exercise (min) <output id="s-sync-o"></output></label>
-        <input id="s-sync" type="range" min="0.25" max="30" step="0.25" value="3">
-        <label class="field" for="s-review">Student review time between tasks (min) <output id="s-review-o"></output></label>
-        <input id="s-review" type="range" min="0" max="15" step="0.5" value="2">
-        <label class="check"><input id="s-retry" type="checkbox" checked> Students re-run a task once when it fails</label>
-        <label class="field" for="s-effort">Workload</label>
-        <select id="s-effort"><option value="medium" selected>Small T1–T3, medium effort (baseline)</option><option value="low">Small, low effort</option><option value="high">Small, high effort</option><option value="wl-medium">Medium M1 (3 measured traces)</option><option value="wl-heavy">Heavy H1 (3 measured traces)</option></select>
-        <h3>Public endpoint <span class="ev ev-verified">Verified</span></h3>
-        <label class="field" for="s-mult">Rate-limit multiplier <output id="s-mult-o"></output></label>
-        <input id="s-mult" type="range" min="1" max="20" step="1" value="1">
-        <label class="check"><input id="s-dyn" type="checkbox" checked> Documented auto-scaling (+20% per busy 15 min)</label>
-        <label class="check"><input id="s-cachedtpm" type="checkbox" checked> Cached tokens count towards tokens/min <span class="ev ev-estimate">Estimate</span> <span class="hint">(inferred from response headers)</span></label>
-        <h3>Dedicated endpoint <span class="ev ev-measured">Measured</span> <span class="ev ev-assumption">Assumption</span></h3>
-        <label class="field" for="s-gpu">Replica configuration</label>
-        <select id="s-gpu"></select>
-        <label class="field" for="s-replicas">Replicas</label>
-        <select id="s-replicas"><option value="auto" selected>Auto: smallest count with p95 slowdown ≤ 1.5×</option></select>
-        <label class="field" for="s-price">Price per replica-hour (USD)</label>
-        <input id="s-price" type="number" step="0.05" min="0.1">
-        <label class="field" for="s-sessions">Sessions per month (for monthly cost)</label>
-        <input id="s-sessions" type="number" min="1" max="60" value="8">
-        <label class="field" for="s-warm">Warm-up hours billed per session</label>
-        <input id="s-warm" type="number" min="0" max="2" step="0.25" value="0.25">
-        <label class="field" for="s-seed">Random seed</label>
-        <input id="s-seed" type="number" min="1" value="7">
+        <input id="s-sync" type="range" min="0.5" max="15" step="0.5" value="3">
+        <label class="field" for="s-mult">Public rate limits</label>
+        <select id="s-mult"><option value="1" selected>Default: 1,000 req/min · 2M tokens/min</option><option value="2">2× (raised, assumed)</option><option value="5">5× (raised, assumed)</option><option value="20">20× (raised, assumed)</option></select>
       </form>
       <div class="econ-out">
-        <div class="compare" id="s-compare"></div>
-        <figure class="panel"><figcaption>Agents working at the same time <span class="ev ev-estimate">Simulated</span></figcaption><div class="chart"><canvas id="c-active"></canvas></div><p class="note" id="s-active-note"></p></figure>
-        <div class="grid two">
-          <figure class="panel"><figcaption>Public endpoint tokens/min vs limit <span class="ev ev-estimate">Simulated</span></figcaption><div class="chart"><canvas id="c-tpm"></canvas></div></figure>
-          <figure class="panel"><figcaption>Dedicated: requests in flight and waiting <span class="ev ev-estimate">Simulated</span></figcaption><div class="chart"><canvas id="c-queue"></canvas></div></figure>
-        </div>
-        <figure class="panel"><figcaption>Cost per month vs class size, with capacity-aware GPU sizing <span class="ev ev-estimate">Simulated</span></figcaption>
-          <div class="panel-head"><p class="hint">Re-runs the simulation for 6 class sizes with the settings on the left.</p><button type="button" id="s-sweep">Run sweep</button></div>
-          <div class="chart tall"><canvas id="c-sweep" data-on-demand></canvas></div><p class="note" id="s-sweep-note"></p></figure>
+        <div class="tiles tiles-3" id="s-tiles"></div>
+        <figure class="panel"><figcaption>Tokens per minute vs the account limit <span class="ev ev-estimate">Simulated</span></figcaption><div class="chart"><canvas id="c-tpm"></canvas></div></figure>
+        <figure class="panel"><figcaption>Agents working at the same time <span class="ev ev-estimate">Simulated</span></figcaption><div class="chart"><canvas id="c-active"></canvas></div><p class="note" id="s-note"></p></figure>
       </div>
     </div>
   </section>
 
-  <!-- ======================================================== METHOD -->
   <section id="view-method" class="view" aria-labelledby="h-method" hidden>
-    <div class="section-head">
-      <h2 id="h-method">Method, sources and limitations</h2>
-      <p>What was measured, what was looked up, and what is assumed. Every input to the model is listed here, and the adjustable ones can be changed in sections 3 and 4.</p>
-    </div>
-    <div class="grid two method" id="method"></div>
+    <div class="section-head"><h2 id="h-method">6 · Method &amp; sources</h2></div>
+    <div class="panel method" id="method"></div>
   </section>
 </main>
 <footer class="foot"><p id="foot"></p><p><button type="button" class="ghost" id="self-check">Check charts in this browser</button></p><div class="panel" id="self-check-out" hidden></div></footer>

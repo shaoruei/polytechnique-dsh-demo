@@ -89,3 +89,20 @@ The VM console showed `Uncaught TypeError: this._fn is not a function`. The caus
 - **Fix (first controlled test).** Animations are disabled: `Chart.defaults.animation = false`, and `animation: false` in every chart's options in `chart()`. `animation: false` alone gives zero animation ticks during hover, legend toggles, input changes and theme switches, so nothing else was changed. No data, model, simulation or evidence label changed.
 - **Regression check.** In `visual_check.cjs`, an *interaction control* runs with motion allowed. It moves the pointer over every chart on every tab, toggles legend entries and switches theme. Then it requires every chart on every tab to be drawn, with no page error, `animation === false` globally and per chart, and zero `Animation.tick` calls. On the pre-fix build it fails with `this._fn is not a function` and lists the blank charts. On the fixed build it passes: 19 canvases.
 - **Verified in:** headless Chromium only. **Firefox was not run here.** Mozilla's download hosts are blocked by this session's network policy, and running a conda-forge Firefox build was refused earlier. The fix still needs confirming on the VM's Firefox 155. The failing code path is engine-independent: it was reproduced in Chromium with one hover.
+
+## Presentation dashboard: DeepSeek-V4-Flash only (2026-11-02, branch dash/deepseek-swebench)
+
+The dashboard now presents only the SWE-bench runs and the API load test of `deepseek-ai/DeepSeek-V4-Flash-0731`. The build embeds only `data/swebench.json` and `data/endpoint_bench.json`. The GPT-OSS data files are archived and not loaded.
+
+| Acceptance test | How it is checked | Result |
+|---|---|---|
+| No `Bigger tasks`, `M1`, `H1`, `T1–T3`, `gpt-oss` in presented content | `dashboard_check.cjs` scans the visible text of every page, light and dark. The raw built HTML also contains 0 matches; full-line comments are stripped from the bundled model code | pass |
+| All 9 runs selectable and replayable on page 1 | `dashboard_check.cjs` selects each run, shows the trajectory, and runs the animated replay | pass |
+| No patch panel, agent report or detailed judge breakdown on page 1 | `dashboard_check.cjs`: no `#run-patch`, no "What the agent reported" or fail-to-pass/pass-to-pass text. Code edits remain visible as diffs in the trajectory | pass |
+| Nine-point chronological decode line chart including 23 tok/s | `dashboard_check.cjs`: one line dataset, labels `A1…C3` in run order, range 23–404. `tests/js/swebench_sim.test.mjs` pins the recorded medians | pass |
+| Cached vs uncached vs output colours distinct | `dashboard_check.cjs`: minimum RGB distance ≥ 120 between the three token colours, light and dark. Dark output colour changed to `#E879F9` after the check found blue and purple too close (102) | pass |
+| Metrics from the DeepSeek SWE-bench data | `test_swebench_data.py`: costs recomputed from tokens at the verified prices, verdicts and patches against the official outputs. `swebench_sim.test.mjs`: every run replayed alone in the simulator reproduces its measured cost and request count. `test_endpoint_bench_data.py`: page 3 numbers equal the benchmark summary, and dedicated is not measured | pass |
+| Rendering | `visual_check.cjs`: 56 pixel-level canvas checks at 1400 and 1024 px, light and dark. Negative, diagnostics, recovery and interaction controls are adapted to the new pages | pass |
+| Firefox at 1366×768 | **Not run.** Firefox cannot be installed in this session: Ubuntu 24.04's `firefox` package is a snap shim, and `packages.mozilla.org` and `ppa.launchpadcontent.net` are refused by the network policy. Inspected instead in headless Chromium at 1366×768, light and dark, by screenshot. | not verified |
+
+Dedicated: the `ecole-demo-ds-flash` endpoint (2× B200) never became ready (14:35–16:23 UTC), so page 3 marks it pending and page 4's dedicated price is an assumption. No GPT-OSS dedicated measurement is used in its place.

@@ -15,7 +15,7 @@ const fs = require('fs');
 
 const MIN_PAINTED = 0.01; // 1% of canvas pixels
 const MIN_COLOR_PIXELS = 25; // pixels that must match a dataset colour
-const VIEWS = ['run', 'measure', 'workloads', 'dedicated', 'economics', 'classroom', 'method'];
+const VIEWS = ['run', 'measure', 'endpoints', 'economics', 'classroom', 'method'];
 
 function inspectCanvases(MIN_COLOR_PIXELS) {
   // runs in the page (constants are passed in as arguments)
@@ -82,14 +82,14 @@ function inspectCanvases(MIN_COLOR_PIXELS) {
   };
 }
 
-// Negative control: suppress every canvas drawing call inside the Cost Curves view (the reported
+// Negative control: suppress every canvas drawing call inside the Measure view (the reported
 // symptom: blank charts, but controls and text present) and require the check to catch it.
-const BLANK_ECONOMICS = () => {
+const BLANK_MEASURE = () => {
   const P = CanvasRenderingContext2D.prototype;
   for (const m of ['fill', 'stroke', 'fillRect', 'strokeRect', 'fillText', 'strokeText', 'drawImage']) {
     const orig = P[m];
     P[m] = function patched(...args) {
-      if (this.canvas && this.canvas.closest && this.canvas.closest('#view-economics')) return undefined;
+      if (this.canvas && this.canvas.closest && this.canvas.closest('#view-measure')) return undefined;
       return orig.apply(this, args);
     };
   }
@@ -99,8 +99,8 @@ async function negativeControl(browser, root) {
   const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 } });
   const page = await ctx.newPage();
   await page.route('**/*', (r) => (r.request().url().startsWith('file://') ? r.continue() : r.abort()));
-  await page.addInitScript(BLANK_ECONOMICS);
-  await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#economics');
+  await page.addInitScript(BLANK_MEASURE);
+  await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#measure');
   await page.waitForTimeout(1200);
   const res = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
@@ -108,7 +108,7 @@ async function negativeControl(browser, root) {
   return { detected, total: res.canvases.length };
 }
 
-// Diagnostics control: make the logarithmic scale throw (as an incompatible engine might) and require
+// Diagnostics control: make the linear scale throw (as an incompatible engine might) and require
 // the page to show the error in the chart box and in the diagnostics banner, not a silent blank.
 // Then remove the fault and change an input: the charts must recover. A partially constructed chart
 // left registered on its canvas would make every retry fail with "Canvas is already in use".
@@ -122,22 +122,24 @@ async function diagnosticsControl(browser, root) {
   await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#run');
   await page.waitForTimeout(500);
   await page.evaluate(() => {
-    const Log = window.Chart.registry.getScale('logarithmic');
+    const Log = window.Chart.registry.getScale('linear');
     window.__origBuildTicks = Log.prototype.buildTicks;
-    Log.prototype.buildTicks = () => { throw new Error('simulated log-scale failure'); };
+    Log.prototype.buildTicks = () => { throw new Error('simulated scale failure'); };
     location.hash = 'economics';
   });
   await page.waitForTimeout(1200);
   const failed = await page.evaluate(() => ({
     notices: [...document.querySelectorAll('#view-economics .chart-error')].map((e) => e.textContent),
     banner: !document.getElementById('diag').hidden,
-    note: document.getElementById('e-curve-note').textContent.length,
+    note: document.getElementById('e-note').textContent.length,
+    canvases: document.querySelectorAll('#view-economics canvas').length,
     // a destroyed partial chart must not stay registered on the canvas
     leftover: [...document.querySelectorAll('#view-economics canvas')].filter((c) => window.Chart.getChart(c)).map((c) => c.id),
   }));
   // transient failure ends: restore the scale and redraw through a real input change
-  await page.evaluate(() => { window.Chart.registry.getScale('logarithmic').prototype.buildTicks = window.__origBuildTicks; });
-  await page.selectOption('#e-speed', '120');
+  await page.evaluate(() => { window.Chart.registry.getScale('linear').prototype.buildTicks = window.__origBuildTicks; });
+  await page.fill('#e-price', '20');
+  await page.dispatchEvent('#e-price', 'input');
   await page.waitForTimeout(1200);
   const recovered = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
@@ -190,7 +192,7 @@ async function interactionControl(browser, root) {
   };
   const checks = [];
   for (const pass of ['hover', 'after']) {
-    for (const view of ['measure', 'run', 'workloads', 'dedicated', 'economics', 'classroom']) {
+    for (const view of ['measure', 'run', 'endpoints', 'economics', 'classroom']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 900);
       if (pass === 'hover') await hoverAll();
@@ -220,25 +222,26 @@ async function interactionControl(browser, root) {
   const problems = [];
   const control = await negativeControl(browser, root);
   if (control.total < 2 || control.detected.length !== control.total) {
-    problems.push(`negative control: blanked Cost Curves charts were not all detected (${control.detected.join(',')} of ${control.total})`);
+    problems.push(`negative control: blanked Measure charts were not all detected (${control.detected.join(',')} of ${control.total})`);
   } else {
     console.log(`negative control OK: blanked charts detected (${control.detected.join(', ')})`);
   }
   const dc = await diagnosticsControl(browser, root);
-  if (dc.notices.length !== 2 || !dc.notices.every((t) => /simulated log-scale failure/.test(t)) || !dc.banner || !dc.note) {
+  if (!dc.canvases || dc.notices.length !== dc.canvases || !dc.notices.every((t) => /simulated scale failure/.test(t)) || !dc.banner || !dc.note) {
     problems.push(`diagnostics control: failure not surfaced (${JSON.stringify(dc).slice(0, 300)})`);
   } else {
     console.log('diagnostics control OK: a throwing chart shows its error in place and in the banner; the rest of the view still renders');
   }
   const rc = dc.recovered;
   const unrecovered = rc.canvases.filter((c) => c.painted < MIN_PAINTED || c.missing.length);
-  if (dc.leftover.length || rc.canvases.length < 2 || unrecovered.length || rc.notices.length || rc.inUse.length) {
+  if (dc.leftover.length || rc.canvases.length < 1 || unrecovered.length || rc.notices.length || rc.inUse.length) {
     problems.push(`recovery control: charts did not recover after the fault was removed (${JSON.stringify({ leftover: dc.leftover, ...rc }).slice(0, 400)})`);
   } else {
-    console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws both charts');
+    console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws the chart again');
   }
   const ic = await interactionControl(browser, root);
-  if (ic.errors.length || ic.blank.length || ic.canvases < 10 || ic.anim.ticks || ic.anim.global !== false || ic.anim.perChart.length) {
+  if (ic.errors.length || ic.blank.length || ic.canvases < 7 || // every chart of the presentation
+      ic.anim.ticks || ic.anim.global !== false || ic.anim.perChart.length) {
     problems.push(`interaction control: ${JSON.stringify(ic).slice(0, 600)}`);
   } else {
     console.log(`interaction control OK: after hovering and legend clicks on every chart and a theme switch, ${ic.canvases} canvases on all tabs still drawn; animations off globally and per chart, 0 animation ticks, no page errors`);
@@ -259,11 +262,6 @@ async function interactionControl(browser, root) {
           if (mode === 'direct') await page.goto('file://' + path.join(root, 'dashboard/dist/index.html') + '#' + view);
           else await page.evaluate((v) => { location.hash = v; }, view);
           await page.waitForTimeout(view === 'classroom' ? 2500 : 900);
-          if (view === 'classroom' && mode === 'direct') {
-            await page.click('#s-sweep');
-            await page.waitForFunction(() => !document.getElementById('s-sweep').disabled, null, { timeout: 120000 });
-            await page.waitForTimeout(800);
-          }
           const res = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
           for (const c of res.canvases) {
             if (c.onDemand) continue; // drawn only when the user runs it (classroom sweep); checked after the click

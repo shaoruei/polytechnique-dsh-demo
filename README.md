@@ -1,19 +1,17 @@
 # DSH × Token Factory: Performance & Cost Demo
 
-École polytechnique, 3 November 2026. A 25-minute technical demo in five connected parts:
+École polytechnique, 3 November 2026. The presented dashboard (`dashboard/dist/index.html`, one offline file) tells one story with one model, **`deepseek-ai/DeepSeek-V4-Flash-0731` on Nebius Token Factory Public**:
 
-1. **Run an agent.** DeepSeek Harness (`dsh`) runs `openai/gpt-oss-120b` on the Nebius Token Factory public API. The agent fixes real code and the harness judges it with hidden tests.
-2. **Measure what happened.** For every LLM request: provider-reported tokens (uncached, cached, output), TTFT, decode speed, tool time and cost.
-3. **Run it on a dedicated endpoint.** The same tasks on `ecole-demo` (4× H100, 1 replica) with paired public controls and 2–5 concurrent agents (2 Nov). See `docs/DEDICATED_BENCHMARK.md`.
-4. **Compare deployment economics.** Public pay-per-token against Dedicated pay-per-replica-hour ($18.80/h for 4× H100), with capacity-aware sizing and break-even curves.
-   Plus **bigger tasks**: two realistic Medium/Heavy tasks (M1, H1) to check whether T1–T3 are representative. See `docs/WORKLOAD_RESULTS.md`.
-5. **Scale to a classroom.** An interactive simulation of 20–500 students. Each simulated agent replays a real measured trajectory.
+1. **Run an agent.** Replay any of 9 recorded SWE-bench Verified runs (3 Django issues × 3 trials, stock DSH Web UI): the issue, every agent action and tool call, code edits as diffs, and the official result (8/9 resolved).
+2. **Measure it.** Task overview, token usage and caching, and latency and decode speed, including the per-run public decode speed over time (23–404 tok/s; TTFT stable at 1.1–1.3 s).
+3. **Public vs Dedicated.** The separate API load test of the same model: throughput and latency against concurrency, and the public rate limits. **Dedicated is pending:** the 2× B200 endpoint never became ready, so there are no dedicated measurements.
+4. **Cost curves.** Public cost per measured SWE-bench task against an *assumed* dedicated hourly price, with the break-even and the public default-limit ceiling.
+5. **Classroom simulation.** Students replay the 9 recorded runs against the public rate limits (DeepSeek prices and limits).
+6. **Method & sources.**
 
-**Live segment (separate):** the stock DSH Web UI with the native DeepSeek model on a real SWE-bench Verified issue (`django__django-16136`), with no Token Factory route and no relay. See [`docs/LIVE_DEMO.md`](docs/LIVE_DEMO.md) and `live_demo/`.
+Sources: [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) (agent runs) and [`docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md`](docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md) (API load test). Build inputs: `data/swebench.json` (`analysis/build_swebench.py`) and `data/endpoint_bench.json` (`analysis/build_endpoint_bench.py`). Labels used: **Measured**, **Verified**, **Estimate**, **Assumption**, **Pending**.
 
-**SWE-bench workload on Token Factory Public (separate):** 9 controlled trials of the stock DSH Web UI calling `deepseek-ai/DeepSeek-V4-Flash-0731` on the public endpoint directly (no relay), with full per-request traces and official SWE-bench evaluation. See [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) and `experiments/swebench_public_v4flash/`.
-
-Every figure in the dashboard is labelled **Measured**, **Verified** (published price or limit), **Benchmark** (third-party), **Estimate** or **Assumption**.
+**Archived, not presented:** the earlier GPT-OSS-120B experiments (T1–T3 baseline, Medium/Heavy workloads, the `ecole-demo` 4× H100 benchmark) remain in `runs/`, `data/` and their docs for reference. The dashboard neither shows nor computes anything from them.
 
 ## Quick start (presentation laptop or this cloud environment)
 

@@ -64,6 +64,22 @@ def attach_edits(run_dir: Path, events: list[dict], workdir: str) -> None:
         }
 
 
+# One-line, presentation-length restatements of the three issues (the full issue text stays available).
+SUMMARY = {
+    "django__django-16136": "A class-based view that defines only an async post() crashes with HTTP 500 on GET: "
+                            "Django's 405 'method not allowed' response cannot be awaited.",
+    "django__django-16493": "A FileField whose storage is a callable returning default_storage loses that callable "
+                            "when Django deconstructs the field (as makemigrations does).",
+    "django__django-16661": "ModelAdmin.lookup_allowed() wrongly rejects a lookup through a foreign key that is also "
+                            "the primary key; the same code worked in Django 1.8.",
+}
+
+
+def issue_text(prompt: str) -> str:
+    """The verbatim issue, as pasted inside <issue> ... </issue> in the agent's prompt."""
+    return prompt.split("<issue>", 1)[-1].split("</issue>", 1)[0].strip()
+
+
 def instance_info(iid: str) -> dict:
     row = json.loads((EXP / "instances" / iid / "instance.json").read_text())[0]
     gold_files = re.findall(r"^diff --git a/(\S+)", row["patch"], flags=re.M)
@@ -72,11 +88,13 @@ def instance_info(iid: str) -> dict:
         "repo": row["repo"],
         "version": row["version"],
         "title": row["problem_statement"].strip().splitlines()[0].strip(),
+        "summary": SUMMARY[iid],
         "fix_files": gold_files,
         "f2p": len(json.loads(row["FAIL_TO_PASS"]) if isinstance(row["FAIL_TO_PASS"], str) else row["FAIL_TO_PASS"]),
         "p2p": len(json.loads(row["PASS_TO_PASS"]) if isinstance(row["PASS_TO_PASS"], str) else row["PASS_TO_PASS"]),
         # the exact text pasted into the Web UI (agent-safe kit; no gold patch, no test names)
         "prompt": sanitize_text((EXP / "instances" / iid / "kit" / "prompt.txt").read_text()),
+        "issue": sanitize_text(issue_text((EXP / "instances" / iid / "kit" / "prompt.txt").read_text())),
     }
 
 
@@ -138,6 +156,7 @@ def main() -> None:
         ts = report["tests_status"]
         runs.append({
             "run_id": rid, "instance_id": iid, "alias": rec["alias"], "trial": rec["trial"],
+            "label": rec["alias"].split("-")[-1].upper() + str(rec["trial"]),  # A1 ... C3
             "started_at": rec["started_at"], "turn_started_at_utc": rec["metrics"]["turn_started_at_utc"],
             "model": rec["model"], "endpoint": rec["endpoint"], "effort": rec["reasoning_effort"], "harness": rec["harness"],
             "success": rec["success"], "wall_time_s": rec["wall_time_s"], "metrics": rec["metrics"],
@@ -158,6 +177,10 @@ def main() -> None:
     requests.sort(key=lambda q: q["t"])
     health = jl(EXP / "provenance" / "endpoint_health_series.jsonl")
     phases, overlap = load_overlap(requests)
+    for r in runs:
+        qs = [q for q in requests if q["run"] == r["run_id"]]
+        # highest offered rate of a load-test phase during which this run sent a request
+        r["load_peak_rpm"] = max((ph["rpm"] or 0 for ph in phases for q in qs if ph["start"] <= q["t"] <= ph["end"]), default=0)
     out = {
         "schema": 1,
         "source": "experiments/swebench_public_v4flash (recorded 2026-11-02; see docs/SWEBENCH_PUBLIC_V4FLASH.md)",

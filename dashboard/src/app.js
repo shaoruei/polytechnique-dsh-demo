@@ -1,25 +1,13 @@
-// Dashboard application. Model functions (simulate, costCurves, ...) are bundled above this file.
+// Dashboard application (presentation build). Model functions (simulate, publicCost, ...) are bundled above.
+// Data: the 9 SWE-bench runs of deepseek-ai/DeepSeek-V4-Flash-0731 on Token Factory Public (D.swe) and the
+// separate API load test of the same model (D.bench). No other workload is shown.
 /* global Chart */
 const D = window.DEMO_DATA;
-const PRICES = D.pricing.public;
-const GPUS = D.profiles.gpus;
-const TRAJ = trajectoriesFrom({ runs: D.runs });
-// Medium/Heavy workloads: formal runs only (pilot excluded); the small baseline stays TRAJ.
-const WL_TRAJ = trajectoriesFrom({ runs: D.runs }, { cohorts: ['workload-formal'] });
-const WC = D.workloadComparison;
-/** Measured traces for a workload selector value. */
-function workloadTraj(value) {
-  if (value === 'wl-medium') return WL_TRAJ.filter((t) => t.task.startsWith('m1-'));
-  if (value === 'wl-heavy') return WL_TRAJ.filter((t) => t.task.startsWith('h1-'));
-  return TRAJ.filter((t) => t.effort === value);
-}
-const WL_LABEL = { medium: 'Small T1–T3', low: 'Small (low effort)', high: 'Small (high effort)', 'wl-medium': 'Medium M1', 'wl-heavy': 'Heavy H1' };
+const SWE = D.swe;
+const BENCH = D.bench;
+const PR = SWE.pricing; // verified public list price, $/1M tokens
+const LIMITS = BENCH.limits;
 const $ = (id) => document.getElementById(id);
-const DB = D.dedicatedBenchmark;
-const EP = (r) => r.endpoint ?? 'public';
-const COHORT = (r) => r.cohort ?? 'public-historical';
-const TASK_SHORT_ALL = { 'm1-late-penalties': 'M1 late-penalty grading', 'h1-usage-budgets': 'H1 gateway budgets' };
-const TASK_SHORT = { 't1-grade-average': 'T1 grade average', 't2-duration-parser': 'T2 duration parser', 't3-schedule-conflicts': 'T3 timetable clashes' };
 
 // ------------------------------------------------------------------ formatting
 const usd = (x, digits) => {
@@ -48,9 +36,6 @@ const median = (a) => {
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
-const tile = (label, value, detail = '', key = false) =>
-  `<div class="tile${key ? ' key' : ''}"><span class="label">${label}</span><span class="value">${value}</span><span class="detail">${detail}</span></div>`;
-
 // ------------------------------------------------------------------ theme-aware charts
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const charts = {};
@@ -58,8 +43,9 @@ function themeDefaults() {
   Chart.defaults.color = css('--muted');
   Chart.defaults.borderColor = css('--line');
   Chart.defaults.font.family = css('--font-body');
-  Chart.defaults.font.size = 12;
+  Chart.defaults.font.size = 14; // projector
   Chart.defaults.plugins.legend.labels.boxWidth = 12;
+  Chart.defaults.datasets.line.pointStyle = 'circle';
   Chart.defaults.maintainAspectRatio = false;
   // No animations. Assigning a partial object here (formerly { duration: 250 }) replaced Chart.js's
   // animation defaults: Animations.configure() copies only the keys of defaults.animation, so colour
@@ -113,6 +99,10 @@ function releaseCanvas(id, canvas) {
 }
 function chart(id, config) {
   const canvas = $(id);
+  if (config.type === 'line') {
+    const lg = (((config.options ??= {}).plugins ??= {}).legend ??= {});
+    lg.labels = { usePointStyle: true, pointStyle: 'line', pointStyleWidth: 28, ...(lg.labels || {}) };
+  }
   releaseCanvas(id, canvas);
   chartNotice(canvas, null);
   config.options = { ...(config.options || {}), animation: false };
@@ -143,9 +133,6 @@ function chart(id, config) {
   }, 600);
   return instance;
 }
-const TASK_COLORS = () => ({ 't1-grade-average': css('--accent'), 't2-duration-parser': css('--bad'), 't3-schedule-conflicts': css('--dedicated') });
-// Canvas colours must be plain CSS colours: color-mix() is not accepted by every engine's canvas
-// colour parser, nor by Chart.js's colour helper. Tokens are hex, so build rgba() directly.
 function alpha(color, a) {
   const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(color).trim());
   if (!m) return color;
@@ -156,11 +143,11 @@ function alpha(color, a) {
 }
 
 // ------------------------------------------------------------------ router
-const VIEWS = ['run', 'measure', 'workloads', 'dedicated', 'economics', 'classroom', 'method'];
+const VIEWS = ['run', 'measure', 'endpoints', 'economics', 'classroom', 'method'];
 const inited = {}; // view -> controls wired and drawn once
 const stale = {}; // view -> charts need redrawing (theme change)
-const INIT = { run: () => renderRun(), measure: () => renderMeasure(), workloads: () => drawWorkloads(), dedicated: () => drawDedicated(), economics: () => renderEconomics(), classroom: () => renderClassroom(), method: () => renderMethod() };
-const DRAW = { run: () => loadRun($('run-select').value), measure: () => drawMeasure(), workloads: () => drawWorkloads(), dedicated: () => drawDedicated(), economics: () => drawEconomics(), classroom: () => drawSim(), method: () => {} };
+const INIT = { run: () => renderRun(), measure: () => renderMeasure(), endpoints: () => drawEndpoints(), economics: () => renderEconomics(), classroom: () => renderClassroom(), method: () => renderMethod() };
+const DRAW = { run: () => loadRun($('run-select').value), measure: () => drawMeasure(), endpoints: () => drawEndpoints(), economics: () => drawEconomics(), classroom: () => drawSim(), method: () => {} };
 function currentView() {
   const v = location.hash.slice(1);
   return VIEWS.includes(v) ? v : 'run';
@@ -187,81 +174,101 @@ function show(view) {
 }
 window.addEventListener('hashchange', () => show(location.hash.slice(1)));
 
-// ==================================================================== 1. RUN
-let replayTimer = null;
-// Page 1 shows the SWE-bench Verified trials (DeepSeek-V4-Flash, public endpoint, stock DSH Web UI).
-const SWE = D.swe;
+
+// ------------------------------------------------------------------ shared data helpers
 const SWE_RUN = (id) => SWE.runs.find((x) => x.run_id === id);
 const replayOf = (r) => SWE.replays[r.run_id];
+const reqsOf = (r) => SWE.requests.filter((q) => q.run === r.run_id);
 const shortIssue = (iid) => iid.replace('django__django-', '');
+const hhmm = (iso) => iso.slice(11, 16);
+const sum = (a) => a.reduce((x, y) => x + y, 0);
+const pctl = (arr, q) => {
+  const a = arr.filter(Number.isFinite).sort((x, y) => x - y);
+  const i = (a.length - 1) * q;
+  return a[Math.floor(i)] + (a[Math.ceil(i)] - a[Math.floor(i)]) * (i - Math.floor(i));
+};
+const scope = (sel) => `<span class="scope ${sel ? 'sel' : 'agg'}">${sel ? 'this run' : 'all 9'}</span>`;
+const statTile = (label, value, agg, key = false) =>
+  `<div class="tile${key ? ' key' : ''}"><span class="label">${scope(true)}${label}</span><span class="value">${value}</span><span class="agg">${scope(false)}${agg}</span></div>`;
+const plainTile = (label, value, detail, evKind) =>
+  `<div class="tile"><span class="label">${label}${evKind ? ' ' + ev(evKind) : ''}</span><span class="value">${value}</span><span class="detail">${detail}</span></div>`;
+// SWE-bench runs in the simulator's trajectory shape (verified to replay exactly by the experiment)
+const SWE_TRAJ = SWE.runs.map((r) => ({ task: r.instance_id, effort: r.effort, success: r.success, lead_s: r.trajectory.lead_s, steps: r.trajectory.steps }));
+const tokensPerTask = mean(SWE.runs.map((r) => r.metrics.prompt_tokens + r.metrics.output_tokens)); // counted by the TPM limiter (cached included)
+const publicTasksPerHourCap = (mult = 1) => Math.min((LIMITS.tokens_per_minute * mult) / tokensPerTask, (LIMITS.requests_per_minute * mult) / mean(SWE.runs.map((r) => r.metrics.llm_requests))) * 60;
+
+// ==================================================================== 1. RUN AN AGENT
+let replayTimer = null;
+let currentRun = null;
 function renderRun() {
   const sel = $('run-select');
-  const byInstance = {};
-  for (const r of SWE.runs) (byInstance[r.instance_id] ??= []).push(r);
-  for (const [iid, runs] of Object.entries(byInstance)) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = `${iid} · ${SWE.instances[iid].title}`;
-    for (const r of runs.sort((a, b) => a.trial - b.trial)) {
+  for (const iid of Object.keys(SWE.instances)) {
+    const og = document.createElement('optgroup');
+    og.label = `Issue ${SWE.instances[iid].alias.slice(-1).toUpperCase()} · django-${shortIssue(iid)}`;
+    for (const r of SWE.runs.filter((x) => x.instance_id === iid).sort((a, b) => a.trial - b.trial)) {
       const o = document.createElement('option');
       o.value = r.run_id;
-      o.textContent = `${shortIssue(iid)} trial ${r.trial} · ${r.official.resolved ? 'resolved' : 'UNRESOLVED'} · ${secs(r.wall_time_s)} · ${r.metrics.llm_requests} req · ${usd(r.metrics.cost_usd)}`;
-      optgroup.append(o);
+      o.textContent = `${r.label} · ${r.official.resolved ? 'resolved' : 'not resolved'} · ${secs(r.wall_time_s)}`;
+      og.append(o);
     }
-    sel.append(optgroup);
+    sel.append(og);
   }
-  sel.value = SWE.runs.find((r) => r.instance_id === 'django__django-16136' && r.trial === 1)?.run_id ?? SWE.runs[0].run_id;
+  sel.value = SWE.runs.find((r) => r.label === 'A1').run_id;
   sel.addEventListener('change', () => loadRun(sel.value));
   $('replay-play').addEventListener('click', () => playReplay());
   $('replay-all').addEventListener('click', () => drawEvents(Infinity));
-  $('copy-cmd').addEventListener('click', async () => {
-    const text = $('live-cmd').textContent;
-    try {
-      await navigator.clipboard.writeText(text);
-      $('copy-cmd').textContent = 'Copied';
-    } catch {
-      const range = document.createRange();
-      range.selectNodeContents($('live-cmd'));
-      getSelection().removeAllRanges();
-      getSelection().addRange(range);
-      $('copy-cmd').textContent = 'Selected';
-    }
-    setTimeout(() => ($('copy-cmd').textContent = 'Copy'), 1500);
-  });
   loadRun(sel.value);
 }
-
-let currentRun = null;
 function loadRun(runId) {
   clearInterval(replayTimer);
   const r = SWE_RUN(runId);
   currentRun = r;
-  const m = r.metrics;
   const inst = SWE.instances[r.instance_id];
-  $('run-meta').innerHTML = [
-    'DeepSeek-V4-Flash · ' + r.effort + ' reasoning', `${m.llm_requests} LLM requests`, `${m.tool_calls} tool calls`, secs(r.wall_time_s),
-    'public ' + usd(m.cost_usd), `cache hit ${pct(m.cache_hit_rate)}`, r.started_at.slice(0, 16).replace('T', ' ') + ' UTC',
-  ].map((x) => `<span>${esc(x)}</span>`).join('');
-  $('run-task-title').textContent = `The task given to the agent: ${inst.instance_id} (Django ${inst.version})`;
-  $('run-prompt').textContent = inst.prompt;
-  drawLane(r);
+  $('issue-id').textContent = `${inst.instance_id} · Django ${inst.version}`;
+  $('issue-title').textContent = inst.title;
+  $('issue-summary').textContent = inst.summary;
+  $('run-prompt').textContent = inst.issue;
+  $('run-metrics').innerHTML = [['Time', secs(r.wall_time_s)], ['LLM requests', num(r.metrics.llm_requests)], ['Cost', usd(r.metrics.cost_usd, 4)]]
+    .map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+  $('run-result').innerHTML = r.official.resolved
+    ? '<span class="pill ok">RESOLVED</span> official SWE-bench tests pass'
+    : '<span class="pill bad">NOT RESOLVED</span> one hidden test still fails';
   drawEvents(Infinity);
-  drawVerdict(r);
-  drawPatch(r);
   if (inited.measure && currentView() !== 'measure') stale.measure = true;
 }
-
+// show a bash command as the command itself rather than its JSON arguments
+function callText(e) {
+  try {
+    const a = JSON.parse(e.text);
+    if (e.name === 'bash' && a.command) return '$ ' + a.command;
+    if (a.file_path || a.path || a.pattern) return [a.file_path ?? a.path, a.pattern].filter(Boolean).join('  ');
+  } catch { /* truncated or not JSON: show as recorded */ }
+  return e.text;
+}
+function eventRow(e) {
+  const t = `<span class="t">${num(e.t, 1)}s</span>`;
+  switch (e.k) {
+    case 'step': return `<li class="step">${t}<span class="kind">request</span><span class="body">LLM request #${e.step}</span></li>`;
+    case 'think': return `<li class="think">${t}<span class="kind">thinking</span><span class="body">${esc(e.text)}</span></li>`;
+    case 'say': return `<li>${t}<span class="kind say">answer</span><span class="body">${esc(e.text)}</span></li>`;
+    case 'call':
+      if (e.edit) {
+        const lines = (txt, sign) => (txt ? txt.split('\n').map((l) => sign + l).join('\n') : '');
+        return `<li>${t}<span class="kind call">edit</span><span class="body edit"><code>${esc(e.edit.file)}</code><pre class="diff">${diffHtml([lines(e.edit.old, '-'), lines(e.edit.new, '+')].filter(Boolean).join('\n'))}</pre></span></li>`;
+      }
+      return `<li>${t}<span class="kind call">${esc(e.name)}</span><span class="body"><code>${esc(callText(e))}</code></span></li>`;
+    case 'result': return `<li>${t}<span class="kind result${e.err ? ' err' : ''}">${e.err ? 'error' : 'result'}</span><span class="body"><code>${esc(e.text)}</code></span></li>`;
+    case 'usage': return `<li>${t}<span class="kind">tokens</span><span class="body mono">in ${num(e.u + e.c)} (cached ${num(e.c)}) · out ${num(e.o)}</span></li>`;
+    case 'end': return `<li class="step">${t}<span class="kind">done</span><span class="body">turn ended: ${esc(e.text)}</span></li>`;
+    default: return '';
+  }
+}
 function diffHtml(text) {
   return text.split('\n').map((l) => {
     const cls = l.startsWith('diff --git') || l.startsWith('+++') || l.startsWith('---') ? 'file' : l.startsWith('@@') ? 'hunk' : l.startsWith('+') ? 'add' : l.startsWith('-') ? 'del' : '';
     return cls ? `<span class="${cls}">${esc(l)}</span>` : esc(l);
   }).join('\n');
 }
-function drawPatch(r) {
-  const d = r.diff;
-  $('patch-stat').textContent = `${d.files.length} file(s): ${d.files.join(', ')} · +${d.lines_added} / −${d.lines_removed} lines`;
-  $('run-patch').innerHTML = diffHtml(r.patch);
-}
-
 function laneSegments(events) {
   // step start -> assistant message (LLM) -> tool result(s) (tool) -> next step start (harness)
   const segs = [];
@@ -300,34 +307,6 @@ function drawLane(r, upTo = Infinity) {
     `<span class="${s.kind}${s.from > upTo ? ' dim' : ''}" style="width:${((s.to - s.from) / total) * 100}%" title="${s.kind} ${num(s.to - s.from, 2)} s"></span>`).join('');
 }
 
-// show a bash command as the command itself rather than its JSON arguments
-function callText(e) {
-  try {
-    const a = JSON.parse(e.text);
-    if (e.name === 'bash' && a.command) return '$ ' + a.command;
-    if (a.file_path || a.path || a.pattern) return [a.file_path ?? a.path, a.pattern].filter(Boolean).join('  ');
-  } catch { /* truncated or not JSON: show as recorded */ }
-  return e.text;
-}
-function eventRow(e) {
-  const t = `<span class="t">${num(e.t, 1)}s</span>`;
-  switch (e.k) {
-    case 'step': return `<li class="step">${t}<span class="kind">request</span><span class="body">LLM request #${e.step}</span></li>`;
-    case 'think': return `<li class="think">${t}<span class="kind">thinking</span><span class="body">${esc(e.text)}</span></li>`;
-    case 'say': return `<li>${t}<span class="kind say">answer</span><span class="body">${esc(e.text)}</span></li>`;
-    case 'call':
-      if (e.edit) {
-        const lines = (txt, sign) => (txt ? txt.split('\n').map((l) => sign + l).join('\n') : '');
-        return `<li>${t}<span class="kind call">edit</span><span class="body edit"><code>${esc(e.edit.file)}</code><pre class="diff">${diffHtml([lines(e.edit.old, '-'), lines(e.edit.new, '+')].filter(Boolean).join('\n'))}</pre></span></li>`;
-      }
-      return `<li>${t}<span class="kind call">${esc(e.name)}</span><span class="body"><code>${esc(callText(e))}</code></span></li>`;
-    case 'result': return `<li>${t}<span class="kind result${e.err ? ' err' : ''}">${e.err ? 'error' : 'result'}</span><span class="body"><code>${esc(e.text)}</code></span></li>`;
-    case 'usage': return `<li>${t}<span class="kind">tokens</span><span class="body mono">in ${num(e.u + e.c)} (cached ${num(e.c)}) · out ${num(e.o)}</span></li>`;
-    case 'end': return `<li class="step">${t}<span class="kind">done</span><span class="body">turn ended: ${esc(e.text)}</span></li>`;
-    default: return '';
-  }
-}
-
 function drawEvents(upTo, animateFrom = Infinity) {
   const events = replayOf(currentRun);
   const shown = events.filter((e) => e.t <= upTo);
@@ -360,50 +339,18 @@ function playReplay() {
   }, 100);
 }
 
-function drawVerdict(r) {
-  const o = r.official;
-  const inst = SWE.instances[r.instance_id];
-  const f2pFail = o.f2p_fail.length ? `<p>Still failing: <code>${o.f2p_fail.map(esc).join(', ')}</code></p>` : '';
-  $('verdict').innerHTML = `
-    <div><h3>What the agent reported</h3><div class="claim">${esc(r.final_answer || '(no final answer)')}</div>
-      <p class="note">Changed ${r.diff.files.length} file(s), +${r.diff.lines_added}/−${r.diff.lines_removed} lines${r.test_files_changed.length ? `, added tests in ${r.test_files_changed.map(esc).join(', ')}` : ''}. ${r.gold_files_only ? 'Touches the same source file as the upstream fix' : 'Touches other files than the upstream fix'}; ${r.identical_to_gold ? 'byte-identical to it' : 'not identical to it'}.</p></div>
-    <div><h3>Official SWE-bench judge ${ev('measured')}</h3>
-      <p><span class="pill ${o.resolved ? 'ok' : 'bad'}">${o.resolved ? 'RESOLVED' : 'UNRESOLVED'}</span> fail-to-pass ${o.f2p_pass.length}/${inst.f2p} · pass-to-pass ${o.p2p_pass}/${inst.p2p}</p>${f2pFail}
-      <p class="note">The swebench harness (official Docker image) applies the patch, adds the hidden tests and runs them. Only this decides success. Integrity scan of the tool calls: ${esc(r.integrity)} (no web, network or outside-workspace access).</p>
-      ${r.official.resolved ? '' : '<p class="note">This run fixed the user-visible bug in a different method than the hidden test calls; see docs/SWEBENCH_PUBLIC_V4FLASH.md §5.</p>'}</div>
-    <div><h3>Measured for this run</h3><dl class="kv">
-      <dt>Agent turn time</dt><dd>${secs(r.wall_time_s)}</dd>
-      <dt>Waiting on the model / tools + harness</dt><dd>${secs(r.metrics.llm_time_s)} / ${secs(r.metrics.gap_time_s)}</dd>
-      <dt>TTFT p50</dt><dd>${num(r.metrics.ttft_s_p50, 2)} s</dd>
-      <dt>Decode p50</dt><dd>${num(r.metrics.decode_tps_p50)} tok/s</dd>
-      <dt>Input (cached) / output</dt><dd>${big(r.metrics.prompt_tokens)} (${big(r.metrics.cached_input_tokens)}) / ${big(r.metrics.output_tokens)}</dd>
-      <dt>Endpoint</dt><dd>public, direct (no relay)</dd>
-      <dt>Cost (list price)</dt><dd>${usd(r.metrics.cost_usd)}</dd></dl></div>`;
-}
 
-// ==================================================================== 2. MEASURE
-// Page 2 measures the same 9 SWE-bench trials. "this run" = the trial selected here (kept in sync
-// with section 1); "all 9" = across the nine trials (or all 168 requests for per-request figures).
-const INST_COLORS = () => ({ 'django__django-16136': css('--accent'), 'django__django-16493': css('--dedicated'), 'django__django-16661': css('--public') });
-const pctl = (arr, q) => {
-  const a = arr.filter(Number.isFinite).sort((x, y) => x - y);
-  if (!a.length) return NaN;
-  const i = (a.length - 1) * q;
-  return a[Math.floor(i)] + (a[Math.ceil(i)] - a[Math.floor(i)]) * (i - Math.floor(i));
-};
-const reqsOf = (r) => SWE.requests.filter((q) => q.run === r.run_id);
-const runLabel = (r) => `${shortIssue(r.instance_id)} t${r.trial}`;
-const hhmm = (epoch) => new Date(epoch * 1000).toISOString().slice(11, 16);
-const statTile = (label, value, agg, key = false) =>
-  `<div class="tile${key ? ' key' : ''}"><span class="label"><span class="scope sel">this run</span>${label}</span><span class="value">${value}</span><span class="agg"><span class="scope agg">all 9</span>${agg}</span></div>`;
+// ==================================================================== 2. MEASURE IT
+// "this run" = the run selected here (shared with page 1); "all 9" = across the nine runs.
+const TOK = () => ({ cached: css('--tok-cached'), uncached: css('--tok-uncached'), output: css('--tok-output') });
 function renderMeasure() {
-  if (!inited.run) { // opened directly at #measure: the run list and selection live in section 1
+  if (!inited.run) { // opened directly at #measure: the run list lives in section 1
     inited.run = true;
     renderRun();
   }
   const sel = $('m-run');
   sel.innerHTML = $('run-select').innerHTML;
-  sel.value = currentRun?.run_id ?? SWE.runs[0].run_id;
+  sel.value = currentRun.run_id;
   sel.addEventListener('change', () => {
     $('run-select').value = sel.value;
     loadRun(sel.value);
@@ -417,786 +364,265 @@ function drawMeasure() {
   const runs = SWE.runs;
   const m = r.metrics;
   const M = (k) => runs.map((x) => x.metrics[k]);
-  const sum = (a) => a.reduce((x, y) => x + y, 0);
-  const range = (a, f) => `${f(Math.min(...a))}–${f(Math.max(...a))}`;
-  const resolved = runs.filter((x) => x.official.resolved).length;
-  const isSel = (x) => x.run_id === r.run_id;
-  const colors = INST_COLORS();
+  const tok = TOK();
+  const dot = (c) => `<i class="dot" style="background:${c}"></i>`;
 
-  // ---- 1. Task overview
+  // A. Task overview
   $('m-tiles-task').innerHTML = [
-    statTile('Agent turn time', secs(r.wall_time_s), `mean ${secs(mean(runs.map((x) => x.wall_time_s)))} · ${range(runs.map((x) => x.wall_time_s), secs)}`),
-    statTile('LLM requests', num(m.llm_requests) + `<small>${num(m.tool_calls)} tool calls</small>`, `mean ${num(mean(M('llm_requests')), 1)} · ${range(M('llm_requests'), num)} · ${sum(M('llm_requests'))} in total`),
-    statTile('Total cost', usd(m.cost_usd, 4) + `<small>${r.official.resolved ? 'resolved' : 'unresolved'}</small>`, `mean ${usd(mean(M('cost_usd')), 4)} · ${usd(sum(M('cost_usd')), 4)} for all 9 · ${resolved}/9 resolved`, true),
+    statTile('Wall time', secs(r.wall_time_s), `mean ${secs(mean(runs.map((x) => x.wall_time_s)))}`),
+    statTile('LLM requests', num(m.llm_requests), `mean ${num(mean(M('llm_requests')), 1)}`),
+    statTile('Public cost (est.)', usd(m.cost_usd, 4), `mean ${usd(mean(M('cost_usd')), 4)} · ${usd(sum(M('cost_usd')), 3)} total`, true),
   ].join('');
-  const parts = runs.map((x) => {
-    const q = reqsOf(x);
-    const ttft = sum(q.map((y) => y.ttft));
-    const stall = sum(q.map((y) => y.stall_s));
-    const gen = sum(q.map((y) => y.lat)) - ttft - stall;
-    return { ttft, gen, stall, tools: x.wall_time_s - ttft - gen - stall };
-  });
-  const lbl = runs.map((x) => (isSel(x) ? '▶ ' : '') + runLabel(x) + (x.official.resolved ? '' : ' ✕'));
-  const fade = (c) => runs.map((x) => (isSel(x) ? c : alpha(c, 0.4)));
-  chart('c-time', {
-    type: 'bar',
-    data: {
-      labels: lbl,
-      datasets: [
-        { label: 'waiting for first token', data: parts.map((p) => p.ttft), backgroundColor: fade(css('--dedicated')) },
-        { label: 'generating', data: parts.map((p) => p.gen), backgroundColor: fade(css('--accent')) },
-        { label: 'stream stalls (>1 s)', data: parts.map((p) => p.stall), backgroundColor: fade(css('--bad')) },
-        { label: 'tools + harness', data: parts.map((p) => p.tools), backgroundColor: fade(css('--public')) },
-      ],
-    },
-    options: {
-      indexAxis: 'y',
-      scales: { x: { stacked: true, title: { display: true, text: 'seconds (agent turn)' } }, y: { stacked: true } },
-      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${num(c.raw, 1)} s` } } },
-    },
-  });
-  const P = parts.reduce((s2, p) => ({ ttft: s2.ttft + p.ttft, gen: s2.gen + p.gen, stall: s2.stall + p.stall, tools: s2.tools + p.tools }), { ttft: 0, gen: 0, stall: 0, tools: 0 });
-  const W = P.ttft + P.gen + P.stall + P.tools;
-  $('m-time-note').textContent = `Chronological order. Across all 9, ${pct((P.ttft + P.gen + P.stall) / W)} of the time is waiting on the model and ${pct(P.tools / W)} is tools and harness (mostly Django test runs). Stalls alone are ${pct(P.stall / W)}; they made the slow trials slow, not extra work (see section 3).`;
 
-  // ---- 2. Token usage & caching
+  // B. Token usage & caching
+  const allCost = sum(M('cost_usd'));
+  const noCache = sum(M('cost_usd_without_cache_discount'));
   $('m-tiles-tokens').innerHTML = [
-    statTile('Input tokens', big(m.prompt_tokens) + `<small>${big(m.cached_input_tokens)} cached</small>`, `mean ${big(mean(M('prompt_tokens')))} · largest prompt ${big(Math.max(...M('max_prompt_tokens')))}`),
-    statTile('Output tokens', big(m.output_tokens) + '<small>incl. reasoning</small>', `mean ${big(mean(M('output_tokens')))} · ${range(M('output_tokens'), big)}`),
-    statTile('Cache hit rate', pct(m.cache_hit_rate, 1), `${pct(sum(M('cached_input_tokens')) / sum(M('prompt_tokens')), 1)} of all prompt tokens · ${range(M('cache_hit_rate'), (v) => pct(v))}`, true),
+    statTile('Cache hit rate', pct(m.cache_hit_rate, 1) + `<small>${dot(tok.cached)}${big(m.cached_input_tokens)} cached · ${dot(tok.uncached)}${big(m.uncached_input_tokens)} uncached · ${dot(tok.output)}${big(m.output_tokens)} output</small>`,
+      pct(sum(M('cached_input_tokens')) / sum(M('prompt_tokens')), 1)),
+    `<div class="tile key"><span class="label">${scope(false)}Caching saved</span><span class="value">${pct(1 - allCost / noCache)}</span><span class="detail">${usd(allCost, 3)} instead of ${usd(noCache, 3)} for all 9 runs</span></div>`,
   ].join('');
-  const PR = SWE.pricing;
   const dollars = runs.map((x) => ({
-    unc: (x.metrics.uncached_input_tokens * PR.input_per_mtok) / 1e6,
-    cac: (x.metrics.cached_input_tokens * PR.cached_input_per_mtok) / 1e6,
-    out: (x.metrics.output_tokens * PR.output_per_mtok) / 1e6,
+    c: (x.metrics.cached_input_tokens * PR.cached_input_per_mtok) / 1e6,
+    u: (x.metrics.uncached_input_tokens * PR.input_per_mtok) / 1e6,
+    o: (x.metrics.output_tokens * PR.output_per_mtok) / 1e6,
   }));
+  const isSel = (x) => x.run_id === r.run_id;
+  const edge = runs.map((x) => (isSel(x) ? 2.5 : 0));
   chart('c-costsplit', {
     type: 'bar',
     data: {
-      labels: lbl,
+      labels: runs.map((x) => (isSel(x) ? '▶ ' : '') + x.label),
       datasets: [
-        { label: `uncached input ($${PR.input_per_mtok}/M)`, data: dollars.map((d) => d.unc), backgroundColor: fade(css('--accent')) },
-        { label: `cached input ($${PR.cached_input_per_mtok}/M)`, data: dollars.map((d) => d.cac), backgroundColor: fade(alpha(css('--accent'), 0.45)) },
-        { label: `output incl. reasoning ($${PR.output_per_mtok}/M)`, data: dollars.map((d) => d.out), backgroundColor: fade(css('--public')) },
+        { label: `Cached input ($${PR.cached_input_per_mtok}/M)`, data: dollars.map((d) => d.c), backgroundColor: tok.cached, borderColor: css('--fg'), borderWidth: edge, tokens: M('cached_input_tokens') },
+        { label: `Uncached input ($${PR.input_per_mtok}/M)`, data: dollars.map((d) => d.u), backgroundColor: tok.uncached, borderColor: css('--fg'), borderWidth: edge, tokens: M('uncached_input_tokens') },
+        { label: `Output ($${PR.output_per_mtok}/M)`, data: dollars.map((d) => d.o), backgroundColor: tok.output, borderColor: css('--fg'), borderWidth: edge, tokens: M('output_tokens') },
       ],
     },
     options: {
-      scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'cost per trial (USD)' }, ticks: { callback: (v) => '$' + v.toFixed(3) } } },
-      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${usd(c.raw, 4)}` } } },
+      scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'USD per run' }, ticks: { callback: (v) => '$' + v.toFixed(3) } } },
+      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${usd(c.raw, 4)} · ${big(c.dataset.tokens[c.dataIndex])} tokens` } } },
     },
   });
-  const tot = dollars.reduce((s2, d) => ({ unc: s2.unc + d.unc, cac: s2.cac + d.cac, out: s2.out + d.out }), { unc: 0, cac: 0, out: 0 });
-  const all = tot.unc + tot.cac + tot.out;
-  const noCache = sum(M('cost_usd_without_cache_discount'));
-  $('cost-split-note').textContent = `All 9: uncached input ${pct(tot.unc / all)}, cached input ${pct(tot.cac / all)}, output ${pct(tot.out / all)} of ${usd(all, 4)}. Without the cache discount the same tokens would cost ${usd(noCache, 4)}: caching cut the bill by ${pct(1 - all / noCache)}.`;
-  const rq = reqsOf(r);
-  const others = runs.filter((x) => !isSel(x));
-  chart('c-context', {
-    type: 'bar',
-    data: {
-      labels: rq.map((q) => q.seq),
-      datasets: [
-        { type: 'bar', label: 'cached input', data: rq.map((q) => q.c), backgroundColor: alpha(css('--accent'), 0.45), stack: 'p' },
-        { type: 'bar', label: 'uncached input', data: rq.map((q) => q.u), backgroundColor: css('--accent'), stack: 'p' },
-        { type: 'line', label: 'other trials (prompt size)', data: [], borderColor: alpha(css('--muted'), 0.6), pointRadius: 0, borderWidth: 1, stack: 'legend' },
-        // each comparison line in its own stack: lines must not add up
-        ...others.map((x, i) => ({ type: 'line', label: '_' + runLabel(x), data: reqsOf(x).map((q) => q.u + q.c), borderColor: alpha(css('--muted'), 0.35), borderWidth: 1, pointRadius: 0, stack: 'o' + i })),
-      ],
-    },
-    options: {
-      scales: { x: { stacked: true, title: { display: true, text: 'LLM request # in the task' } }, y: { stacked: true, title: { display: true, text: 'prompt tokens per request' }, ticks: { callback: (v) => big(v) } } },
-      plugins: { legend: { labels: { filter: (i) => !i.text.startsWith('_') } }, tooltip: { filter: (i) => !i.dataset.label.startsWith('_') } },
-    },
-  });
-  $('m-context-note').textContent = `Every request resends the whole conversation, so the prompt grows from ${big(rq[0].u + rq[0].c)} to ${big(Math.max(...rq.map((q) => q.u + q.c)))} tokens in this run. Only the new part is uncached. Grey lines are the other 8 trials.`;
 
-  // ---- 3. Latency & generation speed
-  const allq = SWE.requests;
-  const f2 = (v) => num(v, 2) + ' s';
-  $('m-tiles-speed').innerHTML = [
-    statTile('TTFT p50', f2(median(rq.map((q) => q.ttft))), `p50 ${f2(pctl(allq.map((q) => q.ttft), 0.5))} · p90 ${f2(pctl(allq.map((q) => q.ttft), 0.9))} over ${allq.length} requests`),
-    statTile('Request latency p50', f2(median(rq.map((q) => q.lat))), `p50 ${f2(pctl(allq.map((q) => q.lat), 0.5))} · p90 ${f2(pctl(allq.map((q) => q.lat), 0.9))}`),
-    statTile('Decode speed p50', num(median(rq.map((q) => q.tps))) + ' tok/s', `p50 ${num(pctl(allq.map((q) => q.tps), 0.5))} · p10 ${num(pctl(allq.map((q) => q.tps), 0.1))} · p90 ${num(pctl(allq.map((q) => q.tps), 0.9))} tok/s`, true),
-  ].join('');
-  const phases = SWE.load_phases ?? [];
-  const t0 = Math.floor((Math.min(...allq.map((q) => q.t)) - 60) / 300) * 300; // 5-minute grid
-  const t1 = Math.max(...allq.map((q) => q.t + q.lat)) + 60;
-  const loadLine = [];
-  for (const ph of phases.filter((x) => x.end > t0 && x.start < t1)) {
-    loadLine.push({ x: ph.start, y: null }, { x: ph.start, y: ph.rpm }, { x: ph.end, y: ph.rpm }, { x: ph.end, y: null });
-  }
-  const health = SWE.health.filter((h) => Number.isFinite(h.decode_tps)).map((h) => ({ x: Date.parse(h.at) / 1000, y: h.decode_tps }));
+  // C. Latency & generation speed: one line through the nine per-run medians, in run order
+  const series = css('--series');
+  const highLoad = runs.map((x) => x.load_peak_rpm >= LIMITS.requests_per_minute);
+  const band = highLoad.reduce((acc, on, i) => (on ? [acc[0] ?? i, i] : acc), []);
   chart('c-decode-time', {
-    type: 'scatter',
-    data: {
-      datasets: [
-        ...Object.keys(SWE.instances).map((iid) => ({
-          label: iid.replace('django__', ''),
-          data: allq.filter((q) => SWE_RUN(q.run).instance_id === iid).map((q) => ({ x: q.t, y: q.tps, q })),
-          backgroundColor: (c) => (c.raw?.q?.run === r.run_id ? colors[iid] : alpha(colors[iid], 0.5)),
-          borderColor: colors[iid],
-          borderWidth: (c) => (c.raw?.q?.run === r.run_id ? 1.5 : 0),
-          pointRadius: (c) => (c.raw?.q?.run === r.run_id ? 5 : 3),
-        })),
-        { label: 'health probe (1 fixed request / min)', data: health, pointStyle: 'rectRot', pointRadius: 5, backgroundColor: css('--fg'), borderColor: css('--fg') },
-        ...(loadLine.length ? [{ type: 'line', label: 'our load benchmark on the same model: offered req/min (right axis)', data: loadLine, yAxisID: 'load', borderColor: css('--bad'), backgroundColor: alpha(css('--bad'), 0.08), fill: true, pointRadius: 0, borderWidth: 1.5, spanGaps: false }] : []),
-      ],
-    },
-    options: {
-      scales: {
-        x: { type: 'linear', min: t0, max: t1, title: { display: true, text: 'time (UTC), 2 November' }, ticks: { stepSize: 300, callback: (v) => hhmm(v) } },
-        y: { min: 0, title: { display: true, text: 'decode speed per request (tok/s)' } },
-        ...(loadLine.length ? { load: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title: { display: true, text: 'offered req/min' } } } : {}),
-      },
-      plugins: { tooltip: { callbacks: { label: (c) => (c.raw.q ? `${runLabel(SWE_RUN(c.raw.q.run))} #${c.raw.q.seq} · ${hhmm(c.raw.x)} · ${num(c.raw.y)} tok/s · TTFT ${num(c.raw.q.ttft, 2)} s${c.raw.q.stall_s ? ` · stalled ${num(c.raw.q.stall_s, 1)} s` : ''}` : `${c.dataset.label}: ${num(c.raw.y)} at ${hhmm(c.raw.x)}`) } } },
-    },
-  });
-  const perRun = runs.map((x) => `${runLabel(x)} ${num(x.metrics.decode_tps_p50)}`).join(' → ');
-  $('m-decode-note').textContent = `A real-world observation, not a property of the model: on the shared public endpoint, per-trial decode p50 went ${perRun} tok/s, while TTFT stayed near 1.1–1.3 s. The slow trials were slow because of mid-stream stalls, not more work.` +
-    (loadLine.length ? ` The dip coincides with our own load benchmark on the same public model: ${SWE.load_overlap.text}` : ' The separate API load benchmark ran on the same public model in this window; its load schedule is overlaid once that dataset is integrated.');
-  chart('c-ttft', {
-    type: 'bar',
-    data: {
-      labels: rq.map((q) => q.seq),
-      datasets: [
-        { label: 'TTFT', data: rq.map((q) => q.ttft), backgroundColor: css('--dedicated') },
-        { label: 'generating', data: rq.map((q) => Math.max(0, q.lat - q.ttft - q.stall_s)), backgroundColor: css('--accent') },
-        { label: 'stalled', data: rq.map((q) => q.stall_s), backgroundColor: css('--bad') },
-      ],
-    },
-    options: {
-      scales: { x: { stacked: true, title: { display: true, text: 'LLM request # in the task' } }, y: { stacked: true, title: { display: true, text: 'seconds per request' } } },
-      plugins: { tooltip: { callbacks: { afterBody: (items) => { const q = rq[items[0].dataIndex]; return `${num(q.o)} output tokens · ${num(q.tps)} tok/s · latency ${num(q.lat, 2)} s`; } } } },
-    },
-  });
-
-  $('runs-table').innerHTML = `<thead><tr><th>run</th><th>issue</th><th>official</th><th>time</th><th>req</th><th>tools</th><th>input</th><th>cached</th><th>output</th><th>hit</th><th>TTFT p50</th><th>decode p50</th><th>stalls</th><th>cost</th></tr></thead><tbody>` +
-    runs.map((x) => { const k = x.metrics; return `<tr${isSel(x) ? ' class="sel"' : ''}><td class="mono">${esc(x.run_id.slice(9, 15))}</td><td>${esc(shortIssue(x.instance_id))} t${x.trial}</td><td>${x.official.resolved ? 'resolved' : '<b>unresolved</b>'}</td><td>${secs(x.wall_time_s)}</td><td>${k.llm_requests}</td><td>${k.tool_calls}</td><td>${big(k.prompt_tokens)}</td><td>${big(k.cached_input_tokens)}</td><td>${big(k.output_tokens)}</td><td>${pct(k.cache_hit_rate)}</td><td>${num(k.ttft_s_p50, 2)} s</td><td>${num(k.decode_tps_p50)}</td><td>${num(k.stream_stall_s, 1)} s</td><td>${usd(k.cost_usd, 4)}</td></tr>`; }).join('') + '</tbody>';
-}
-
-// ==================================================================== 3. WORKLOADS
-function drawWorkloads() {
-  const G = WC.groups;
-  const keys = ['small', 'medium', 'heavy'];
-  const name = { small: 'Small · T1–T3', medium: 'Medium · M1', heavy: 'Heavy · H1' };
-  const col = { small: css('--accent'), medium: css('--public'), heavy: css('--bad') };
-  const s = G.small;
-  const x = (k, f) => f(G[k]) / f(s);
-  $('w-tiles').innerHTML = [
-    tile('Formal runs', `${G.medium.runs} + ${G.heavy.runs}`, `M1 + H1; pilot (${G.pilot.runs}) kept separate; spend ${usd(WC.experiment.provider_reported_spend_usd, 3)} for all ${WC.experiment.paid_attempts} attempts ${ev('measured')}`),
-    tile('Success (hidden tests)', `M1 ${G.medium.successes}/${G.medium.runs} · H1 ${G.heavy.successes}/${G.heavy.runs}`, `H1 passed ${pct(G.heavy.hidden_checks_passed_fraction.mean)} of checks on average; small tasks ${G.small.successes}/${G.small.runs}`, true),
-    tile('Cost per task', `${usd(G.medium.cost_per_task_usd.mean, 3)} / ${usd(G.heavy.cost_per_task_usd.mean, 3)}`, `M1 / H1: ${num(x('medium', (g) => g.cost_per_task_usd.mean), 1)}× and ${num(x('heavy', (g) => g.cost_per_task_usd.mean), 1)}× the small tasks (${usd(s.cost_per_task_usd.mean, 4)})`, true),
-    tile('Tokens per task', `${big(G.heavy.prompt_tokens.mean + G.heavy.output_tokens.mean)}`, `H1 prompt + output; small ${big(s.prompt_tokens.mean + s.output_tokens.mean)}; cache hit ${pct(G.heavy.cache_hit_rate)} vs ${pct(s.cache_hit_rate)}`),
-    tile('LLM requests per task', `${num(G.medium.llm_requests.mean, 0)} / ${num(G.heavy.llm_requests.mean, 0)}`, `M1 / H1; small ${num(s.llm_requests.mean, 1)}`),
-    tile('Task time p50', `${secs(G.medium.task_time_s.p50)} / ${secs(G.heavy.task_time_s.p50)}`, `M1 / H1; small ${secs(s.task_time_s.p50)}`),
-    tile('Task starts/min in default limit', `${num(WC.dedicated_estimates.heavy.task_starts_per_minute_within_default_tpm, 1)}`, `H1 (500k tokens/min ÷ tokens per task); small ${num(WC.dedicated_estimates.small.task_starts_per_minute_within_default_tpm, 1)} ${ev('estimate')}`),
-  ].join('');
-  const row = (label, f, fmt = (v) => v) => `<tr><td>${label}</td>${keys.map((k) => `<td>${fmt(f(G[k]))}</td>`).join('')}</tr>`;
-  $('w-table').innerHTML = `<thead><tr><th>Measured, public endpoint, medium effort</th>${keys.map((k) => `<th>${name[k]} (n=${G[k].runs})</th>`).join('')}</tr></thead><tbody>` +
-    row('Success: all hidden tests pass', (g) => `${g.successes}/${g.runs}`) +
-    row('Hidden checks passed (mean)', (g) => pct(g.hidden_checks_passed_fraction.mean)) +
-    row('Task time p50 (min–max)', (g) => `${secs(g.task_time_s.p50)} (${secs(g.task_time_s.min)}–${secs(g.task_time_s.max)})`) +
-    row('LLM requests / tool calls (failed)', (g) => `${num(g.llm_requests.mean, 1)} / ${num(g.tool_calls.mean, 1)} (${num(g.tool_calls_failed.mean, 1)})`) +
-    row('Uncached input / cached input / output tokens', (g) => `${big(g.uncached_input_tokens.mean)} / ${big(g.cached_input_tokens.mean)} / ${big(g.output_tokens.mean)}`) +
-    row('Cache hit rate', (g) => pct(g.cache_hit_rate, 1)) +
-    row('Largest prompt in a task (mean)', (g) => big(g.max_prompt_tokens.mean)) +
-    row('Uncached input : output', (g) => `${num(g.uncached_to_output_ratio, 1)} : 1`) +
-    row('TTFT p50 / request latency p50', (g) => `${num(g.ttft_s.p50, 2)} s / ${num(g.latency_s.p50, 2)} s`) +
-    row('Decode p50', (g) => `${num(g.decode_tps.p50)} tok/s`) +
-    row('Public cost per task (mean)', (g) => usd(g.cost_per_task_usd.mean, 4)) +
-    row('Public cost per successful task', (g) => (g.cost_per_successful_task_usd ? usd(g.cost_per_successful_task_usd, 4) : 'no full pass')) +
-    row('Share of cost from cached input', (g) => pct(g.cached_share_of_cost)) + '</tbody>';
-
-  chart('c-w-tokens', {
-    type: 'bar',
-    data: { labels: keys.map((k) => name[k]), datasets: [
-      { label: 'cached input', data: keys.map((k) => G[k].cached_input_tokens.mean), backgroundColor: alpha(css('--accent'), 0.45) },
-      { label: 'uncached input', data: keys.map((k) => G[k].uncached_input_tokens.mean), backgroundColor: css('--accent') },
-      { label: 'output (incl. reasoning)', data: keys.map((k) => G[k].output_tokens.mean), backgroundColor: css('--public') },
-    ] },
-    options: { scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'tokens per task (mean)' }, ticks: { callback: (v) => big(v) } } } },
-  });
-  chart('c-w-context', {
     type: 'line',
-    data: { datasets: keys.flatMap((k) => G[k].context_growth.slice(0, k === 'small' ? 6 : 3).map((series, i) => ({
-      label: i === 0 ? name[k] : '', data: series.map((y, j) => ({ x: j + 1, y })), borderColor: col[k], backgroundColor: col[k],
-      pointRadius: 0, borderWidth: k === 'small' ? 1.2 : 2 }))) },
-    options: { parsing: false, plugins: { legend: { labels: { filter: (it) => it.text } } },
-      scales: { x: { type: 'linear', title: { display: true, text: 'LLM request # within the task' } }, y: { min: 0, title: { display: true, text: 'prompt tokens' }, ticks: { callback: (v) => big(v) } } } },
+    data: {
+      labels: runs.map((x) => x.label),
+      datasets: [{
+        label: 'median decode speed of the run',
+        data: M('decode_tps_p50'),
+        borderColor: series, backgroundColor: series, borderWidth: 4, tension: 0,
+        pointRadius: runs.map((x) => (isSel(x) ? 9 : 6)), pointBorderWidth: runs.map((x) => (isSel(x) ? 3 : 0)), pointBorderColor: css('--fg'),
+        pointHoverRadius: 10,
+      }],
+    },
+    options: {
+      layout: { padding: { top: 28 } },
+      scales: {
+        y: { min: 0, suggestedMax: 450, title: { display: true, text: 'tokens / second' }, ticks: { font: { size: 15 } } },
+        x: { offset: true, title: { display: true, text: 'runs in the order they ran (A, B, C = the three issues)' }, ticks: { font: { size: 16, weight: '600' } } },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: {
+          title: (c) => { const x = runs[c[0].dataIndex]; return `${x.label} · django-${shortIssue(x.instance_id)} · started ${hhmm(x.metrics.turn_started_at_utc)} UTC`; },
+          label: (c) => { const x = runs[c.dataIndex].metrics; return [`decode median ${num(x.decode_tps_p50, 1)} tok/s`, `TTFT median ${num(x.ttft_s_p50, 2)} s`, `stalls ${num(x.stream_stall_s, 1)} s`]; },
+        } },
+      },
+    },
+    plugins: [
+      { id: 'pointValues', afterDatasetsDraw(ch) {
+        const { ctx } = ch;
+        ctx.save();
+        ctx.fillStyle = css('--fg');
+        ctx.font = `600 15px ${css('--font-body')}`;
+        ctx.textAlign = 'center';
+        ch.getDatasetMeta(0).data.forEach((p, i) => ctx.fillText(num(ch.data.datasets[0].data[i]), p.x, p.y - 14));
+        ctx.restore();
+      } },
+      { id: 'loadBand', beforeDatasetsDraw(ch) {
+        if (band.length !== 2) return;
+        const { ctx, chartArea, scales } = ch;
+        const step = scales.x.getPixelForValue(1) - scales.x.getPixelForValue(0);
+        const x0 = scales.x.getPixelForValue(band[0]) - step / 2;
+        const x1 = scales.x.getPixelForValue(band[1]) + step / 2;
+        ctx.save();
+        ctx.fillStyle = alpha(css('--muted'), 0.12);
+        ctx.fillRect(x0, chartArea.top, x1 - x0, chartArea.bottom - chartArea.top);
+        ctx.fillStyle = css('--muted');
+        ctx.font = `13px ${css('--font-body')}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('separate load test ≥ 1,000 req/min', (x0 + x1) / 2, chartArea.top + 16);
+        ctx.restore();
+      } },
+    ],
   });
-  chart('c-w-cost', {
-    data: { labels: keys.map((k) => name[k]), datasets: [
-      { type: 'bar', label: 'public cost per task (USD)', data: keys.map((k) => G[k].cost_per_task_usd.mean), backgroundColor: keys.map((k) => col[k]), yAxisID: 'y' },
-      { type: 'line', label: 'task time p50 (s)', data: keys.map((k) => G[k].task_time_s.p50), borderColor: css('--muted'), backgroundColor: css('--muted'), yAxisID: 'y2', pointRadius: 5 },
-    ] },
-    options: { scales: { y: { min: 0, ticks: { callback: (v) => '$' + v.toFixed(3) } }, y2: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title: { display: true, text: 'seconds' } } } },
-  });
-  const E = WC.dedicated_estimates;
-  const R = WC.dedicated_measured_reference;
-  $('w-econ').innerHTML = `<h3>What the bigger tasks change in the economics</h3><ul>
-    <li><b>Workload effect</b> ${ev('measured')}: a medium/heavy task costs ~${num(x('heavy', (g) => g.cost_per_task_usd.mean), 0)}× more on the public endpoint, mostly re-sent cached context (${pct(G.heavy.cached_share_of_cost)} of the cost). Each task also needs ~${num(E.heavy.output_tokens_per_task / E.small.output_tokens_per_task, 0)}× more output tokens, which is the GPU work a dedicated replica has to generate.</li>
-    <li><b>Break-even utilisation</b> ${ev('estimate')}: on the 4× H100 replica at 90 tok/s per user, ${pct(E.small.breakeven_utilisation)} (small) → ${pct(E.medium.breakeven_utilisation)} (M1) → ${pct(E.heavy.breakeven_utilisation)} (H1). Heavier, more cache-heavy tasks pay the public endpoint more per output token, which moves the break-even modestly towards dedicated.</li>
-    <li><b>Traffic volume and idle time</b> still dominate: matching public pricing needs ~${num(E.heavy.tasks_per_minute_to_match_public, 1)} H1 tasks/min (${num(E.small.tasks_per_minute_to_match_public, 0)} small tasks/min) on one replica for every billed minute. Classroom bursts leave a replica idle most of the time.</li>
-    <li><b>Rate limits</b> ${ev('estimate')}: the default 500k tokens/min admits only ~${num(E.heavy.task_starts_per_minute_within_default_tpm, 1)} H1 task starts per minute (${num(E.small.task_starts_per_minute_within_default_tpm, 1)} small), so realistic tasks hit the public limit even sooner.</li>
-    <li><b>Dedicated speed</b>: measured only on small tasks (${secs(R.seq_task_time_s_p50)} p50, ${num(R.decode_tps_p50)} tok/s). For H1 the calibrated model <i>estimates</i> ${secs(E.heavy.idle_replica_task_time_s_p50)} on an idle replica against ${secs(E.heavy.measured_public_task_time_s_p50)} measured on public ${ev('estimate')}. Not measured.</li></ul>`;
+  const d = M('decode_tps_p50');
+  const t = M('ttft_s_p50');
+  $('m-takeaways').innerHTML =
+    `<li><b>${num(Math.min(...d))}–${num(Math.max(...d))} tok/s</b><span>observed decode speed (median per run)</span></li>` +
+    `<li><b>${num(Math.min(...t), 1)}–${num(Math.max(...t), 1)} s</b><span>time to first token stayed stable (median per run)</span></li>` +
+    `<li class="minor"><b>${num(pctl(SWE.requests.map((q) => q.lat), 0.5), 1)} s</b><span>request latency, median of all ${SWE.requests.length} requests</span></li>`;
+  $('m-decode-note').textContent = 'The slowdown overlapped with a separate load test we ran on the same public model (shaded); the timing matches, but correlation does not establish causation.';
 }
 
-// ==================================================================== 3. DEDICATED (measured)
-function drawDedicated() {
-  const ep = DB.endpoint;
-  const b = DB.billing;
-  const C = DB.cohorts_medium;
-  const ph = C['public-historical'];
-  const pc = C['public-control'];
-  const ds = C['dedicated-seq'];
-  const allDed = ['dedicated-seq', 'conc-2', 'conc-3', 'conc-5'].map((k) => C[k]).filter(Boolean);
-  const dedRuns = allDed.reduce((a, c) => a + c.runs, 0);
-  const dedSucc = allDed.reduce((a, c) => a + c.successes, 0);
-  $('d-hw').textContent = `${ep.gpu_count}× ${ep.gpu_type.replace('gpu-', '').toUpperCase()}, ${ep.scaling.max_replicas} replica, ${ep.region}, ${ep.flavor_name} flavor, ${usd(b.price_per_hour, 2)}/h`;
-  const v = DB.verification;
-  $('d-tiles').innerHTML = [
-    tile('Dedicated DSH runs', num(dedRuns), `${num(v.dedicated_requests)} requests; ${v.dedicated_requests_answered_by_dedicated}/${v.dedicated_requests} answered by the dedicated model ${ev('measured')}`),
-    tile('Success (hidden tests)', `${dedSucc}/${dedRuns}`, `public control ${pc.successes}/${pc.runs}; same T2 failure on both`, true),
-    tile('Task time p50, sequential', secs(ds.task_time_s.p50), `public control ${secs(pc.task_time_s.p50)}, historical ${secs(ph.task_time_s.p50)}`),
-    tile('Decode p50 per request', `${num(ds.decode_tps.p50)} tok/s`, `public control ${num(pc.decode_tps.p50)}, historical ${num(ph.decode_tps.p50)}`, true),
-    tile('TTFT p50', `${num(ds.ttft_s.p50, 2)} s`, `public control ${num(pc.ttft_s.p50, 2)} s`),
-    tile('Errors / timeouts', `${allDed.reduce((a, c) => a + c.http_errors, 0)} / ${allDed.reduce((a, c) => a + c.timeouts, 0)}`, 'HTTP errors / agent timeouts across all dedicated runs'),
-    tile('Cache hit rate', 'not reported', 'dedicated usage has no cached_tokens field'),
-    tile('GPU time billed in benchmark', usd(b.benchmark_window_usd, 2), `${num(b.benchmark_window_minutes, 1)} min × ${usd(b.price_per_hour / 60, 3)}/min; upper bound incl. idle ${usd(b.max_billable_usd, 2)}`),
+// ==================================================================== 3. PUBLIC VS DEDICATED
+function drawEndpoints() {
+  const S = BENCH.scaling;
+  const conc = S.A.map((x) => x.c);
+  const R = BENCH.ramps.R;
+  const firstR = R.find((x) => x.rate_429 > 0);
+  $('ep-public-status').textContent = `${num(BENCH.totals.public_requests)} requests on ${BENCH.model}, ${BENCH.window_utc} UTC. No errors up to 30 concurrent requests or 1,000 requests/min.`;
+  $('ep-dedicated-status').textContent = `${BENCH.dedicated.endpoint} (${BENCH.dedicated.hardware}) stayed in “starting” from 14:35 to 16:23 UTC and never served a request. No dedicated numbers are shown.`;
+  const lines = (k) => [
+    { label: 'agent step (~10k in / 512 out)', data: S.B.map((x) => x[k]), borderColor: css('--series'), backgroundColor: css('--series'), borderWidth: 3, pointRadius: 5 },
+    { label: 'chat (~3k in / 256 out)', data: S.A.map((x) => x[k]), borderColor: css('--muted'), backgroundColor: css('--muted'), borderWidth: 2, pointRadius: 4, borderDash: [6, 4] },
+  ];
+  const x = { title: { display: true, text: 'concurrent requests' } };
+  chart('c-ep-throughput', { type: 'line', data: { labels: conc, datasets: lines('agg_out_tps') },
+    options: { scales: { x, y: { min: 0, title: { display: true, text: 'output tokens / second (all requests)' } } } } });
+  chart('c-ep-latency', { type: 'line', data: { labels: conc, datasets: lines('lat_p95') },
+    options: { scales: { x, y: { min: 0, title: { display: true, text: 'p95 latency per request (s)' } } } } });
+  $('ep-limits').innerHTML = [
+    plainTile('Requests', '1,000 / min', `first 429 after ${num(firstR.first_429_s / 60, 0)} min at ${num(firstR.offered_rpm)} req/min`, 'verified'),
+    plainTile('Tokens', '2M / min', `cached tokens count in full: ≈ ${num(publicTasksPerHourCap(), 0)} SWE-bench tasks per hour`, 'measured'),
+    plainTile('Over the limit', `≈ ${num(firstR.lat429_p50, 1)} s wait`, 'then HTTP 429, without a Retry-After header', 'measured'),
   ].join('');
-
-  // task time by task
-  const tasks = Object.keys(TASK_SHORT);
-  const cohorts = [['public-historical', 'Public · 30 Oct', css('--public'), 0.45], ['public-control', 'Public · control 2 Nov', css('--public'), 1],
-    ['dedicated-seq', 'Dedicated · 1 agent', css('--dedicated'), 1], ['conc-5', 'Dedicated · 5 agents', css('--dedicated'), 0.45]];
-  chart('c-d-task', {
-    type: 'bar',
-    data: { labels: tasks.map((t) => TASK_SHORT[t]),
-      datasets: cohorts.filter(([k]) => C[k]).map(([k, label, color, a]) => ({ label, backgroundColor: alpha(color, a),
-        data: tasks.map((t) => C[k].by_task[t]?.task_time_s?.p50 ?? null),
-        n: tasks.map((t) => C[k].by_task[t]?.runs ?? 0) })) },
-    options: { scales: { y: { min: 0, title: { display: true, text: 'median task time (s)' } } },
-      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${secs(c.raw)} (n=${c.dataset.n[c.dataIndex]})` } } } },
-  });
-
-  // per-request speed
-  const sp = [['public-historical', 'Public · 30 Oct'], ['public-control', 'Public · control'], ['dedicated-seq', 'Dedicated · 1 agent'], ['conc-5', 'Dedicated · 5 agents']].filter(([k]) => C[k]);
-  chart('c-d-speed', {
-    type: 'bar',
-    data: { labels: sp.map(([, l]) => l),
-      datasets: [{ label: 'decode p50 (tok/s)', data: sp.map(([k]) => C[k].decode_tps.p50), backgroundColor: sp.map(([k]) => (k.startsWith('public') ? css('--public') : css('--dedicated'))), yAxisID: 'y' },
-        { label: 'TTFT p50 (s)', type: 'line', data: sp.map(([k]) => C[k].ttft_s.p50), borderColor: css('--muted'), backgroundColor: css('--muted'), yAxisID: 'y2', pointRadius: 5 }] },
-    options: { scales: { y: { min: 0, title: { display: true, text: 'output tok/s per request' } }, y2: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title: { display: true, text: 'TTFT (s)' } } } },
-  });
-  $('d-speed-note').textContent = `TTFT is similar (${num(ds.ttft_s.p50, 2)} s dedicated vs ${num(pc.ttft_s.p50, 2)} s public). Decoding is about ${num(pc.decode_tps.p50 / ds.decode_tps.p50, 1)}× slower per stream on this dedicated deployment, which is why tasks take longer. Request counts: ${sp.map(([k, l]) => `${l} ${C[k].requests}`).join(', ')}.`;
-
-  // concurrency scaling
-  const lv = Object.entries(DB.concurrency).sort((a, b2) => +a[0] - +b2[0]);
-  chart('c-d-conc', {
-    data: { labels: lv.map(([k]) => `${k} agent${k === '1' ? '' : 's'}`),
-      datasets: [
-        { type: 'bar', label: 'aggregate output tok/s', data: lv.map(([, c]) => c.aggregate_output_tps), backgroundColor: alpha(css('--dedicated'), 0.55), yAxisID: 'y' },
-        { type: 'line', label: 'completed tasks per minute', data: lv.map(([, c]) => c.tasks_per_min), borderColor: css('--accent'), backgroundColor: css('--accent'), yAxisID: 'y2', pointRadius: 5 },
-        { type: 'line', label: 'task slowdown vs 1 agent (p50)', data: lv.map(([, c]) => c.slowdown_vs_seq_median?.p50), borderColor: css('--bad'), backgroundColor: css('--bad'), borderDash: [4, 4], yAxisID: 'y3', pointRadius: 4 },
-      ] },
-    options: { scales: { y: { min: 0, title: { display: true, text: 'output tok/s (all agents)' } },
-      y2: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title: { display: true, text: 'tasks/min' } },
-      y3: { display: false, min: 0, max: 3 } },
-      plugins: { tooltip: { callbacks: { afterBody: (c) => { const x = lv[c[0].dataIndex][1]; return `agents measured: ${x.agents}, waves: ${x.waves}, slowdown p50 ${num(x.slowdown_vs_seq_median?.p50, 2)}×`; } } } } },
-  });
-  const c5 = DB.concurrency['5'];
-  const c1 = DB.concurrency['1'];
-  $('d-conc-note').innerHTML = `From 1 to 5 agents, aggregate output rose ${num(c5.aggregate_output_tps / c1.aggregate_output_tps, 1)}× and completed tasks/min ${num(c5.tasks_per_min / c1.tasks_per_min, 1)}×, while the median task took ${num(c5.slowdown_vs_seq_median.p50, 2)}× longer. Small sample: ${c5.agents} agents in ${c5.waves} waves at the top level, so no p95 is reported. The replica was not saturated at 5 agents; its limit was not measured.`;
-
-  // load curve: measured dots + model line
-  const prof = GPUS.h100x4;
-  const pts = DB.per_request_dedicated.filter((q) => q.decode_tps).map((q) => ({ x: q.inflight, y: q.decode_tps }));
-  const line = [];
-  for (let c = 1; c <= 32; c += 0.5) line.push({ x: c, y: interactivityAt(prof, c / prof.gpus_per_replica) });
-  chart('c-d-curve', {
-    type: 'scatter',
-    data: { datasets: [
-      { label: `measured requests (n=${pts.length})`, data: pts, backgroundColor: alpha(css('--dedicated'), 0.35), pointRadius: 2.5 },
-      { type: 'line', label: 'model: measured ≤5', data: line.filter((p) => p.x <= 5), borderColor: css('--dedicated'), pointRadius: 0, borderWidth: 2.5 },
-      { type: 'line', label: 'model: extrapolated >5', data: line.filter((p) => p.x >= 5), borderColor: css('--dedicated'), borderDash: [5, 4], pointRadius: 0, borderWidth: 2 },
-    ] },
-    options: { parsing: false, scales: { x: { type: 'linear', min: 0, max: 32, title: { display: true, text: 'requests in flight on the replica' } },
-      y: { min: 0, title: { display: true, text: 'per-request decode tok/s' } } } },
-  });
-
-  // cost
-  const pubPerTask = pc.public_token_cost_usd / pc.runs;
-  $('d-cost').innerHTML = `<h3>Cost per task, actually incurred ${ev('measured')}</h3><ul>
-    <li>Public endpoint (control runs): <b>${usd(pubPerTask, 4)}</b> per task, from billed tokens; <b>${usd(pc.public_token_cost_usd / Math.max(pc.successes, 1), 4)}</b> per successful task.</li>
-    <li>Dedicated, GPU time of the measurement window (${num(b.benchmark_window_minutes, 1)} min, ${usd(b.benchmark_window_usd, 2)}) ÷ ${b.dedicated_tasks} tasks: <b>${usd(b.cost_per_completed_task_benchmark_window, 3)}</b> per task, <b>${usd(b.cost_per_successful_task_benchmark_window, 3)}</b> per successful task.</li>
-    <li>Dedicated at the best measured rate (${num(b.best_measured_tasks_per_min, 1)} tasks/min with 5 agents): <b>${usd(b.cost_per_task_at_best_measured_rate, 3)}</b> per task, ${num(b.cost_per_task_at_best_measured_rate / pubPerTask, 1)}× the public price.</li>
-    <li>Including idle time from deployment to shutdown (upper bound ${usd(b.max_billable_usd, 2)}): ${usd(b.cost_per_completed_task_incl_idle, 3)} per task.</li>
-    <li>To match the public price, one replica must complete about <b>${num(b.price_per_hour / 60 / pubPerTask, 0)} tasks/min</b>, ${num(b.price_per_hour / 60 / pubPerTask / b.best_measured_tasks_per_min, 1)}× the best measured rate. That throughput is beyond what was tested here.</li>
-    <li class="note">The same dedicated tokens at public prices would have cost ${usd(b.public_equivalent_token_cost_of_dedicated_traffic_usd, 2)}. That figure is a counterfactual, not the dedicated cost.</li></ul>`;
-  const cp = DB.compatibility;
-  $('d-compat').innerHTML = `<h3>Streaming compatibility ${ev('measured')}</h3><ul>
-    <li>Tool-call index bug (last argument fragment with a new index and no id): public <b>${cp.public.tool_trials_with_index_anomaly}/${cp.public.tool_trials}</b> trials, dedicated <b>${cp.dedicated.tool_trials_with_index_anomaly}/${cp.dedicated.tool_trials}</b>. The relay repair is not needed on dedicated. It stayed in place for both groups so the client path is identical, and it made ${DB.cohorts['dedicated-seq'].tool_index_repairs} repairs on dedicated traffic.</li>
-    <li>Dedicated streams tool calls in finer chunks (${cp.dedicated.tool_call_deltas_per_call.join('/')} deltas per call vs ${cp.public.tool_call_deltas_per_call.join('/')} on public).</li>
-    <li>Dedicated <code>usage</code> has no <code>cached_tokens</code>, so prefix-cache behaviour cannot be measured from responses.</li>
-    <li>${esc(DB.routing_note)}</li></ul>`;
 }
 
-// ==================================================================== 3. ECONOMICS
-function fillGpuSelect(sel, priceInput) {
-  for (const [k, g] of Object.entries(GPUS)) {
-    const o = document.createElement('option');
-    o.value = k;
-    o.textContent = `${g.label}`;
-    sel.append(o);
-  }
-  sel.value = 'h100x4';
-  // the price input is per replica-hour; the model works per GPU-hour
-  const setPrice = () => {
-    const g = D.pricing.dedicated.gpus[sel.value];
-    priceInput.value = (g.price_per_replica_hour ?? g.price_per_gpu_hour * (GPUS[sel.value].gpus_per_replica || 1)).toFixed(2);
-  };
-  setPrice();
-  sel.addEventListener('change', setPrice);
-}
-const gprOf = (key) => GPUS[key].gpus_per_replica || 1;
-
-function econInputs() {
-  const s = $('e-sched').value;
-  const schedule = s === 'class-only'
-    ? { kind: s, sessionsPerMonth: +$('e-sessions').value, sessionHours: +$('e-shours').value, warmupHours: +$('e-warm').value }
-    : s === 'business-hours' ? { kind: s, hoursPerDay: +$('e-bh').value, daysPerMonth: +$('e-bd').value } : { kind: s };
-  const tr = workloadTraj($('e-effort').value);
-  return {
-    perTask: perTaskProfile(tr),
-    schedule,
-    gpu: { key: $('e-gpu').value, profile: GPUS[$('e-gpu').value], pricePerGpuHour: +$('e-price').value / gprOf($('e-gpu').value) },
-    targetInteractivity: +$('e-speed').value,
-    targetUtilization: +$('e-util').value,
-    peakFactor: +$('e-peak').value,
-    efficiency: +$('e-eff').value,
-    rateLimits: { rpm: PRICES.rate_limits.requests_per_minute, tpm: PRICES.rate_limits.tokens_per_minute, multiplier: 1 },
-  };
-}
-
+// ==================================================================== 4. COST CURVES
 function renderEconomics() {
-  fillGpuSelect($('e-gpu'), $('e-price'));
-  const form = $('econ-form');
-  const safeDraw = () => {
-    try {
-      drawEconomics();
-    } catch (err) {
-      reportProblem('view economics', err);
-    }
-  };
-  form.addEventListener('input', safeDraw);
-  form.addEventListener('change', safeDraw);
-  $('e-sched').addEventListener('change', () => {
-    for (const d of document.querySelectorAll('#econ-form .sched')) d.hidden = d.dataset.s !== $('e-sched').value;
-  });
+  const sel = $('e-task');
+  const opt = (v, label) => { const o = document.createElement('option'); o.value = v; o.textContent = label; sel.append(o); };
+  opt('all', `All 9 runs: ${usd(mean(SWE.runs.map((r) => r.metrics.cost_usd)), 4)} per task`);
+  for (const [iid, inst] of Object.entries(SWE.instances)) {
+    const c = mean(SWE.runs.filter((r) => r.instance_id === iid).map((r) => r.metrics.cost_usd));
+    opt(iid, `Issue ${inst.alias.slice(-1).toUpperCase()} (django-${shortIssue(iid)}): ${usd(c, 4)}`);
+  }
+  $('econ-form').addEventListener('input', drawEconomics);
   drawEconomics();
 }
-
 function drawEconomics() {
-  const inp = econInputs();
-  $('e-util-o').textContent = pct(inp.targetUtilization);
-  $('e-peak-o').textContent = num(inp.peakFactor, 1) + '×';
-  $('e-eff-o').textContent = num(inp.efficiency, 1) + '×';
-  const g = D.pricing.dedicated.gpus[inp.gpu.key];
-  const gpr = gprOf(inp.gpu.key);
-  const measuredHw = inp.gpu.key === 'h100x4';
-  $('e-price-hint').innerHTML = measuredHw
-    ? `Billing rate of the deployed <code>ecole-demo</code> (4× H100): ${usd(g.price_per_replica_hour, 2)}/h = ${usd(g.price_per_gpu_hour, 2)} per GPU-hour ${ev('verified', 'Provided')}. Invoice not yet verified.`
-    : `Default = Nebius AI Cloud on-demand list price ${usd(g.price_per_gpu_hour, 2)} per GPU-hour ${ev('assumption')}. Not the deployed configuration.`;
-
-  const p = inp.perTask;
-  const costPerTask = publicCost(p.tokens, PRICES);
-  const hours = billedHoursPerMonth(inp.schedule);
-  const activeH = activeHoursPerMonth(inp.schedule);
-  const perGpuOut = capacityPerGpu(inp.gpu.profile, inp.targetInteractivity, inp.efficiency);
-  const tasksPerGpuHour = (perGpuOut * inp.targetUtilization * 3600) / (p.tokens.output * inp.peakFactor);
-  const tasksPerReplicaHour = tasksPerGpuHour * gpr;
-  const capEv = measuredHw ? `${ev('measured')} ≤5 in flight, ${ev('benchmark', 'Extrapolated')} above` : ev('benchmark');
-  const be = breakEvenTasks({ ...inp, prices: PRICES });
-  const naiveBE = naiveDedicatedCost(inp) / costPerTask;
-  const perSession = inp.schedule.kind === 'class-only' ? inp.schedule.sessionsPerMonth : null;
-
-  const volumes = [];
-  for (let e = 2; e <= 7.0001; e += 0.02) volumes.push(Math.round(10 ** e));
-  const curves = costCurves({ volumes, ...inp, prices: PRICES });
-  const studentsAt = (tasks) => (perSession ? ` ≈ ${num(tasks / perSession / 6)} students × 6 tasks per session` : '');
-
+  const price = +$('e-price').value;
+  const v = $('e-task').value;
+  const perTask = mean(SWE.runs.filter((r) => v === 'all' || r.instance_id === v).map((r) => r.metrics.cost_usd));
+  const be = price / perTask;
+  const cap = publicTasksPerHourCap();
+  $('e-price-o').textContent = usd(price, 2);
+  const xmax = Math.ceil((Math.max(be, cap) * 1.25) / 500) * 500;
+  const ymax = Math.max(price, perTask * xmax) * 1.05;
   $('e-tiles').innerHTML = [
-    tile('Public cost per task', usd(costPerTask, 4), `${ev('measured')} tokens × ${ev('verified')} prices`, true),
-    tile('One replica, per month', usd(inp.gpu.pricePerGpuHour * gpr * hours, 0), `${num(hours)} billed h × ${usd(inp.gpu.pricePerGpuHour * gpr, 2)} (${gpr} GPU) ${measuredHw ? ev('verified', 'Provided') : ev('assumption')}`),
-    tile('Tasks one replica can serve', `${big(tasksPerReplicaHour)}/h`, `at ≥${inp.targetInteractivity} tok/s per user, ${pct(inp.targetUtilization)} peak utilisation ${capEv}`),
-    tile('Break-even volume', be.tasks ? `${big(be.tasks)} tasks/mo` : 'none', be.tasks ? `${studentsAt(be.tasks)} ${ev('estimate')}` : esc(be.reason), true),
-    tile('Naive break-even', `${big(naiveBE)} tasks/mo`, 'if one replica had unlimited capacity'),
+    plainTile('Public cost per task', usd(perTask, 4), 'DeepSeek list price × measured tokens', 'measured'),
+    plainTile('Break-even', `${num(be, 0)} tasks/h`, `≈ ${num(be / 60, 0)} per minute, every billed hour`, 'estimate'),
+    plainTile('Public default limit', `≈ ${num(cap, 0)} tasks/h`, `2M tokens/min ÷ ${big(tokensPerTask)} tokens per task`, 'estimate'),
   ].join('');
-
-  const rows = curves.rows;
-  const over = rows.filter((r) => !r.publicWithinLimits);
   chart('c-curve', {
     type: 'line',
     data: {
       datasets: [
-        { label: 'Public (pay per token)', data: rows.map((r) => ({ x: r.tasksPerMonth, y: r.publicCost })), borderColor: css('--public'), backgroundColor: css('--public'), pointRadius: 0, borderWidth: 2.5,
-          segment: { borderDash: (c) => (rows[c.p1DataIndex] && !rows[c.p1DataIndex].publicWithinLimits ? [6, 4] : undefined) } },
-        { label: `Dedicated ${inp.gpu.profile.label}, sized for capacity`, data: rows.map((r) => ({ x: r.tasksPerMonth, y: r.dedicatedCost, gpus: r.dedicatedGpus })), borderColor: css('--dedicated'), backgroundColor: css('--dedicated'), stepped: 'before', pointRadius: 0, borderWidth: 2.5 },
-        { label: 'Dedicated, naive (one replica, ignores capacity)', data: rows.map((r) => ({ x: r.tasksPerMonth, y: r.naiveDedicatedCost })), borderColor: css('--muted'), borderDash: [3, 4], pointRadius: 0, borderWidth: 1.5 },
+        { label: 'Public: pay per token', data: [{ x: 0, y: 0 }, { x: xmax, y: perTask * xmax }], borderColor: css('--series'), backgroundColor: css('--series'), borderWidth: 4, pointRadius: 0 },
+        { label: `Dedicated replica: ${usd(price, 2)} per hour (assumed)`, data: [{ x: 0, y: price }, { x: xmax, y: price }], borderColor: css('--tok-output'), backgroundColor: css('--tok-output'), borderWidth: 3, borderDash: [8, 5], pointRadius: 0 },
+        { label: 'Public default limit', data: [{ x: cap, y: 0 }, { x: cap, y: ymax }], borderColor: css('--muted'), backgroundColor: css('--muted'), borderWidth: 1.5, borderDash: [3, 4], pointRadius: 0 },
+        { type: 'scatter', label: 'break-even', data: [{ x: be, y: price }], backgroundColor: css('--fg'), borderColor: css('--fg'), pointRadius: 7 },
       ],
     },
     options: {
-      parsing: false,
-      interaction: { mode: 'nearest', axis: 'x', intersect: false },
       scales: {
-        x: { type: 'logarithmic', title: { display: true, text: 'agent tasks per month (log scale)' }, ticks: { callback: (v) => ([1e2, 1e3, 1e4, 1e5, 1e6, 1e7].includes(v) ? big(v) : '') } },
-        y: { type: 'logarithmic', title: { display: true, text: 'USD per month (log scale)' }, ticks: { callback: (v) => ([1, 10, 100, 1e3, 1e4, 1e5, 1e6].includes(v) ? usd(v, 0) : '') } },
+        x: { type: 'linear', min: 0, max: xmax, title: { display: true, text: 'SWE-bench tasks per hour' } },
+        y: { min: 0, max: ymax, title: { display: true, text: 'USD per billed hour' }, ticks: { callback: (y) => usd(y, 0) } },
       },
-      plugins: { tooltip: { callbacks: { title: (c) => `${big(c[0].raw.x)} tasks/month`, label: (c) => `${c.dataset.label}: ${usd(c.raw.y, 0)}${c.raw.gpus ? ` (${c.raw.gpus} GPU)` : ''}` } } },
+      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${num(c.raw.x, 0)} tasks/h → ${usd(c.raw.y, 2)}` } } },
     },
   });
-  const firstOver = over[0];
-  $('e-curve-note').innerHTML = `${be.tasks ? `Dedicated becomes cheaper at <b>${big(be.tasks)} tasks/month</b>${be.permanentFromTasks ? `, and stays cheaper above ${big(be.permanentFromTasks)}` : ''}.` : 'With these inputs dedicated never becomes cheaper.'}
-    The dedicated line steps up each time another ${gpr > 1 ? `${gpr}-GPU replica` : 'GPU'} is needed to hold ${inp.targetInteractivity} tok/s per user at peak.
-    ${firstOver ? `The public line turns dashed above ${big(firstOver.tasksPerMonth)} tasks/month: peak demand then exceeds the account's default ${big(PRICES.rate_limits.tokens_per_minute)} tokens/min, so that volume needs higher (auto-scaled or Enterprise) rate limits.` : ''}`;
-
-  // cost per task vs utilisation
-  const utils = [];
-  for (let u = 0.02; u <= 1.0001; u += 0.02) utils.push(u);
-  const perTaskAt = (u) => (inp.gpu.pricePerGpuHour / (perGpuOut * u * 3600)) * p.tokens.output;
-  chart('c-util', {
-    type: 'line',
-    data: {
-      datasets: [
-        { label: 'Dedicated cost per task', data: utils.map((u) => ({ x: u * 100, y: perTaskAt(u) })), borderColor: css('--dedicated'), pointRadius: 0, borderWidth: 2.5 },
-        { label: 'Public cost per task', data: utils.map((u) => ({ x: u * 100, y: costPerTask })), borderColor: css('--public'), pointRadius: 0, borderWidth: 2.5 },
-      ],
-    },
-    options: {
-      parsing: false,
-      scales: { x: { type: 'linear', min: 0, max: 100, title: { display: true, text: 'average GPU utilisation over billed hours (%)' } }, y: { type: 'logarithmic', title: { display: true, text: 'USD per task (log)' }, ticks: { callback: (v) => ([0.0001, 0.001, 0.01, 0.1, 1].includes(v) ? '$' + v : '') } } },
-    },
-  });
-  const crossU = (inp.gpu.pricePerGpuHour * p.tokens.output) / (perGpuOut * 3600 * costPerTask);
-
-  // speed and feasibility
-  const pubReq = D.runs.filter((r) => r.usable && EP(r) === 'public').flatMap((r) => r.metrics.requests);
-  const pubTps = median(pubReq.map((q) => q.tps).filter(Number.isFinite));
-  const tr = workloadTraj($('e-effort').value);
-  const solo = median(tr.map((t) => t.lead_s + t.steps.reduce((s, x) => s + soloRequestSeconds(inp.gpu.profile, x, { efficiency: inp.efficiency }) + x.gap, 0)));
-  const pubReqHist = D.runs.filter((r) => r.usable && COHORT(r) === 'public-historical').flatMap((r) => r.metrics.requests);
-  const measured = median(tr.map((t) => t.lead_s + t.steps.reduce((s, x) => s + x.lat + x.gap, 0)));
-  const maxC = concurrencyForInteractivity(inp.gpu.profile, inp.targetInteractivity, inp.efficiency);
-  $('e-feasibility').innerHTML = `<h3>Break-even is not the same as feasibility</h3><ul>
-    <li>A dedicated replica pays off only above about <b>${pct(crossU)}</b> average utilisation of its billed hours. ${ev('estimate')}</li>
-    <li>At ${inp.targetInteractivity} tok/s per user one ${inp.gpu.profile.label} holds about <b>${num(maxC * gpr, 0)}</b> requests in flight. ${measuredHw ? `Measured up to ${GPUS.h100x4.measured_max_per_replica_concurrency}; ${maxC * gpr > GPUS.h100x4.measured_max_per_replica_concurrency ? 'this figure is an extrapolation' : 'within the measured range'}.` : ''} Each running agent has about one request in flight most of the time. ${capEv}</li>
-    <li>Single-stream speed: public endpoint measured <b>${num(pubTps)} tok/s</b> median ${ev('measured')}; ${inp.gpu.profile.label} ${measuredHw ? 'measured' : 'benchmark best case'} ${num(interactivityAt(inp.gpu.profile, 1 / gpr) * inp.efficiency)} tok/s ${measuredHw ? ev('measured') : ev('benchmark')}.</li>
-    <li>Median task on an idle dedicated replica: <b>${secs(solo)}</b> (estimate) vs ${secs(measured)} measured on public.</li>
-    <li>Public endpoint default limits: ${num(PRICES.rate_limits.requests_per_minute)} requests/min and ${big(PRICES.rate_limits.tokens_per_minute)} tokens/min ${ev('verified')}. One task sends about ${big(p.tokens.prompt_plus_output)} tokens, so the default limit covers about <b>${num(PRICES.rate_limits.tokens_per_minute / p.tokens.prompt_plus_output, 0)} task starts per minute</b>.</li></ul>`;
+  $('e-note').textContent = `Dedicated only pays off above ${num(be, 0)} tasks per hour, ${num(be / cap, 1)}× what the default public limits allow, and only if the replica is that busy every billed hour. Dedicated capacity for this model is pending: the 2× B200 endpoint never became ready, so whether one replica could serve that load is unknown.`;
 }
 
-// ==================================================================== 4. CLASSROOM
+// ==================================================================== 5. CLASSROOM SIMULATION
 let simTimer = null;
 let lastSim = null;
 function renderClassroom() {
-  fillGpuSelect($('s-gpu'), $('s-price'));
-  for (const n of [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]) {
-    const o = document.createElement('option');
-    o.value = String(n);
-    o.textContent = `${n} replica${n > 1 ? 's' : ''} (fixed)`;
-    $('s-replicas').append(o);
-  }
   const form = $('sim-form');
-  const schedule = () => {
-    clearTimeout(simTimer);
-    simTimer = setTimeout(runSim, 180);
-  };
+  const schedule = () => { clearTimeout(simTimer); simTimer = setTimeout(runSim, 150); };
   form.addEventListener('input', schedule);
   form.addEventListener('change', schedule);
-  for (const b of document.querySelectorAll('.presets button')) {
-    b.addEventListener('click', () => {
-      $('s-students').value = b.dataset.n;
-      schedule();
-    });
-  }
-  $('s-pattern').addEventListener('change', () => {
-    const day = $('s-pattern').value === 'day';
-    $('s-hours').value = day ? 10 : 2;
-    $('s-sync').disabled = day;
-  });
-  $('s-sweep').addEventListener('click', runSweep);
+  for (const b of document.querySelectorAll('.presets button')) b.addEventListener('click', () => { $('s-students').value = b.dataset.n; schedule(); });
   runSim();
 }
-
-function simInputs() {
-  const students = +$('s-students').value;
-  const scenario = {
-    students, tasksPerStudent: +$('s-tasks').value, pattern: $('s-pattern').value, windowHours: +$('s-hours').value,
-    syncMinutes: +$('s-sync').value, releaseSpan: 0.8, reviewMinutes: +$('s-review').value, retryFailed: $('s-retry').checked,
-    seed: +$('s-seed').value || 1, effort: $('s-effort').value.startsWith('wl-') ? 'medium' : $('s-effort').value,
-  };
-  const traj = workloadTraj($('s-effort').value);
-  const publicB = {
-    kind: 'public', rpm: PRICES.rate_limits.requests_per_minute, tpm: PRICES.rate_limits.tokens_per_minute,
-    rateLimitMultiplier: +$('s-mult').value, dynamicLimits: $('s-dyn').checked, tpmCountsCached: $('s-cachedtpm').checked,
-  };
-  const gpuKey = $('s-gpu').value;
-  const dedicatedB = { kind: 'dedicated', profile: GPUS[gpuKey], targetInteractivity: 90 };
-  return { scenario, traj, workload: $('s-effort').value, publicB, dedicatedB, gpuKey, replicas: $('s-replicas').value, price: +$('s-price').value,
-    sessions: +$('s-sessions').value, warm: +$('s-warm').value };
-}
-
-function feasibility(sum) {
-  if (sum.tasksCompleted < sum.tasksAttempted || sum.overranWindow) return ['bad', 'overloaded'];
-  if (sum.slowdownP95 > 3) return ['bad', 'severely slowed'];
-  if (sum.slowdownP95 > 1.5) return ['warn', 'slowed'];
-  return ['ok', 'keeps up'];
-}
-
-const RAISED_MULT = 20; // documented hard ceiling of dynamic scaling; stands in for raised / Enterprise limits
-function simulatePair(inp) {
-  const pub = simulate(inp.traj, inp.scenario, inp.publicB, PRICES);
-  const pubRaised = simulate(inp.traj, inp.scenario, { ...inp.publicB, rateLimitMultiplier: RAISED_MULT, dynamicLimits: false }, PRICES);
-  let ded;
-  let replicas;
-  if (inp.replicas === 'auto') {
-    const r = autoSize(inp.traj, inp.scenario, inp.dedicatedB, PRICES, { sloSlowdown: 1.5, maxReplicas: 64 });
-    replicas = r.replicas ?? 64;
-    ded = r.result;
-  } else {
-    replicas = +inp.replicas;
-    ded = simulate(inp.traj, inp.scenario, { ...inp.dedicatedB, replicas }, PRICES);
-  }
-  const gpr = inp.dedicatedB.profile.gpus_per_replica || 1;
-  const windowH = Math.max(inp.scenario.windowHours, ded.summary.makespanS / 3600);
-  const billedH = inp.scenario.pattern === 'class' ? windowH + inp.warm : windowH;
-  const dedSession = replicas * inp.price * billedH; // price input is per replica-hour
-  const measuredMax = inp.dedicatedB.profile.measured_max_per_replica_concurrency ?? null;
-  const extrapolated = measuredMax === null || ded.summary.maxPerReplicaInstant > measuredMax;
-  return { pub, pubRaised, ded, replicas, gpus: replicas * gpr, dedSession, billedH, measuredMax, extrapolated };
-}
-
 function runSim() {
-  const inp = simInputs();
-  $('s-students-o').textContent = inp.scenario.students;
-  $('s-tasks-o').textContent = inp.scenario.tasksPerStudent;
-  $('s-hours-o').textContent = num(inp.scenario.windowHours, 1) + ' h';
-  $('s-sync-o').textContent = num(inp.scenario.syncMinutes, 2);
-  $('s-review-o').textContent = num(inp.scenario.reviewMinutes, 1);
-  $('s-mult-o').textContent = inp.publicB.rateLimitMultiplier + '×';
-  for (const b of document.querySelectorAll('.presets button')) b.setAttribute('aria-pressed', String(+b.dataset.n === inp.scenario.students));
-  const t0 = performance.now();
-  const res = simulatePair(inp);
-  lastSim = { inp, res, ms: performance.now() - t0 };
+  const scenario = {
+    students: +$('s-students').value, tasksPerStudent: +$('s-tasks').value, pattern: 'class', windowHours: +$('s-hours').value,
+    syncMinutes: +$('s-sync').value, releaseSpan: 0.8, reviewMinutes: 2, retryFailed: false, seed: 7,
+  };
+  const mult = +$('s-mult').value;
+  const backend = { kind: 'public', rpm: LIMITS.requests_per_minute, tpm: LIMITS.tokens_per_minute, rateLimitMultiplier: mult, dynamicLimits: false, tpmCountsCached: true };
+  $('s-students-o').textContent = scenario.students;
+  $('s-tasks-o').textContent = scenario.tasksPerStudent;
+  $('s-hours-o').textContent = num(scenario.windowHours, 1) + ' h';
+  $('s-sync-o').textContent = num(scenario.syncMinutes, 1);
+  for (const b of document.querySelectorAll('.presets button')) b.setAttribute('aria-pressed', String(+b.dataset.n === scenario.students));
+  lastSim = { scenario, mult, res: simulate(SWE_TRAJ, scenario, backend, PR) };
   drawSim();
 }
-
-function sideCard(kind, sum, extra) {
-  const [cls, label] = feasibility(sum);
-  const title = kind === 'public' ? (extra.title ?? 'Public endpoint') : `Dedicated · ${extra.replicas} × ${extra.gpuLabel}`;
-  return `<div class="panel side ${kind}"><h3>${title} <span class="pill ${cls}">${label}</span></h3><dl class="kv">
-    <dt>Cost for this session</dt><dd class="big">${usd(extra.sessionCost, 2)}</dd>
-    <dt>Cost per month (${extra.sessions} sessions)</dt><dd>${usd(extra.sessionCost * extra.sessions, 0)}</dd>
-    <dt>Cost basis</dt><dd>${extra.basis}</dd>
-    <dt>Task time p50 / p95</dt><dd>${secs(sum.taskDurationP50)} / ${secs(sum.taskDurationP95)}</dd>
-    <dt>p95 slowdown vs ${kind === 'public' ? 'measured' : 'idle replica'}</dt><dd>${num(sum.slowdownP95, 2)}×</dd>
-    ${kind === 'dedicated' ? `<dt>p95 task time vs measured public</dt><dd>${num(sum.vsMeasuredPublicP95, 2)}×</dd>` : ''}
-    <dt>Mean wait per task</dt><dd>${secs(sum.meanWaitPerTask)}</dd>
-    <dt>Peak agents working</dt><dd>${num(sum.peakActiveAgents, 0)}</dd>
-    <dt>Peak requests / min</dt><dd>${num(sum.peakRpm)}</dd>
-    <dt>Peak tokens / min</dt><dd>${big(sum.peakTpm)}</dd>
-    ${kind === 'public' ? `<dt>Rate-limit factor reached</dt><dd>${sum.rateLimitHistory?.length ? num(Math.max(...sum.rateLimitHistory.map((h) => h.factor)), 2) + '×' : '1×'}</dd>`
-      : `<dt>Decode-slot utilisation</dt><dd>${pct(sum.slotUtilization, 1)}</dd>`}
-    ${kind === 'dedicated' ? `<dt>Peak requests in flight per replica</dt><dd>${sum.maxPerReplicaInstant}</dd>` : ''}
-    <dt>Tasks finished (successful)</dt><dd>${sum.tasksCompleted} (${sum.successfulTasks})</dd></dl>
-    ${extra.note ? `<p class="note">${extra.note}</p>` : ''}</div>`;
-}
-
 function drawSim() {
-  const { inp, res, ms } = lastSim;
-  const ps = res.pub.summary;
-  const ds = res.ded.summary;
-  const gpuLabel = inp.dedicatedB.profile.label.replace(/^1x /, '');
-  const rs = res.pubRaised.summary;
-  const tokBasis = (x) => `${big(x.tokens.uncached + x.tokens.cached + x.tokens.output)} tokens`;
-  const dedNote = res.measuredMax === null
-    ? `Capacity from third-party benchmark data ${ev('benchmark')}.`
-    : res.extrapolated
-      ? `<span class="pill warn">extrapolated</span> Peak load ${ds.maxPerReplicaInstant} requests per replica exceeds the ${res.measuredMax} measured on ecole-demo; speeds above that come from the benchmark-shaped extrapolation.`
-      : `<span class="pill ok">within measured range</span> Peak load ${ds.maxPerReplicaInstant} ≤ ${res.measuredMax} requests per replica measured on ecole-demo.`;
-  $('s-compare').innerHTML =
-    sideCard('public', ps, { title: `Public · account limits ×${inp.publicB.rateLimitMultiplier}`, sessionCost: ps.publicCostUsd, sessions: inp.sessions, basis: tokBasis(ps),
-      note: `${ev('verified')} ${num(PRICES.rate_limits.tokens_per_minute * inp.publicB.rateLimitMultiplier)} tokens/min${inp.publicB.dynamicLimits ? ' + documented auto-scaling' : ''}.` }) +
-    sideCard('public', rs, { title: `Public · raised limits ×${RAISED_MULT} (hypothetical)`, sessionCost: rs.publicCostUsd, sessions: inp.sessions, basis: tokBasis(rs),
-      note: `${ev('assumption')} Stands in for an Enterprise or negotiated limit; ${RAISED_MULT}× is the documented auto-scaling ceiling.` }) +
-    sideCard('dedicated', ds, { sessionCost: res.dedSession, sessions: inp.sessions, gpus: res.gpus, replicas: res.replicas, gpuLabel,
-      basis: `${res.replicas} replica × ${num(res.billedH, 2)} h × ${usd(inp.price, 2)}`, note: dedNote });
-
-  const labels = (tl) => tl.map((m) => m.minute);
-  const n = Math.max(res.pub.timeline.length, res.ded.timeline.length);
-  const xs = Array.from({ length: n }, (_, i) => i);
-  const val = (tl, k) => xs.map((i) => tl[i]?.[k] ?? 0);
-  chart('c-active', {
-    type: 'line',
-    data: {
-      labels: xs,
-      datasets: [
-        { label: 'Public: agents in progress', data: val(res.pub.timeline, 'activeAgents'), borderColor: css('--public'), backgroundColor: alpha(css('--public'), 0.15), fill: true, pointRadius: 0, borderWidth: 2 },
-        { label: 'Dedicated: agents in progress', data: val(res.ded.timeline, 'activeAgents'), borderColor: css('--dedicated'), backgroundColor: alpha(css('--dedicated'), 0.15), fill: true, pointRadius: 0, borderWidth: 2 },
-      ],
-    },
-    options: { scales: { x: { title: { display: true, text: 'minute of the session' }, ticks: { maxTicksLimit: 12 } }, y: { title: { display: true, text: 'agents (minute average)' }, min: 0 } } },
-  });
-  const total = ps.tasksAttempted;
-  const wlNote = inp.workload.startsWith('wl-') ? ` <b>Workload: ${WL_LABEL[inp.workload]}</b>, replaying ${inp.traj.length} measured traces (small sample)${inp.workload === 'wl-heavy' ? '; H1 never fully passed, so with retries on every task is re-run once' : ''}.` : '';
-  $('s-active-note').innerHTML = `${num(inp.scenario.students)} students × ${inp.scenario.tasksPerStudent} tasks = ${num(total)} agent runs including retries, about ${big(ps.requests)} LLM requests (${num(ps.requests / Math.max(total, 1), 1)} per task). When the public endpoint throttles, agents pile up: they wait instead of finishing. Simulated in ${num(ms)} ms, seed ${inp.scenario.seed}.${wlNote}`;
-
-  const mult = inp.publicB.rateLimitMultiplier;
-  const limitLine = xs.map((i) => {
-    const h = ps.rateLimitHistory || [];
-    let f = 1;
-    for (const e of h) if (e.minute <= i) f = e.factor;
-    return PRICES.rate_limits.tokens_per_minute * mult * (inp.publicB.dynamicLimits ? f : 1);
-  });
+  const { scenario, mult, res } = lastSim;
+  const s = res.summary;
+  const limit = LIMITS.tokens_per_minute * mult;
+  const feasible = s.tasksCompleted >= s.tasksAttempted && !s.overranWindow;
+  $('s-tiles').innerHTML = [
+    plainTile('Session cost', usd(s.publicCostUsd, 2), `${usd(s.publicCostUsd / scenario.students, 3)} per student · list price`, 'estimate'),
+    plainTile('Task time p95', secs(s.taskDurationP95), feasible ? `${num(s.slowdownP95, 1)}× the recorded run` : 'not all tasks finished in the session', 'estimate'),
+    plainTile('Peak tokens / min', big(s.peakTpm), `${pct(s.peakTpm / limit)} of the ${big(limit)} limit`, 'estimate'),
+  ].join('');
+  const tl = res.timeline;
+  const xs = tl.map((x) => x.minute);
   chart('c-tpm', {
     type: 'line',
-    data: {
-      labels: xs,
-      datasets: [
-        { label: 'tokens/min sent', data: xs.map((i) => (res.pub.timeline[i] ? res.pub.timeline[i].tokensIn + res.pub.timeline[i].tokensOut : 0)), borderColor: css('--public'), pointRadius: 0, borderWidth: 2 },
-        { label: 'tokens/min limit', data: limitLine, borderColor: css('--bad'), borderDash: [5, 4], pointRadius: 0, borderWidth: 1.5, stepped: true },
-      ],
-    },
-    options: { scales: { x: { title: { display: true, text: 'minute' }, ticks: { maxTicksLimit: 10 } }, y: { min: 0, ticks: { callback: (v) => big(v) } } } },
+    data: { labels: xs, datasets: [
+      { label: 'tokens/min sent (cached included)', data: tl.map((x) => x.tokensIn + x.tokensOut), borderColor: css('--series'), backgroundColor: alpha(css('--series'), 0.15), fill: true, pointRadius: 0, borderWidth: 2.5 },
+      { label: `limit ${big(limit)}/min`, data: xs.map(() => limit), borderColor: css('--bad'), borderDash: [6, 4], pointRadius: 0, borderWidth: 2 },
+    ] },
+    options: { scales: { x: { title: { display: true, text: 'minute of the session' }, ticks: { maxTicksLimit: 12 } }, y: { min: 0, ticks: { callback: (v) => big(v) } } } },
   });
-  chart('c-queue', {
+  chart('c-active', {
     type: 'line',
-    data: {
-      labels: xs,
-      datasets: [
-        { label: 'requests in flight', data: val(res.ded.timeline, 'inflight'), borderColor: css('--dedicated'), pointRadius: 0, borderWidth: 2 },
-        { label: 'requests waiting for a slot', data: val(res.ded.timeline, 'queued'), borderColor: css('--bad'), pointRadius: 0, borderWidth: 2 },
-        { label: `slot capacity at 90 tok/s/user (${res.replicas} replica${res.replicas > 1 ? 's' : ''})`, data: xs.map(() => res.gpus * concurrencyForInteractivity(inp.dedicatedB.profile, 90)), borderColor: css('--muted'), borderDash: [4, 4], pointRadius: 0, borderWidth: 1.5 },
-      ],
-    },
-    options: { scales: { x: { title: { display: true, text: 'minute' }, ticks: { maxTicksLimit: 10 } }, y: { min: 0, title: { display: true, text: 'requests (minute average)' } } } },
+    data: { labels: xs, datasets: [
+      { label: 'agents in progress', data: tl.map((x) => x.activeAgents), borderColor: css('--tok-output'), backgroundColor: alpha(css('--tok-output'), 0.15), fill: true, pointRadius: 0, borderWidth: 2.5 },
+    ] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'minute of the session' }, ticks: { maxTicksLimit: 12 } }, y: { min: 0, title: { display: true, text: 'agents' } } } },
   });
+  $('s-note').textContent = `${num(scenario.students)} students × ${scenario.tasksPerStudent} tasks, replaying the 9 recorded runs. Assumes each request keeps its recorded latency; the API test saw requests slow down from about 10 concurrent. Dedicated comparison pending.`;
 }
 
-async function runSweep() {
-  const btn = $('s-sweep');
-  btn.disabled = true;
-  const base = simInputs();
-  const sizes = [20, 50, 100, 200, 350, 500];
-  const out = [];
-  for (const n of sizes) {
-    btn.textContent = `Simulating ${n} students…`;
-    await new Promise((r) => setTimeout(r, 20));
-    const inp = { ...base, scenario: { ...base.scenario, students: n }, replicas: 'auto' };
-    const res = simulatePair(inp);
-    out.push({ n, pubMonth: res.pub.summary.publicCostUsd * base.sessions, dedMonth: res.dedSession * base.sessions, gpus: res.gpus,
-      extrapolated: res.extrapolated,
-      pubSlow: res.pub.summary.slowdownP95, pubFeas: feasibility(res.pub.summary)[1] });
-  }
-  btn.textContent = 'Run sweep';
-  btn.disabled = false;
-  chart('c-sweep', {
-    data: {
-      labels: sizes,
-      datasets: [
-        { type: 'line', label: 'Public: cost per month', data: out.map((o) => o.pubMonth), borderColor: css('--public'), backgroundColor: css('--public'), yAxisID: 'y', borderWidth: 2.5,
-          pointStyle: out.map((o) => (o.pubSlow > 1.5 ? 'triangle' : 'circle')), pointRadius: out.map((o) => (o.pubSlow > 1.5 ? 7 : 4)) },
-        { type: 'line', label: 'Dedicated (auto-sized): cost per month; hollow = extrapolated beyond measured load', data: out.map((o) => o.dedMonth), borderColor: css('--dedicated'), backgroundColor: out.map((o) => (o.extrapolated ? 'transparent' : css('--dedicated'))), pointRadius: 5, pointBorderWidth: 2, yAxisID: 'y', borderWidth: 2.5, stepped: false },
-        { type: 'bar', label: 'GPUs needed', data: out.map((o) => o.gpus), backgroundColor: alpha(css('--dedicated'), 0.2), yAxisID: 'y2' },
-      ],
-    },
-    options: {
-      scales: {
-        x: { title: { display: true, text: 'students in the class' } },
-        y: { position: 'left', min: 0, title: { display: true, text: 'USD per month' }, ticks: { callback: (v) => usd(v, 0) } },
-        y2: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title: { display: true, text: 'GPUs' }, ticks: { stepSize: 1 } },
-      },
-      plugins: { tooltip: { callbacks: { afterBody: (c) => `public p95 slowdown ${num(out[c[0].dataIndex].pubSlow, 1)}× (${out[c[0].dataIndex].pubFeas})` } } },
-    },
-  });
-  const cross = out.find((o) => o.dedMonth <= o.pubMonth);
-  const slow = out.filter((o) => o.pubSlow > 1.5).map((o) => o.n);
-  $('s-sweep-note').innerHTML = `${cross ? `With these settings dedicated is cheaper from about <b>${cross.n} students</b>.` : 'With these settings dedicated stays more expensive across all class sizes.'}
-    ${slow.length ? `Triangles mark class sizes where the public endpoint, at the chosen rate limits, slows the p95 task by more than 1.5× (${slow.join(', ')} students). The cheaper option there is not a working option without higher limits.` : 'At the chosen rate limits the public endpoint keeps up at every class size.'}
-    Dedicated cost is per-minute billing for ${$('s-sessions').value} sessions/month plus warm-up; GPUs are auto-sized to keep p95 slowdown ≤ 1.5×.`;
-}
-
-// ==================================================================== METHOD
+// ==================================================================== 6. METHOD & SOURCES
 function renderMethod() {
-  const pr = D.pricing;
-  const pf = D.profiles;
-  const li = (s) => `<li>${s}</li>`;
-  const src = (arr) => arr.map((s) => li(`${esc(s.label)}: ${s.ref.startsWith('http') ? `<a href="${esc(s.ref)}" target="_blank" rel="noopener">${esc(s.ref)}</a>` : `<code>${esc(s.ref)}</code>`}`)).join('');
-  const gpuRows = Object.entries(pf.gpus).map(([k, g]) => {
-    const pts = curvePoints(g).map((p) => `${p.interactivity} tok/s/user → ${num(p.tpsPerGpu)} tok/s/GPU (≈${num(p.concurrency, 1)} req/GPU)`).join('; ');
-    return li(`<b>${esc(g.label)}</b> ${usd(pr.dedicated.gpus[k].price_per_gpu_hour, 2)}/GPU-h ${ev('assumption')}. Benchmark: ${pts} ${ev('benchmark')}. Max ${g.max_concurrency_per_gpu} concurrent: ${esc(g.max_concurrency_note)} Prefill ${num(g.prefill_tps)} tok/s ${ev('assumption')}.`);
-  }).join('');
-  const w = D.workload.pooled;
+  const p = SWE.pooled;
   $('method').innerHTML = `
-  <div class="panel"><h3>Public endpoint pricing ${ev('verified')}</h3><ul>
-    ${li(`Input $${pr.public.input_per_mtok}/M, cached input $${pr.public.cached_input_per_mtok}/M, output $${pr.public.output_per_mtok}/M tokens (reasoning tokens bill as output). Read from the API's own <code>pricing</code> block on ${esc(D.apiSnapshot.retrieved_at)}: prompt ${esc(D.apiSnapshot.pricing.prompt)}, input_cache_read ${esc(D.apiSnapshot.pricing.input_cache_read)}, completion ${esc(D.apiSnapshot.pricing.completion)} USD/token.`)}
-    ${li(`Rate limits for this account: ${num(pr.public.rate_limits.requests_per_minute)} requests/min, ${num(pr.public.rate_limits.tokens_per_minute)} tokens/min (API <code>per_request_limits</code> and matching <code>x-ratelimit-limit-*</code> headers). ${esc(pr.public.rate_limits.notes)}`)}
-    ${li(esc(pr.public.billing_notes))}
-    ${li(`Do cached tokens count towards tokens/min? Fitting the measured <code>x-ratelimit-remaining-tokens</code> drops across ${D.rateLimitInference.n_pairs} request pairs: cached-token coefficient ${D.rateLimitInference.model_with_cached.coef_cached}, R² ${D.rateLimitInference.model_with_cached.r2} vs ${D.rateLimitInference.model_without_cached.r2} without cached tokens. Conclusion: ${esc(D.rateLimitInference.conclusion)} ${ev('estimate')}. This is why agent traffic, which resends a mostly cached context on every request, reaches the token limit long before the request limit.`)}
-    ${li(`Batch inference: ${pct(pr.batch.discount)} off, 24 h turnaround, so not usable for interactive agents (${esc(pr.batch.ref)}).`)}
-    ${src(pr.public.sources)}</ul></div>
-  <div class="panel"><h3>Dedicated endpoint ${ev('assumption')} ${ev('benchmark')}</h3><ul>
-    ${li(esc(pr.dedicated.billing_model))}
-    ${li(esc(pr.dedicated.price_note))}
-    ${gpuRows}
-    ${li(`Benchmark: ${esc(pf.benchmark.name)}. ${esc(pf.benchmark.interpretation)}`)}
-    ${Object.values(pf.model_assumptions).filter((x) => typeof x === 'string').map((x) => li(esc(x))).join('')}
-    ${pf.gpu_requirements.facts.map((x) => li(esc(x) + ' ' + ev('verified'))).join('')}
-    ${src(pr.dedicated.sources)}</ul></div>
-  <div class="panel"><h3>What was measured ${ev('measured')}</h3><ul>
-    ${li(`${D.ledger.runs} DSH runs (${esc(D.runs[0]?.started_at?.slice(0, 10))}), ${num(D.ledger.llm_requests)} LLM requests, ${big(D.ledger.prompt_tokens)} prompt and ${big(D.ledger.output_tokens)} output tokens. Total experiment spend <b>${usd(D.ledger.total_cost_usd, 4)}</b>. Every run is sequential; there was no load testing.`)}
-    ${li('Three tasks with hidden acceptance tests and reference solutions: T1 bug-fix (1 file), T2 feature from a written spec with its own tests, T3 multi-file debugging. Efforts: low/medium/high.')}
-    ${li('Token usage: the provider <code>usage</code> block of every streamed response (prompt_tokens incl. cached_tokens, completion_tokens incl. reasoning).')}
-    ${li('TTFT: relay receives the request → first streamed delta of any kind. Decode: completion tokens ÷ (last byte − first token). Latency: request → last byte. These are client-side observations from this cloud container (Finland endpoint), and they include proxy hops.')}
-    ${li('Tool time: DSH session log <code>tool/call</code> → <code>tool/result</code>. Task time: harness wall clock from launching <code>dsh</code> to process exit (includes ~1.5–2 s DSH start-up).')}
-    ${li(`Success: the harness's own unittest run (pristine visible tests + hidden tests) against the agent's code. The agent's claim is shown but never used.`)}
-    ${li(`Pooled: success ${pct(w.success_rate)}, per-request TTFT p50 ${num(w.per_request.ttft_s.p50, 2)} s, decode p50 ${num(w.per_request.decode_tps.p50)} tok/s, uncached input : output = ${num(w.per_request.uncached_to_output_ratio, 1)} : 1.`)}</ul></div>
-  <div class="panel"><h3>Dedicated benchmark (2 Nov) ${ev('measured')}</h3><ul>
-    ${li(`Endpoint <code>${esc(DB.endpoint.name)}</code> (${esc(DB.endpoint.id)}): ${DB.endpoint.gpu_count}× ${esc(DB.endpoint.gpu_type)}, ${DB.endpoint.scaling.max_replicas} replica, ${esc(DB.endpoint.region)}, routing key <code>${esc(DB.endpoint.routing_key)}</code>.`)}
-    ${li(esc(DB.routing_note))}
-    ${li('Same DSH 0.2.1-rc.5, overlay, tools, tasks, hidden tests and medium effort as the public runs. Only the model id (routing key) and the endpoint differ. The relay stayed in the path for both endpoints.')}
-    ${li(`Endpoint verification: every chat request carries the expected model; the relay refuses any other model and records the response's <code>model</code>. ${DB.verification.dedicated_requests_answered_by_dedicated}/${DB.verification.dedicated_requests} dedicated requests were answered by the dedicated model; 0 public-labelled requests were answered by dedicated and 0 the other way round.`)}
-    ${li(`Billing: ${usd(DB.billing.price_per_hour, 2)}/h (provided). Measurement window ${esc(DB.billing.live_window_start)} → ${esc(DB.billing.last_dedicated_request_end)}. Stop requested ${esc(DB.billing.stop_requested_at)}, stopped (0 ready replicas) observed ${esc(DB.billing.stopped_observed_at)}. ${esc(DB.billing.max_billable_note)} Invoice not verified.`)}
-    ${li('Concurrency: waves of 2, 3 and 5 agents (2 waves each), each agent in its own workspace, DSH home and relay. The run that crashed in harness post-processing (sanitiser bug, fixed) was rebuilt offline from its preserved workspace; its wall time is reconstructed and flagged.')}
-    ${li(`The 4× H100 capacity curve uses the measured per-request decode at 1–5 requests in flight. Above 5 it is extrapolated: ${esc(GPUS.h100x4.extrapolation)}`)}</ul></div>
-  <div class="panel"><h3>Medium/Heavy workload experiment (2 Nov) ${ev('measured')}</h3><ul>
-    ${li('Protocol written and fixtures committed before any paid run (<code>docs/WORKLOAD_PROTOCOL.md</code>). Both fixtures fail their hidden tests as shipped; the reference solutions pass. Each run records the fixture sha256; every M1 and H1 run used the same hash.')}
-    ${li(`Attempts: ${WC.experiment.paid_attempts} (${WC.experiment.pilot_attempts} pilot, ${WC.experiment.formal_attempts} formal), sequential, 600 s limit. Spend ${usd(WC.experiment.provider_reported_spend_usd, 4)} provider-reported. A relay cap per run of min($0.75, remaining budget) was enforced and never reached. The total $3 budget was enforced by the runner between runs.`)}
-    ${li('The pilot found no fixture defects: the H1 pilot failures were spec requirements the agent missed (UnknownUser/UnknownModel errors, half-up rounding, UTC months). Nothing was changed between pilot and formal runs. The pilot is not pooled.')}
-    ${li('In the Cost and Classroom views, the workload selector replays the 3 formal traces of M1 or H1. These are small samples. The original 33-run baseline stays the default.')}</ul></div>
-  <div class="panel"><h3>Integration notes and limitations</h3><ul>
-    ${li('<b>Token Factory streaming bug.</b> For gpt-oss-120b the last argument fragment of a streamed tool call arrives with <code>index: 1</code> and no id. A spec-following client (pi-ai inside DSH) then opens a second, nameless tool call and the agent loop aborts. A loopback relay (<code>harness/tofa_relay.py</code>) remaps such fragments to the open call. It forwards to the same host through the same egress proxy and never sees the credential.')}
-    ${li('DSH compat settings needed for Token Factory: no <code>developer</code> role, no <code>store</code>, <code>max_tokens</code> (see <code>dsh/tofa.patch.yml</code>). DSH telemetry is disabled.')}
-    ${li('Small sample: 2–6 runs per task × effort. Treat success rates as indicative. T2 fails every time on the same spec clause.')}
-    ${li('Public latency in the simulation is the measured latency. It assumes the shared endpoint does not slow down under our own traffic.')}
-    ${li('Dedicated 4× H100 latency and throughput are <b>measured</b> at 1–5 concurrent agents (section 3). Above 5 requests per replica, and for the other GPU rows, they are <b>simulated</b> from third-party benchmark data. The benchmark mix is 8k input / 1k output tokens, while agent requests carry fewer uncached tokens per output token, so capacity is likely conservative. The efficiency slider covers serving optimisations.')}
-    ${li('Not modelled: cold starts and capacity availability of dedicated endpoints, failed or retried HTTP requests (none occurred in the measured runs), network differences between campus and this container, and the student-side review time distribution.')}
-    ${li('Simulation: time step 0.1 s (0.5 s for day-long windows), deterministic for a seed; every backend sees identical demand (common random numbers).')}</ul></div>`;
+    <h3>Data</h3><ul>
+      <li><b>Agent runs</b> ${ev('measured')}: 9 SWE-bench Verified runs (3 Django issues × 3), stock DSH Web UI, <code>${esc(SWE.model)}</code> on Token Factory Public, 2 November 14:54–15:28 UTC. Official SWE-bench harness: ${p.successes}/${p.runs} resolved. <code>docs/SWEBENCH_PUBLIC_V4FLASH.md</code></li>
+      <li><b>API load test</b> ${ev('measured')}: ${num(BENCH.totals.public_requests)} requests to the same model, ${BENCH.window_utc} UTC, concurrency 1–30 and rate ramps to 1,500 req/min. <code>docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md</code></li>
+      <li><b>Prices and limits</b> ${ev('verified')}: $${PR.input_per_mtok} input, $${PR.cached_input_per_mtok} cached input, $${PR.output_per_mtok} output per 1M tokens; 1,000 requests and 2M tokens per minute (model catalogue and response headers).</li></ul>
+    <h3>Definitions</h3><ul>
+      <li>TTFT: request sent → first streamed token. Decode speed: output tokens ÷ time from first to last token. Latency: request sent → response complete.</li>
+      <li>Cost = uncached input × $${PR.input_per_mtok} + cached input × $${PR.cached_input_per_mtok} + output × $${PR.output_per_mtok} per 1M tokens (list price, not an invoice).</li></ul>
+    <h3>Limits of this demo</h3><ul>
+      <li>Dedicated: not measured. The 2× B200 endpoint never became ready; its hourly price is an assumption.</li>
+      <li>9 runs on 3 issues on one afternoon: a small sample. Public speed varied during the window.</li>
+      <li>The classroom simulation replays recorded requests and assumes the shared pool does not slow down with class load.</li></ul>`;
 }
 
 // ------------------------------------------------------------------ boot
-window.addEventListener('error', (e) => reportProblem('uncaught error', e.error || e.message));
-window.addEventListener('unhandledrejection', (e) => reportProblem('unhandled promise rejection', e.reason));
-// In-browser chart check (for the presentation machine): visits every chart view and measures
-// each canvas. Reading pixels can be blocked by privacy settings; that is reported, not hidden.
 async function selfCheck() {
   const btn = $('self-check');
   const box = $('self-check-out');
   btn.disabled = true;
   const back = currentView();
   const rows = [];
-  for (const v of ['measure', 'workloads', 'dedicated', 'economics', 'classroom']) {
+  for (const v of ['measure', 'endpoints', 'economics', 'classroom']) {
     location.hash = v;
     await new Promise((r) => setTimeout(r, v === 'classroom' ? 2500 : 1200));
     for (const c of document.querySelectorAll(`#view-${v} canvas`)) {
@@ -1224,11 +650,12 @@ async function selfCheck() {
   btn.disabled = false;
 }
 
+
 function boot() {
   themeDefaults();
   $('self-check').addEventListener('click', () => selfCheck().catch((err) => reportProblem('self-check', err)));
-  $('dsh-version').textContent = D.runs[0]?.dsh_version ?? '';
-  $('foot').textContent = `Built ${D.builtAt.slice(0, 16).replace('T', ' ')} UTC from ${D.runs.length} recorded runs. Model: openai/gpt-oss-120b via https://api.tokenfactory.nebius.com/v1. Offline-capable: all data and code are inside this file.`;
+  $('dsh-version').textContent = (/\d+\.\d+\.\d+(-[\w.]+)?/.exec(SWE.harness) || [''])[0];
+  $('foot').textContent = `Built ${D.builtAt.slice(0, 16).replace('T', ' ')} UTC from ${SWE.runs.length} recorded SWE-bench runs and ${num(BENCH.totals.public_requests)} API test requests. Model ${SWE.model} on Nebius Token Factory Public. Offline: all data and code are inside this file.`;
   show(currentView());
   const redraw = () => {
     themeDefaults();

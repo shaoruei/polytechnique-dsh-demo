@@ -16,35 +16,21 @@ const CHART_VERSION = '4.4.9';
 
 // Model modules, concatenated in dependency order. Imports are dropped and exports become plain
 // declarations; the module names do not collide.
-const MODEL_ORDER = ['prng.js', 'capacity.js', 'cost.js', 'data.js', 'sim.js'];
+const MODEL_ORDER = ['prng.js', 'capacity.js', 'cost.js', 'sim.js'];
 const bundleModel = () =>
   MODEL_ORDER.map((f) => `// ---- model/${f}\n` + rd(`model/${f}`)
     .replace(/^import .*?;\s*$/gms, '')
-    .replace(/^export (?=(async )?function|const|let|class)/gm, ''))
+    .replace(/^export (?=(async )?function|const|let|class)/gm, '')
+    .replace(/^\s*\/\/.*\n/gm, '')) // drop full-line comments (development notes, not presentation content)
     .join('\n');
 
-const provenance = json('data/provenance/tofa_models_verbose_2026-10-30.json');
+// Presentation data: DeepSeek-V4-Flash SWE-bench runs and the API load test only.
 const data = {
   builtAt: new Date().toISOString(),
-  runs: json('data/runs.json').runs,
-  workload: json('data/workload.json'),
-  pricing: json('data/pricing.json'),
-  profiles: json('data/dedicated_profiles.json'),
-  ledger: json('data/experiment_ledger.json'),
-  replays: json('data/replays.json').runs,
-  tasks: json('data/tasks.json').tasks,
-  rateLimitInference: json('data/rate_limit_inference.json'),
-  dedicatedBenchmark: json('data/dedicated_benchmark.json'),
   swe: json('data/swebench.json'),
-  workloadComparison: (() => { const w = json('data/workload_comparison.json'); delete w.groups.pilot?.context_growth; return w; })(),
-  apiSnapshot: { retrieved_at: provenance.retrieved_at, pricing: provenance.entry.pricing, limits: provenance.entry.per_request_limits },
+  bench: json('data/endpoint_bench.json'),
 };
-// keep the bundle small: per-request detail is only needed for the context-growth chart
-for (const r of data.runs) {
-  r.metrics.requests = (r.metrics.requests || []).map((q) => ({
-    p: q.prompt_tokens, c: q.cached_tokens, o: q.completion_tokens, ttft: q.ttft_s, lat: q.latency_s, tps: q.decode_tps,
-  }));
-}
+delete data.swe.groups; // not shown
 
 const body = rd('dashboard/src/page.html');
 const css = rd('dashboard/src/style.css');
@@ -68,4 +54,4 @@ writeFileSync(path.join(ROOT, 'dashboard/dist/index.html'), page({ chartTag: cha
 writeFileSync(path.join(ROOT, 'dashboard/dist/artifact.html'), page({ chartTag: chartCdn, skeleton: false }));
 const size = (f) => (readFileSync(path.join(ROOT, 'dashboard/dist', f)).length / 1024).toFixed(0) + ' KB';
 console.log(`built dashboard/dist/index.html (${size('index.html')}, offline) and artifact.html (${size('artifact.html')}); ` +
-  `${data.runs.length} runs, ${readdirSync(path.join(ROOT, 'runs')).length} run folders`);
+  `${data.swe.runs.length} SWE-bench runs, ${data.bench.totals.public_requests} API test requests`);
