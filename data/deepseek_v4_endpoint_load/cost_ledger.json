@@ -1,0 +1,41 @@
+{
+ "spent_usd": 1.27064908,
+ "requests": 11252,
+ "phases": {
+  "20261102T144747Z_smoke_public_mixed": 0.0015505,
+  "20261102T144806Z_smoke_public_mixed": 0.00140628,
+  "20261102T144840Z_scaling-c1_public_A": 0.02052848,
+  "20261102T145014Z_scaling-c2_public_A": 0.02042726,
+  "20261102T145108Z_scaling-c5_public_A": 0.0229327,
+  "20261102T145136Z_scaling-c10_public_A": 0.02494996,
+  "20261102T145156Z_scaling-c20_public_A": 0.04073076,
+  "20261102T145217Z_scaling-c30_public_A": 0.06067138,
+  "20261102T145243Z_scaling-c1_public_B": 0.06521158,
+  "20261102T145530Z_scaling-c2_public_B": 0.06650448,
+  "20261102T145654Z_scaling-c5_public_B": 0.0710626,
+  "20261102T145741Z_scaling-c10_public_B": 0.07815738,
+  "20261102T145815Z_scaling-c20_public_B": 0.12430292,
+  "20261102T145900Z_scaling-c30_public_B": 0.18562656,
+  "20261102T150014Z_ratelimit-rpm100_public_R": 0.0004655,
+  "20261102T150124Z_ratelimit-rpm250_public_R": 0.0012054,
+  "20261102T150235Z_ratelimit-rpm500_public_R": 0.0023667,
+  "20261102T150347Z_ratelimit-rpm750_public_R": 0.0035182,
+  "20261102T150459Z_ratelimit-rpm900_public_R": 0.0045521,
+  "20261102T150612Z_ratelimit-rpm1000_public_R": 0.0048412,
+  "20261102T150724Z_ratelimit-rpm1100_public_R": 0.0054929,
+  "20261102T150837Z_ratelimit-rpm1250_public_R": 0.0060368,
+  "20261102T150950Z_ratelimit-rpm1500_public_R": 0.0174881,
+  "20261102T151422Z_smoke_public_mixed": 0.00210964,
+  "20261102T151443Z_ratelimit-rpm50_public_Bc": 0.01796776,
+  "20261102T151556Z_ratelimit-rpm100_public_Bc": 0.04053066,
+  "20261102T151709Z_ratelimit-rpm150_public_Bc": 0.05552832,
+  "20261102T151823Z_ratelimit-rpm190_public_Bc": 0.070971,
+  "20261102T151938Z_ratelimit-rpm300_public_Bc": 0.25351196
+ },
+ "budget_usd": 1.9,
+ "price_per_mtok": {
+  "input": 0.14,
+  "cached_input": 0.01,
+  "output": 0.28
+ }
+}
