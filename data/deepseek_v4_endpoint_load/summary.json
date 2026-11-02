@@ -1,0 +1,277 @@
+{
+ "generated_at": "2026-11-02T14:51:10+00:00",
+ "price_per_mtok_public": {
+  "input": 0.14,
+  "cached_input": 0.01,
+  "output": 0.28
+ },
+ "scaling": {
+  "public": {
+   "A": {
+    "c=1": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 0.8356,
+      "p50": 0.8313,
+      "p95": 1.3909,
+      "min": 0.4889,
+      "max": 1.9549,
+      "p50_ci95": [
+       0.7258,
+       0.8711
+      ],
+      "p95_ci95": [
+       0.9135,
+       1.9549
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 2.1409,
+      "p50": 2.1213,
+      "p95": 2.7337,
+      "min": 1.3165,
+      "max": 3.5476,
+      "p50_ci95": [
+       1.8623,
+       2.3322
+      ],
+      "p95_ci95": [
+       2.5757,
+       3.5476
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 209.6295,
+      "p50": 196.04,
+      "p95": 310.785,
+      "min": 135.51,
+      "max": 363.88
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 125.423,
+      "p50": 120.68,
+      "p95": 173.0165,
+      "min": 72.16,
+      "max": 194.45
+     },
+     "wall_span_s": 85.669,
+     "aggregate_output_tps": 119.53,
+     "completed_rps": 0.4669,
+     "achieved_ok_rpm": 28.0,
+     "input_tokens": {
+      "total": 122313,
+      "per_request": {
+       "n": 40,
+       "mean": 3057.825,
+       "p50": 3054.0,
+       "p95": 3989.2,
+       "min": 2039,
+       "max": 4014
+      }
+     },
+     "output_tokens": {
+      "total": 10240,
+      "per_request": {
+       "n": 40,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.019991,
+     "phase_ids": [
+      "20261102T144840Z_scaling-c1_public_A"
+     ]
+    },
+    "c=2": {
+     "n_requests": 40,
+     "n_ok": 40,
+     "error_counts": {
+      "ok": 40
+     },
+     "error_rate": 0.0,
+     "rate_429": 0.0,
+     "timeout_rate": 0.0,
+     "ttft_s": {
+      "n": 40,
+      "mean": 0.8253,
+      "p50": 0.7174,
+      "p95": 1.1666,
+      "min": 0.4829,
+      "max": 4.6647,
+      "p50_ci95": [
+       0.6562,
+       0.7638
+      ],
+      "p95_ci95": [
+       0.9066,
+       4.6647
+      ],
+      "p95_reliable": true
+     },
+     "latency_s": {
+      "n": 40,
+      "mean": 2.2407,
+      "p50": 2.156,
+      "p95": 3.3299,
+      "min": 1.3889,
+      "max": 5.3491,
+      "p50_ci95": [
+       1.9343,
+       2.3904
+      ],
+      "p95_ci95": [
+       2.6246,
+       5.3491
+      ],
+      "p95_reliable": true
+     },
+     "decode_tps_per_request": {
+      "n": 40,
+      "mean": 198.4033,
+      "p50": 186.075,
+      "p95": 299.2595,
+      "min": 93.62,
+      "max": 372.61
+     },
+     "e2e_output_tps_per_request": {
+      "n": 40,
+      "mean": 122.8678,
+      "p50": 118.745,
+      "p95": 167.875,
+      "min": 47.86,
+      "max": 184.32
+     },
+     "wall_span_s": 46.632,
+     "aggregate_output_tps": 219.59,
+     "completed_rps": 0.8578,
+     "achieved_ok_rpm": 51.5,
+     "input_tokens": {
+      "total": 117433,
+      "per_request": {
+       "n": 40,
+       "mean": 2935.825,
+       "p50": 2890.5,
+       "p95": 3927.1,
+       "min": 2019,
+       "max": 4002
+      }
+     },
+     "output_tokens": {
+      "total": 10240,
+      "per_request": {
+       "n": 40,
+       "mean": 256.0,
+       "p50": 256.0,
+       "p95": 256.0,
+       "min": 256,
+       "max": 256
+      }
+     },
+     "cached_tokens_total": 0,
+     "cache_hit_ratio": 0.0,
+     "response_models": [
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+     ],
+     "est_public_cost_usd": 0.019308,
+     "phase_ids": [
+      "20261102T145014Z_scaling-c2_public_A"
+     ]
+    }
+   }
+  }
+ },
+ "ratelimit": {},
+ "phases": [
+  {
+   "endpoint": "public",
+   "exclude_from_summary": true,
+   "kind": "smoke",
+   "n": 3,
+   "phase_id": "20261102T144747Z_smoke_public_mixed",
+   "profiles": [
+    "R",
+    "A",
+    "B"
+   ]
+  },
+  {
+   "endpoint": "public",
+   "exclude_from_summary": true,
+   "kind": "smoke",
+   "n": 4,
+   "phase_id": "20261102T144806Z_smoke_public_mixed",
+   "profiles": [
+    "A",
+    "A",
+    "B",
+    "R"
+   ]
+  },
+  {
+   "concurrency": 1,
+   "connections_opened": 41,
+   "elapsed_s": 89.21,
+   "endpoint": "public",
+   "index_base": 10000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T144840Z_scaling-c1_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.02348526,
+   "started_at": "2026-11-02T14:48:40+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 1
+  },
+  {
+   "concurrency": 2,
+   "connections_opened": 42,
+   "elapsed_s": 48.73,
+   "endpoint": "public",
+   "index_base": 20000,
+   "kind": "scaling",
+   "max_phase_seconds": 420.0,
+   "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "n_measured_planned": 40,
+   "phase_id": "20261102T145014Z_scaling-c2_public_A",
+   "profile": "A",
+   "salt": "v1",
+   "spent_usd_after": 0.04391252,
+   "started_at": "2026-11-02T14:50:14+00:00",
+   "stop_reason": null,
+   "timeout_s": 180.0,
+   "warmup_requests": 2
+  }
+ ],
+ "totals": {
+  "requests": 83,
+  "public_requests": 83,
+  "dedicated_requests": 0,
+  "est_public_cost_usd": 0.040956,
+  "model_mismatches": 0
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "retrieved_at": "2026-11-02T14:47:46+00:00",
+ "source": "GET /v1/models?verbose=true, GET /v0/dedicated_endpoints, GET /v0/dedicated_endpoints/templates",
+ "public_model": {
+  "listed": true,
+  "id": "deepseek-ai/DeepSeek-V4-Flash-0731",
+  "context_length": 1048576,
+  "quantization": "fp8",
+  "pricing": {
+   "prompt": "0.00000014",
+   "input_cache_read": "0.00000001",
+   "completion": "0.00000028",
+   "image": "0",
+   "price_per_video_second": "0",
+   "request": "0",
+   "price_per_minute": "0"
+  },
+  "per_request_limits": {
+   "tokens_per_minute": 2000000.0,
+   "requests_per_minute": 1000.0,
+   "burst_ratio": 1.0
+  },
+  "regions": [
+   {
+    "country_code": "US",
+    "name": "us-central1"
+   }
+  ],
+  "supported_features": [
+   "tools",
+   "json_mode",
+   "structured_outputs",
+   "reasoning"
+  ]
+ },
+ "dedicated_routing_key_listed": false,
+ "dedicated_endpoint": {
+  "http_status": 200,
+  "id": "39fbfeb6-22c4-4fce-8df2-1a20abae081c",
+  "name": "ecole-demo-ds-flash",
+  "description": "",
+  "enabled": true,
+  "routing_key": "dedicated/deepseek-ai/DeepSeek-V4-Flash-0731-vZaOfN",
+  "model_name": "deepseek-ai/DeepSeek-V4-Flash-0731",
+  "flavor_name": "base",
+  "region": "us-central1",
+  "gpu_type": "gpu-b200-sxm",
+  "gpu_count": 2,
+  "custom_weights_id": null,
+  "scaling": {
+   "min_replicas": 1,
+   "max_replicas": 1
+  },
+  "reservation_policy": {
+   "policy": "FORBID",
+   "reservation_ids": []
+  },
+  "deployment": {
+   "ready_replicas": 0,
+   "status": "starting",
+   "readiness": "not_ready"
+  },
+  "created_at": "2026-11-02T14:35:40.486403Z"
+ },
+ "dedicated_template": {
+  "name": "deepseek-ai/DeepSeek-V4-Flash-0731",
+  "type": "text2text",
+  "metadata": {
+   "huggingface_url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731",
+   "vendor": "deepseek",
+   "context_window_k": 1024,
+   "size_b": 304.0,
+   "license": {
+    "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/blob/main/LICENSE",
+    "name": "MIT License"
+   }
+  },
+  "flavors": {
+   "base": {
+    "quantization": "fp8",
+    "use_cases": [
+     "text",
+     "code",
+     "function_calling",
+     "reasoning",
+     "context_and_rag",
+     "responses_api"
+    ],
+    "tags": [
+     "1024K context",
+     "FP4 + FP8",
+     "reasoning",
+     "code",
+     "JSON mode",
+     "math",
+     "SGLang",
+     "speculative decoding",
+     "DSPARK"
+    ],
+    "base_model_slug": "deepseek-ai/DeepSeek-V4-Flash-0731-FP8",
+    "available_configurations": {
+     "gpu_configurations": {
+      "gpu-b200-sxm": {
+       "allowed_regions": [
+        "us-central1"
+       ],
+       "allowed_gpu_counts": [
+        2
+       ],
+       "max_replicas_allowed": 1
+      }
+     }
+    }
+   }
+  }
+ }
+}
