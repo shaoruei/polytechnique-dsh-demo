@@ -1,11 +1,12 @@
 {
- "spent_usd": 0.04391252,
- "requests": 89,
+ "spent_usd": 0.06684522,
+ "requests": 134,
  "phases": {
   "20261102T144747Z_smoke_public_mixed": 0.0015505,
   "20261102T144806Z_smoke_public_mixed": 0.00140628,
   "20261102T144840Z_scaling-c1_public_A": 0.02052848,
-  "20261102T145014Z_scaling-c2_public_A": 0.02042726
+  "20261102T145014Z_scaling-c2_public_A": 0.02042726,
+  "20261102T145108Z_scaling-c5_public_A": 0.0229327
  },
  "budget_usd": 2.0,
  "price_per_mtok": {
