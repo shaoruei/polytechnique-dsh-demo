@@ -6,6 +6,7 @@
 2. **Measure what happened.** For every LLM request: provider-reported tokens (uncached, cached, output), TTFT, decode speed, tool time and cost.
 3. **Run it on a dedicated endpoint.** The same tasks on `ecole-demo` (4× H100, 1 replica) with paired public controls and 2–5 concurrent agents (2 Nov). See `docs/DEDICATED_BENCHMARK.md`.
 4. **Compare deployment economics.** Public pay-per-token against Dedicated pay-per-replica-hour ($18.80/h for 4× H100), with capacity-aware sizing and break-even curves.
+   Plus **bigger tasks**: two realistic Medium/Heavy tasks (M1, H1) to check whether T1–T3 are representative. See `docs/WORKLOAD_RESULTS.md`.
 5. **Scale to a classroom.** An interactive simulation of 20–500 students. Each simulated agent replays a real measured trajectory.
 
 Every figure in the dashboard is labelled **Measured**, **Verified** (published price or limit), **Benchmark** (third-party), **Estimate** or **Assumption**.
@@ -32,6 +33,8 @@ Requirements: Node ≥ 22, Python ≥ 3.11 (stdlib only; `numpy` only for `analy
 | Concurrency waves (max 5 agents) | `python3 harness/run_concurrent.py --endpoint dedicated --levels 2 3 5 --waves 2` |
 | Dedicated benchmark analysis | `python3 analysis/dedicated_analysis.py` |
 | Rebuild a run whose harness crashed | `python3 harness/finalize_run.py <run-id>` |
+| Medium/Heavy workload runs (budget-enforced, max 8 attempts) | `python3 harness/run_workloads.py pilot\|formal` |
+| Workload comparison (no API calls) | `python3 analysis/workload_analysis.py` |
 | Re-run the measurement plan (budget-capped, sequential) | `python3 harness/run_batch.py --plan default --budget-usd 2` |
 | Rebuild data + dashboard | `npm run build` |
 | All tests (model, harness, independent cost check) | `npm test` |
@@ -56,6 +59,13 @@ analysis/                   build_data.py, check_costs.py, key_findings.mjs, rat
 dashboard/                  src/ (page, style, app), build.mjs, vendor/chart.js, dist/index.html
 docs/                       WALKTHROUGH, FINDINGS, METHODOLOGY, VALIDATION
 ```
+
+## Medium/Heavy workloads (2 Nov, see docs/WORKLOAD_RESULTS.md)
+
+- M1 (multi-file grading fix + policy) 3/3 pass. H1 (university LLM gateway: usage accounting and budgets) 0/3 full passes, 87% of hidden checks; the same two spec rules were missed every time.
+- About **6× the tokens and cost** ($0.037 per task) and **3× the requests and time** (~30 requests, ~33 s) of T1–T3. 96% cache hit; largest prompts 15–23k tokens.
+- The workload size moves the dedicated break-even only modestly (75% → 60–68% utilisation, estimate). Traffic shape and idle billing still dominate. Public rate limits bite ~6× sooner.
+- 8 paid attempts (2 pilot + 6 formal), $0.338 in total.
 
 ## Dedicated endpoint (2 Nov, see docs/DEDICATED_BENCHMARK.md)
 

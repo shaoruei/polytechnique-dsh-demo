@@ -1970,7 +1970,9 @@
  "tasks": {
   "t1-grade-average": "T1 Fix weighted grade average (1 file bug-fix)",
   "t2-duration-parser": "T2 Implement duration parser + tests (feature from spec)",
-  "t3-schedule-conflicts": "T3 Fix timetable clash detection (multi-file debugging)"
+  "t3-schedule-conflicts": "T3 Fix timetable clash detection (multi-file debugging)",
+  "m1-late-penalties": "M1 Late-penalty grading: CSV import fix + policy across 4 modules (medium)",
+  "h1-usage-budgets": "H1 API gateway usage accounting and budgets (heavy)"
  },
  "pooled": {
   "runs": 33,

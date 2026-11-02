@@ -1,6 +1,14 @@
 {
  "schema": 1,
  "tasks": {
+  "h1-usage-budgets": {
+   "title": "H1 API gateway usage accounting and budgets (heavy)",
+   "prompt": "The university runs a small API gateway (`gateway` package) in front of an LLM provider so that\nstudents and staff can use coding agents. Today it forwards requests and charges nothing.\n\nImplement per-user usage accounting and budget enforcement as specified in `SPEC.md`:\ncorrect token pricing including cached input, monthly budgets by role with per-user overrides,\nadmission control before calling the provider, retries of transient provider errors (including\ncharging failed attempts that the provider billed), idempotent client retries, budget warning\nheaders, and the usage reports.\n\nRead `SPEC.md` and the existing code first; keep the existing public API working. Use\n`decimal.Decimal` for money as the existing code does.\n\nRun `python3 -m unittest discover -s tests -v` and make sure it passes. Do not change the\nexisting tests; you may add new ones.\n"
+  },
+  "m1-late-penalties": {
+   "title": "M1 Late-penalty grading: CSV import fix + policy across 4 modules (medium)",
+   "prompt": "The course team uses the `submissions` package to compute assignment grades from the\nlearning platform's CSV export. Two things need to be done; the exact rules are in `SPEC.md`.\n\n1. Bug: importing the CSV export breaks for students whose name contains a comma\n   (for example `\"Dupont, Marie\"`), and the importer accepts timestamps without a timezone.\n2. Feature: late submissions are currently graded as if they were on time. Implement the\n   late-submission policy and the grading rules described in `SPEC.md` (grace period, penalty\n   per started day, penalty cap, zero after a cutoff, best submission wins, optional roster).\n\nRead the existing code before changing it; the fix touches several modules. Keep the public\nAPI of the package (the names exported from `submissions/__init__.py`) working.\n\nRun `python3 -m unittest discover -s tests -v` and make sure it passes. Do not change the\nexisting tests; you may add new ones.\n"
+  },
   "t1-grade-average": {
    "title": "T1 Fix weighted grade average (1 file bug-fix)",
    "prompt": "A student reported that `final_grade()` in the `gradebook` package returns wrong results\nwhen the coursework weights do not add up to exactly 1.0, and that it crashes for a\nstudent with no graded items.\n\nPlease fix the bug(s) in `gradebook/grades.py` so that:\n- the final grade is the weighted average of the item scores, normalised by the sum of\n  the weights that were actually used;\n- items with a score of `None` (not yet graded) are ignored entirely;\n- a student with no graded items gets `None` instead of an exception.\n\nRun the existing test-suite with `python3 -m unittest discover -s tests -v` and make\nsure it passes. Do not change the tests.\n"

@@ -36,7 +36,18 @@ Fallback without network: pick any recorded run and use **Replay** at 3×.
 - **Where the time goes.** The agent is LLM-bound: tool execution is a few hundred ms per task.
 - **Reasoning effort.** High effort costs ~3× more on T2 and still fails, so effort is not free accuracy.
 
-## 3. Dedicated, measured (4 min), tab 3
+## 2b. Bigger tasks (3 min), tab 3
+
+- The small tasks are not representative. Two realistic tasks (M1 grading, H1 gateway budgets) take ~30 LLM calls, ~33 s and ~$0.037 per task: 6× the cost and 3× the time.
+- **Context growth** chart: prompts grow to 15–23k tokens, and 96% of the input is cached. Cached input becomes 84% of the bill.
+- H1 never fully passed: 87% of checks, the same two rules missed each time, while the agent's own tests were green. Use the presenter narrative in `docs/WORKLOAD_RESULTS.md`.
+- Callout box:
+  - the workload moves the dedicated break-even only modestly (75% → ~60%, estimate);
+  - traffic shape and idle billing still decide;
+  - public rate limits bite ~6× sooner.
+- Later, in the Cost and Classroom views, switch **Workload** to *Heavy H1* to show the same scenarios with realistic tasks. These are 3 measured traces, a small sample.
+
+## 3. Dedicated, measured (4 min), tab 4
 
 The dedicated endpoint `ecole-demo` is **stopped** (to stop billing). Present the recorded runs from 2 November. A live dedicated run would need the endpoint re-enabled, with a few minutes of provisioning, billing at $0.31/min while it runs, and no guarantee that capacity is available.
 
@@ -53,7 +64,7 @@ The dedicated endpoint `ecole-demo` is **stopped** (to stop billing). Present th
   - matching public pricing needs ~58 tasks/min per replica.
 - **Compatibility box:** dedicated does *not* have the public endpoint's tool-call streaming bug. It does not report cached tokens.
 
-## 4. Cost curves (4 min), tab 4
+## 4. Cost curves (4 min), tab 5
 
 - Defaults: **4× H100 replica (ecole-demo, measured)** at **$18.80 per replica-hour**, class-only schedule.
   - The dedicated curve steps up one 4-GPU replica at a time.
@@ -64,7 +75,7 @@ The dedicated endpoint `ecole-demo` is **stopped** (to stop billing). Present th
   - single-stream speed is measured at 181 tok/s on dedicated against ~460 on public;
   - the public default limit covers about 10 task starts per minute.
 
-## 5. Classroom (5 min), tab 5
+## 5. Classroom (5 min), tab 6
 
 1. Defaults: 100 students, 6 tasks each, 2-hour session, starts within ~3 minutes of each exercise. Three cards:
    - **Public at account limits:** "severely slowed". Tokens/min sits at the 500k ceiling and p95 task time is ~5 min.

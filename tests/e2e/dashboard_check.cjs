@@ -23,9 +23,17 @@ const fs = require('fs');
     page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_FAILED/.test(m.text())) problems.push(`[${scheme}] console: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`[${scheme}] pageerror: ${e.message}`));
     await page.goto('file://' + path.join(root, 'dashboard/dist/index.html'));
-    for (const view of ['run', 'measure', 'dedicated', 'economics', 'classroom', 'method']) {
+    for (const view of ['run', 'measure', 'workloads', 'dedicated', 'economics', 'classroom', 'method']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 700);
+      if (view === 'economics') {
+        await page.selectOption('#e-effort', 'wl-heavy');
+        await page.waitForTimeout(500);
+        const t = await page.locator('#e-tiles').innerText();
+        if (!/public cost per task/i.test(t) || /NaN|undefined/.test(t)) problems.push(`[${scheme}] economics: heavy workload broke tiles`);
+        await page.selectOption('#e-effort', 'medium');
+        await page.waitForTimeout(300);
+      }
       if (view === 'run') {
         await page.click('#replay-all');
         const n = await page.locator('#events li').count();
@@ -36,6 +44,13 @@ const fs = require('fs');
         await page.waitForFunction(() => !document.getElementById('s-sweep').disabled, null, { timeout: 120000 });
         const txt = await page.locator('#s-compare').innerText();
         if (!/Cost for this session/.test(txt)) problems.push(`[${scheme}] classroom: no comparison output`);
+        // workload selector: heavy traces must simulate without errors and say so
+        await page.selectOption('#s-effort', 'wl-heavy');
+        await page.waitForTimeout(2500);
+        const note = await page.locator('#s-active-note').innerText();
+        if (!/Heavy H1/.test(note)) problems.push(`[${scheme}] classroom: heavy workload not applied`);
+        await page.selectOption('#s-effort', 'medium');
+        await page.waitForTimeout(1500);
       }
       // every visible canvas must have a Chart instance with data
       const empty = await page.evaluate(() => [...document.querySelectorAll('.view:not([hidden]) canvas')]
@@ -46,7 +61,7 @@ const fs = require('fs');
     }
     // phone width: no horizontal page scroll
     await page.setViewportSize({ width: 400, height: 900 });
-    for (const view of ['run', 'measure', 'dedicated', 'classroom']) {
+    for (const view of ['run', 'measure', 'workloads', 'dedicated', 'classroom']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(600);
       const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

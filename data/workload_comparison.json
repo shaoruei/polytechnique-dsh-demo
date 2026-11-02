@@ -1,0 +1,1131 @@
+{
+ "schema": 1,
+ "groups": {
+  "small": {
+   "label": "Small: T1-T3",
+   "cohort": "public-historical",
+   "runs": 18,
+   "successes": 13,
+   "success_rate": 0.7222,
+   "hidden_checks_passed_fraction": {
+    "n": 18,
+    "mean": 0.9444,
+    "p50": 1.0,
+    "min": 0.8,
+    "max": 1.0
+   },
+   "task_time_s": {
+    "n": 18,
+    "mean": 10.0404,
+    "p50": 9.9575,
+    "min": 6.244,
+    "max": 18.497
+   },
+   "llm_time_s": {
+    "n": 18,
+    "mean": 7.3869,
+    "p50": 7.1525,
+    "min": 3.606,
+    "max": 15.745
+   },
+   "tool_time_s": {
+    "n": 18,
+    "mean": 0.2396,
+    "p50": 0.235,
+    "min": 0.159,
+    "max": 0.457
+   },
+   "llm_requests": {
+    "n": 18,
+    "mean": 8.8889,
+    "p50": 9.5,
+    "min": 6,
+    "max": 12
+   },
+   "tool_calls": {
+    "n": 18,
+    "mean": 7.8889,
+    "p50": 8.5,
+    "min": 5,
+    "max": 11
+   },
+   "tool_calls_failed": {
+    "n": 18,
+    "mean": 1.6111,
+    "p50": 1.0,
+    "min": 0,
+    "max": 3
+   },
+   "prompt_tokens": {
+    "n": 18,
+    "mean": 50270.4444,
+    "p50": 54240.0,
+    "min": 28080,
+    "max": 75194
+   },
+   "uncached_input_tokens": {
+    "n": 18,
+    "mean": 4174.4444,
+    "p50": 3290.0,
+    "min": 1296,
+    "max": 11292
+   },
+   "cached_input_tokens": {
+    "n": 18,
+    "mean": 46096.0,
+    "p50": 50944.0,
+    "min": 22688,
+    "max": 72256
+   },
+   "output_tokens": {
+    "n": 18,
+    "mean": 1426.4444,
+    "p50": 1030.0,
+    "min": 578,
+    "max": 4216
+   },
+   "max_prompt_tokens": {
+    "n": 18,
+    "mean": 6825.5,
+    "p50": 7229.0,
+    "min": 5349,
+    "max": 8166
+   },
+   "cache_hit_rate": 0.917,
+   "cached_share_of_cost": 0.7567,
+   "uncached_to_output_ratio": 2.926,
+   "prompt_plus_output_per_task": 51697,
+   "ttft_s": {
+    "n": 160,
+    "mean": 0.453,
+    "p50": 0.38,
+    "min": 0.323,
+    "max": 2.645
+   },
+   "latency_s": {
+    "n": 160,
+    "mean": 0.831,
+    "p50": 0.542,
+    "min": 0.39,
+    "max": 4.895
+   },
+   "decode_tps": {
+    "n": 158,
+    "mean": 459.3709,
+    "p50": 453.35,
+    "min": 252.4,
+    "max": 743.2
+   },
+   "http_errors": 0,
+   "timeouts": 0,
+   "cost_per_task_usd": {
+    "n": 18,
+    "mean": 0.0061,
+    "p50": 0.0065,
+    "min": 0.0032,
+    "max": 0.0093
+   },
+   "cost_total_usd": 0.109649,
+   "cost_per_successful_task_usd": 0.008435,
+   "public_cost_per_million_output_usd": 4.271,
+   "context_growth": [
+    [
+     4188,
+     4255,
+     4328,
+     4804,
+     5411,
+     5871,
+     6057
+    ],
+    [
+     4234,
+     5430,
+     5497,
+     5585,
+     5659,
+     5730,
+     6039,
+     6526,
+     6911,
+     7302,
+     7483
+    ],
+    [
+     4188,
+     4255,
+     4326,
+     4799,
+     5163,
+     5349
+    ],
+    [
+     4127,
+     4227,
+     4856,
+     5111,
+     5941,
+     6038,
+     6095,
+     6753,
+     7038,
+     7527,
+     7669
+    ],
+    [
+     4234,
+     4403,
+     4710,
+     5150,
+     5385,
+     5968,
+     6375,
+     6592,
+     6645,
+     6821
+    ],
+    [
+     4188,
+     4253,
+     4396,
+     4873,
+     5476,
+     5933,
+     6119
+    ],
+    [
+     4127,
+     4198,
+     4270,
+     4899,
+     5154,
+     6780,
+     6909,
+     7318,
+     7463
+    ],
+    [
+     4234,
+     5423,
+     5473,
+     5533,
+     5686,
+     5993,
+     6472,
+     6880,
+     7100,
+     7275
+    ],
+    [
+     4188,
+     4254,
+     4319,
+     4795,
+     5343,
+     5529
+    ],
+    [
+     4127,
+     4229,
+     4858,
+     5112,
+     6072,
+     6554,
+     7067,
+     7224
+    ],
+    [
+     4234,
+     5422,
+     5472,
+     5526,
+     5589,
+     5668,
+     5975,
+     6441,
+     6833,
+     7052,
+     7234
+    ],
+    [
+     4188,
+     4256,
+     4320,
+     4797,
+     5245,
+     5431
+    ],
+    [
+     4127,
+     4192,
+     4242,
+     4322,
+     4951,
+     5206,
+     6294,
+     6847,
+     7623,
+     7761
+    ],
+    [
+     4234,
+     5422,
+     5474,
+     5532,
+     5625,
+     5934,
+     6393,
+     7060,
+     7241
+    ],
+    [
+     4188,
+     4253,
+     4324,
+     4801,
+     5430,
+     5615
+    ],
+    [
+     4127,
+     4198,
+     4266,
+     4895,
+     5150,
+     6857,
+     7133,
+     7299,
+     7399,
+     7675,
+     8029,
+     8166
+    ],
+    [
+     4234,
+     5422,
+     5492,
+     5554,
+     5995,
+     6333,
+     6711,
+     6837,
+     6983,
+     7166
+    ],
+    [
+     4234,
+     5422,
+     5477,
+     5570,
+     5647,
+     5954,
+     6456,
+     6894,
+     7029,
+     7083,
+     7256
+    ]
+   ],
+   "run_ids": [
+    "20261030T145704Z_t1_medium",
+    "20261030T145804Z_t3_medium",
+    "20261030T145823Z_t1_medium",
+    "20261030T145829Z_t2_medium",
+    "20261030T145848Z_t3_medium",
+    "20261030T145900Z_t1_medium",
+    "20261030T145907Z_t2_medium",
+    "20261030T145919Z_t3_medium",
+    "20261030T145930Z_t1_medium",
+    "20261030T145936Z_t2_medium",
+    "20261030T145947Z_t3_medium",
+    "20261030T145958Z_t1_medium",
+    "20261030T150005Z_t2_medium",
+    "20261030T150019Z_t3_medium",
+    "20261030T150027Z_t1_medium",
+    "20261030T150034Z_t2_medium",
+    "20261030T150049Z_t3_medium",
+    "20261030T152142Z_t3_medium"
+   ],
+   "fixture_sha256": []
+  },
+  "medium": {
+   "label": "Medium: M1 late-penalty grading",
+   "cohort": "workload-formal",
+   "runs": 3,
+   "successes": 3,
+   "success_rate": 1.0,
+   "hidden_checks_passed_fraction": {
+    "n": 3,
+    "mean": 1.0,
+    "p50": 1.0,
+    "min": 1.0,
+    "max": 1.0
+   },
+   "task_time_s": {
+    "n": 3,
+    "mean": 34.2893,
+    "p50": 32.549,
+    "min": 30.165,
+    "max": 40.154
+   },
+   "llm_time_s": {
+    "n": 3,
+    "mean": 30.9053,
+    "p50": 29.253,
+    "min": 26.91,
+    "max": 36.553
+   },
+   "tool_time_s": {
+    "n": 3,
+    "mean": 0.463,
+    "p50": 0.41,
+    "min": 0.342,
+    "max": 0.637
+   },
+   "llm_requests": {
+    "n": 3,
+    "mean": 29.6667,
+    "p50": 28.0,
+    "min": 28,
+    "max": 33
+   },
+   "tool_calls": {
+    "n": 3,
+    "mean": 28.6667,
+    "p50": 27.0,
+    "min": 27,
+    "max": 32
+   },
+   "tool_calls_failed": {
+    "n": 3,
+    "mean": 5.3333,
+    "p50": 5.0,
+    "min": 5,
+    "max": 6
+   },
+   "prompt_tokens": {
+    "n": 3,
+    "mean": 314418.3333,
+    "p50": 275674.0,
+    "min": 267910,
+    "max": 399671
+   },
+   "uncached_input_tokens": {
+    "n": 3,
+    "mean": 14034.3333,
+    "p50": 10870.0,
+    "min": 10218,
+    "max": 21015
+   },
+   "cached_input_tokens": {
+    "n": 3,
+    "mean": 300384.0,
+    "p50": 265456.0,
+    "min": 257040,
+    "max": 378656
+   },
+   "output_tokens": {
+    "n": 3,
+    "mean": 7770.0,
+    "p50": 6783.0,
+    "min": 6347,
+    "max": 10180
+   },
+   "max_prompt_tokens": {
+    "n": 3,
+    "mean": 17976.0,
+    "p50": 15742.0,
+    "min": 15553,
+    "max": 22633
+   },
+   "cache_hit_rate": 0.9554,
+   "cached_share_of_cost": 0.8161,
+   "uncached_to_output_ratio": 1.806,
+   "prompt_plus_output_per_task": 322188,
+   "ttft_s": {
+    "n": 89,
+    "mean": 0.4403,
+    "p50": 0.425,
+    "min": 0.318,
+    "max": 1.1
+   },
+   "latency_s": {
+    "n": 89,
+    "mean": 1.0418,
+    "p50": 0.665,
+    "min": 0.4,
+    "max": 4.866
+   },
+   "decode_tps": {
+    "n": 88,
+    "mean": 459.1932,
+    "p50": 462.9,
+    "min": 269.2,
+    "max": 758.8
+   },
+   "http_errors": 0,
+   "timeouts": 0,
+   "cost_per_task_usd": {
+    "n": 3,
+    "mean": 0.0368,
+    "p50": 0.0319,
+    "min": 0.0314,
+    "max": 0.0471
+   },
+   "cost_total_usd": 0.110417,
+   "cost_per_successful_task_usd": 0.036806,
+   "public_cost_per_million_output_usd": 4.737,
+   "context_growth": [
+    [
+     4238,
+     4299,
+     4404,
+     5282,
+     5680,
+     5906,
+     6291,
+     6555,
+     6813,
+     7102,
+     7859,
+     8665,
+     9002,
+     9424,
+     9815,
+     10078,
+     10485,
+     10603,
+     11282,
+     11608,
+     12338,
+     12670,
+     13379,
+     13891,
+     14592,
+     14731,
+     15365,
+     15553
+    ],
+    [
+     4238,
+     4298,
+     4399,
+     5277,
+     5673,
+     5905,
+     6096,
+     6356,
+     6673,
+     6962,
+     7170,
+     7930,
+     8521,
+     9739,
+     10639,
+     10919,
+     11311,
+     11998,
+     12322,
+     13024,
+     13427,
+     14057,
+     15119,
+     15722,
+     16814,
+     17456,
+     18526,
+     19543,
+     20634,
+     21525,
+     22322,
+     22443,
+     22633
+    ],
+    [
+     4238,
+     4298,
+     4398,
+     5275,
+     5671,
+     5891,
+     6189,
+     6506,
+     6738,
+     7495,
+     7785,
+     8001,
+     9351,
+     9827,
+     10238,
+     10499,
+     10860,
+     11568,
+     11892,
+     12567,
+     12902,
+     13607,
+     13909,
+     14589,
+     14642,
+     15437,
+     15559,
+     15742
+    ]
+   ],
+   "run_ids": [
+    "20261102T132645Z_m1_medium",
+    "20261102T132759Z_m1_medium",
+    "20261102T132912Z_m1_medium"
+   ],
+   "fixture_sha256": [
+    "28611005a9fc9b5c734b423a2d5d2720d8fde9f47505621c6c3271bb32eb2274"
+   ]
+  },
+  "heavy": {
+   "label": "Heavy: H1 usage accounting & budgets",
+   "cohort": "workload-formal",
+   "runs": 3,
+   "successes": 0,
+   "success_rate": 0.0,
+   "hidden_checks_passed_fraction": {
+    "n": 3,
+    "mean": 0.8696,
+    "p50": 0.8696,
+    "min": 0.8696,
+    "max": 0.8696
+   },
+   "task_time_s": {
+    "n": 3,
+    "mean": 35.2807,
+    "p50": 33.55,
+    "min": 31.654,
+    "max": 40.638
+   },
+   "llm_time_s": {
+    "n": 3,
+    "mean": 31.8543,
+    "p50": 30.252,
+    "min": 28.465,
+    "max": 36.846
+   },
+   "tool_time_s": {
+    "n": 3,
+    "mean": 0.4777,
+    "p50": 0.526,
+    "min": 0.37,
+    "max": 0.537
+   },
+   "llm_requests": {
+    "n": 3,
+    "mean": 29.6667,
+    "p50": 30.0,
+    "min": 29,
+    "max": 30
+   },
+   "tool_calls": {
+    "n": 3,
+    "mean": 28.6667,
+    "p50": 29.0,
+    "min": 28,
+    "max": 29
+   },
+   "tool_calls_failed": {
+    "n": 3,
+    "mean": 4.3333,
+    "p50": 4.0,
+    "min": 4,
+    "max": 5
+   },
+   "prompt_tokens": {
+    "n": 3,
+    "mean": 327698.3333,
+    "p50": 319165.0,
+    "min": 315132,
+    "max": 348798
+   },
+   "uncached_input_tokens": {
+    "n": 3,
+    "mean": 13079.6667,
+    "p50": 12556.0,
+    "min": 11485,
+    "max": 15198
+   },
+   "cached_input_tokens": {
+    "n": 3,
+    "mean": 314618.6667,
+    "p50": 307680.0,
+    "min": 302576,
+    "max": 333600
+   },
+   "output_tokens": {
+    "n": 3,
+    "mean": 7024.3333,
+    "p50": 6256.0,
+    "min": 5558,
+    "max": 9259
+   },
+   "max_prompt_tokens": {
+    "n": 3,
+    "mean": 18637.3333,
+    "p50": 17630.0,
+    "min": 17088,
+    "max": 21194
+   },
+   "cache_hit_rate": 0.9601,
+   "cached_share_of_cost": 0.8359,
+   "uncached_to_output_ratio": 1.862,
+   "prompt_plus_output_per_task": 334723,
+   "ttft_s": {
+    "n": 89,
+    "mean": 0.4549,
+    "p50": 0.441,
+    "min": 0.34,
+    "max": 0.698
+   },
+   "latency_s": {
+    "n": 89,
+    "mean": 1.0737,
+    "p50": 0.714,
+    "min": 0.418,
+    "max": 5.248
+   },
+   "decode_tps": {
+    "n": 87,
+    "mean": 416.8908,
+    "p50": 426.7,
+    "min": 56.8,
+    "max": 677.3
+   },
+   "http_errors": 0,
+   "timeouts": 0,
+   "cost_per_task_usd": {
+    "n": 3,
+    "mean": 0.0376,
+    "p50": 0.0359,
+    "min": 0.0358,
+    "max": 0.0412
+   },
+   "cost_total_usd": 0.112915,
+   "cost_per_successful_task_usd": null,
+   "public_cost_per_million_output_usd": 5.358,
+   "context_growth": [
+    [
+     4206,
+     4270,
+     4375,
+     5557,
+     5624,
+     5878,
+     6239,
+     6774,
+     7203,
+     7680,
+     8106,
+     8761,
+     10028,
+     10214,
+     10857,
+     11301,
+     11946,
+     12178,
+     12606,
+     13881,
+     14359,
+     14523,
+     15042,
+     16203,
+     18483,
+     19051,
+     20376,
+     20845,
+     21038,
+     21194
+    ],
+    [
+     4206,
+     4270,
+     4356,
+     5538,
+     5793,
+     5857,
+     6218,
+     6691,
+     7119,
+     7585,
+     8009,
+     8089,
+     8730,
+     10252,
+     10449,
+     10657,
+     11174,
+     11289,
+     12593,
+     13313,
+     13749,
+     13940,
+     14947,
+     15602,
+     15749,
+     15868,
+     16372,
+     16731,
+     16931,
+     17088
+    ],
+    [
+     4206,
+     5398,
+     5454,
+     5527,
+     5887,
+     6375,
+     6857,
+     7261,
+     7686,
+     8365,
+     9606,
+     9813,
+     10067,
+     10226,
+     10858,
+     11297,
+     11473,
+     11761,
+     12150,
+     12443,
+     12575,
+     13008,
+     14512,
+     16366,
+     16723,
+     16948,
+     17239,
+     17421,
+     17630
+    ]
+   ],
+   "run_ids": [
+    "20261102T132718Z_h1_medium",
+    "20261102T132840Z_h1_medium",
+    "20261102T132943Z_h1_medium"
+   ],
+   "fixture_sha256": [
+    "5d10c8d43e2bf13796932612d6f787b8a5011b7dceadc73a440fccf5c5d71a07"
+   ]
+  },
+  "pilot": {
+   "label": "Pilot (M1 + H1, not pooled)",
+   "cohort": "workload-pilot",
+   "runs": 2,
+   "successes": 1,
+   "success_rate": 0.5,
+   "hidden_checks_passed_fraction": {
+    "n": 2,
+    "mean": 0.913,
+    "p50": 0.913,
+    "min": 0.8261,
+    "max": 1.0
+   },
+   "task_time_s": {
+    "n": 2,
+    "mean": 47.4315,
+    "p50": 47.4315,
+    "min": 35.677,
+    "max": 59.186
+   },
+   "llm_time_s": {
+    "n": 2,
+    "mean": 38.3965,
+    "p50": 38.3965,
+    "min": 22.088,
+    "max": 54.705
+   },
+   "tool_time_s": {
+    "n": 2,
+    "mean": 0.7725,
+    "p50": 0.7725,
+    "min": 0.702,
+    "max": 0.843
+   },
+   "llm_requests": {
+    "n": 2,
+    "mean": 40.0,
+    "p50": 40.0,
+    "min": 23,
+    "max": 57
+   },
+   "tool_calls": {
+    "n": 2,
+    "mean": 39.0,
+    "p50": 39.0,
+    "min": 22,
+    "max": 56
+   },
+   "tool_calls_failed": {
+    "n": 2,
+    "mean": 6.0,
+    "p50": 6.0,
+    "min": 3,
+    "max": 9
+   },
+   "prompt_tokens": {
+    "n": 2,
+    "mean": 520731.0,
+    "p50": 520731.0,
+    "min": 190363,
+    "max": 851099
+   },
+   "uncached_input_tokens": {
+    "n": 2,
+    "mean": 20603.0,
+    "p50": 20603.0,
+    "min": 16075,
+    "max": 25131
+   },
+   "cached_input_tokens": {
+    "n": 2,
+    "mean": 500128.0,
+    "p50": 500128.0,
+    "min": 174288,
+    "max": 825968
+   },
+   "output_tokens": {
+    "n": 2,
+    "mean": 6969.0,
+    "p50": 6969.0,
+    "min": 4318,
+    "max": 9620
+   },
+   "max_prompt_tokens": {
+    "n": 2,
+    "mean": 18083.0,
+    "p50": 18083.0,
+    "min": 12742,
+    "max": 23424
+   },
+   "cache_hit_rate": 0.9604,
+   "cached_share_of_cost": 0.8731,
+   "uncached_to_output_ratio": 2.956,
+   "prompt_plus_output_per_task": 527700,
+   "ttft_s": {
+    "n": 80,
+    "mean": 0.4944,
+    "p50": 0.4685,
+    "min": 0.322,
+    "max": 1.095
+   },
+   "latency_s": {
+    "n": 80,
+    "mean": 0.9599,
+    "p50": 0.7195,
+    "min": 0.441,
+    "max": 5.196
+   },
+   "decode_tps": {
+    "n": 80,
+    "mean": 405.5375,
+    "p50": 386.65,
+    "min": 218.8,
+    "max": 1186.2
+   },
+   "http_errors": 0,
+   "timeouts": 0,
+   "cost_per_task_usd": {
+    "n": 2,
+    "mean": 0.0573,
+    "p50": 0.0573,
+    "min": 0.0224,
+    "max": 0.0921
+   },
+   "cost_total_usd": 0.114569,
+   "cost_per_successful_task_usd": 0.114569,
+   "public_cost_per_million_output_usd": 8.22,
+   "context_growth": [
+    [
+     4238,
+     4298,
+     4395,
+     5152,
+     5358,
+     5754,
+     5978,
+     6263,
+     6585,
+     6843,
+     7130,
+     8010,
+     8772,
+     9255,
+     9671,
+     10049,
+     10590,
+     10922,
+     11533,
+     11863,
+     12418,
+     12544,
+     12742
+    ],
+    [
+     4206,
+     5398,
+     5448,
+     5549,
+     5804,
+     5868,
+     6228,
+     6644,
+     7068,
+     7535,
+     8007,
+     8687,
+     10045,
+     10242,
+     10496,
+     10688,
+     11260,
+     11469,
+     12269,
+     12483,
+     12610,
+     13963,
+     14393,
+     15679,
+     15798,
+     15923,
+     16059,
+     16429,
+     16564,
+     16631,
+     17037,
+     17768,
+     17906,
+     18036,
+     18153,
+     18269,
+     18387,
+     18511,
+     18610,
+     18718,
+     18828,
+     18933,
+     19037,
+     19141,
+     19250,
+     19608,
+     19717,
+     19844,
+     20170,
+     20319,
+     20793,
+     21629,
+     21826,
+     21966,
+     22503,
+     23273,
+     23424
+    ]
+   ],
+   "run_ids": [
+    "20261102T132446Z_m1_medium",
+    "20261102T132522Z_h1_medium"
+   ],
+   "fixture_sha256": [
+    "28611005a9fc9b5c734b423a2d5d2720d8fde9f47505621c6c3271bb32eb2274",
+    "5d10c8d43e2bf13796932612d6f787b8a5011b7dceadc73a440fccf5c5d71a07"
+   ]
+  }
+ },
+ "per_task": {
+  "h1-usage-budgets": {
+   "runs": 3,
+   "successes": 0,
+   "task_time_s_p50": 33.55,
+   "cost_per_task_usd_mean": 0.037639
+  },
+  "m1-late-penalties": {
+   "runs": 3,
+   "successes": 3,
+   "task_time_s_p50": 32.549,
+   "cost_per_task_usd_mean": 0.036806
+  },
+  "t1-grade-average": {
+   "runs": 6,
+   "successes": 6,
+   "task_time_s_p50": 6.478,
+   "cost_per_task_usd_mean": 0.003762
+  },
+  "t2-duration-parser": {
+   "runs": 5,
+   "successes": 0,
+   "task_time_s_p50": 13.44,
+   "cost_per_task_usd_mean": 0.00765
+  },
+  "t3-schedule-conflicts": {
+   "runs": 7,
+   "successes": 7,
+   "task_time_s_p50": 10.257,
+   "cost_per_task_usd_mean": 0.006976
+  }
+ },
+ "dedicated_estimates": {
+  "small": {
+   "traces": 18,
+   "idle_replica_task_time_s_p50": 11.78112459791864,
+   "measured_public_task_time_s_p50": 9.9575,
+   "public_cost_per_task": 0.006091633333333334,
+   "output_tokens_per_task": 1426.4444444444443,
+   "tasks_per_replica_hour_at_full_use": 4118.645650617802,
+   "breakeven_utilisation": 0.749324039960312,
+   "tasks_per_minute_to_match_public": 51.43666996809832,
+   "task_starts_per_minute_within_default_tpm": 9.671761894117848
+  },
+  "medium": {
+   "traces": 3,
+   "idle_replica_task_time_s_p50": 51.837060548722796,
+   "measured_public_task_time_s_p50": 32.549,
+   "public_cost_per_task": 0.036805550000000006,
+   "output_tokens_per_task": 7770,
+   "tasks_per_replica_hour_at_full_use": 756.1157280513561,
+   "breakeven_utilisation": 0.6755480821002764,
+   "tasks_per_minute_to_match_public": 8.513208832182464,
+   "task_starts_per_minute_within_default_tpm": 1.5518873536699551
+  },
+  "heavy": {
+   "traces": 3,
+   "idle_replica_task_time_s_p50": 49.8652720277515,
+   "measured_public_task_time_s_p50": 33.55,
+   "public_cost_per_task": 0.03763841666666667,
+   "output_tokens_per_task": 7024.333333333333,
+   "tasks_per_replica_hour_at_full_use": 836.3810383370717,
+   "breakeven_utilisation": 0.5972034737743632,
+   "tasks_per_minute_to_match_public": 8.324827691565135,
+   "task_starts_per_minute_within_default_tpm": 1.4937739501756677
+  }
+ },
+ "dedicated_measured_reference": {
+  "note": "Measured on ecole-demo (4x H100) for T1-T3 only, 2026-11-02",
+  "seq_task_time_s_p50": 13.283,
+  "decode_tps_p50": 181.2017,
+  "best_measured_tasks_per_min": 9.55,
+  "price_per_hour": 18.8
+ },
+ "experiment": {
+  "paid_attempts": 8,
+  "pilot_attempts": 2,
+  "formal_attempts": 6,
+  "provider_reported_spend_usd": 0.337902,
+  "relay_counted_spend_usd": 0.337901,
+  "cap_rejections": 0,
+  "http_errors": 0,
+  "fixtures": {
+   "h1-usage-budgets": [
+    "5d10c8d43e2bf13796932612d6f787b8a5011b7dceadc73a440fccf5c5d71a07"
+   ],
+   "m1-late-penalties": [
+    "28611005a9fc9b5c734b423a2d5d2720d8fde9f47505621c6c3271bb32eb2274"
+   ]
+  }
+ }
+}

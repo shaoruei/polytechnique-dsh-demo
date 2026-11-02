@@ -7,8 +7,8 @@ representative of more realistic coding-agent work?
 
 | Task | Codebase | What the agent must do | Public tests | Hidden acceptance tests |
 |---|---|---|---|---|
-| M1 `m1-late-penalties` | `submissions` grading package: 6 modules + `SPEC.md` | Fix the CSV import (quoted fields, timezone-less timestamps, line-numbered errors) and implement the late-submission policy and grading rules across `timeparse.py`, `csvio.py`, `policy.py` and `grading.py` | 6 | 14 (with subtests) |
-| H1 `h1-usage-budgets` | `gateway` package: university LLM API gateway, 6 modules + `SPEC.md` | Implement per-user usage accounting and budgets: cached-input pricing with half-up rounding, role budgets with overrides, admission control, retries (3 attempts), charging billed failed attempts, idempotent replays, warning headers, monthly UTC periods, usage reports | 4 | 23 |
+| M1 `m1-late-penalties` | `submissions` grading package: 6 modules + `SPEC.md` | Fix the CSV import (quoted fields, timezone-less timestamps, line-numbered errors) and implement the late-submission policy and grading rules across `timeparse.py`, `csvio.py`, `policy.py` and `grading.py` | 6 | 14 test methods (with subtests) |
+| H1 `h1-usage-budgets` | `gateway` package: university LLM API gateway, 6 modules + `SPEC.md` | Implement per-user usage accounting and budgets: cached-input pricing with half-up rounding, role budgets with overrides, admission control, retries (3 attempts), charging billed failed attempts, idempotent replays, warning headers, monthly UTC periods, usage reports | 4 | 19 test methods |
 
 - Both fixtures fail their hidden tests as shipped, and the reference solutions pass (`tests/python/test_fixtures.py`).
 - Workspaces contain neither hidden tests nor references (also tested).
@@ -29,6 +29,8 @@ representative of more realistic coding-agent work?
 - Stop on 401/403 or on repeated provider errors. No dedicated endpoint is started.
 
 ## Analysis plan
+
+*Correction after the pilot (documentation only, no fixture change):* the H1 hidden-test count was first written as 23. 23 is the total the judge runs (4 public + 19 hidden).
 
 Compare the new runs with T1–T3 (historical public cohort, medium effort) on:
 - success, end-to-end time, LLM and tool calls (failed tool calls included);

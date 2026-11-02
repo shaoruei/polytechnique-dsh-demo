@@ -1,0 +1,182 @@
+diff --git a/submissions/csvio.py b/submissions/csvio.py
+index 3457051..48a336d 100644
+--- a/submissions/csvio.py
++++ b/submissions/csvio.py
+@@ -6,23 +6,71 @@ from .models import Assignment, Submission
+ from .timeparse import parse_timestamp
+ 
+ 
++import csv
++from io import StringIO
++
++
+ def _rows(text: str) -> List[List[str]]:
+-    lines = text.splitlines()
+-    return [line.split(",") for line in lines[1:]]
++    """Parse CSV text into rows, handling quoted fields and stripping whitespace.
++    Returns rows excluding the header line. Blank lines are ignored.
++    """
++    f = StringIO(text)
++    reader = csv.reader(f)
++    # Skip header
++    try:
++        header = next(reader)
++    except StopIteration:
++        return []
++    rows: List[List[str]] = []
++    for row in reader:
++        # ignore completely blank lines
++        if not row:
++            continue
++        # Strip whitespace from each field
++        rows.append([field.strip() for field in row])
++    return rows
+ 
+ 
+ def read_submissions(text: str) -> List[Submission]:
+-    """Parse the submissions export (header: student_id,name,assignment,submitted_at,score)."""
+-    out = []
+-    for row in _rows(text):
+-        student_id, name, assignment, submitted_at, score = row
+-        out.append(Submission(student_id, name, assignment, parse_timestamp(submitted_at), float(score)))
++    """Parse the submissions export (header: student_id,name,assignment,submitted_at,score).
++    Raises ValueError with line number for malformed rows, timestamps without offset, or non-numeric scores.
++    """
++    out: List[Submission] = []
++    rows = _rows(text)
++    # _rows returns rows after header, line numbers start at 2
++    for idx, row in enumerate(rows, start=2):
++        if len(row) != 5:
++            raise ValueError(f"line {idx}: expected 5 fields, got {len(row)}")
++        student_id, name, assignment, submitted_at_str, score_str = row
++        try:
++            submitted_at = parse_timestamp(submitted_at_str)
++        except Exception as e:
++            raise ValueError(f"line {idx}: {e}")
++        try:
++            score = float(score_str)
++        except Exception:
++            raise ValueError(f"line {idx}: invalid score '{score_str}'")
++        out.append(Submission(student_id, name, assignment, submitted_at, score))
+     return out
+ 
+ 
+ def read_assignments(text: str) -> Dict[str, Assignment]:
+-    """Parse the assignments file (header: assignment,deadline,max_score)."""
+-    out = {}
+-    for name, deadline, max_score in _rows(text):
+-        out[name] = Assignment(name, parse_timestamp(deadline), float(max_score))
++    """Parse the assignments file (header: assignment,deadline,max_score).
++    Raises ValueError with line number for malformed rows or timestamps without offset.
++    """
++    out: Dict[str, Assignment] = {}
++    rows = _rows(text)
++    for idx, row in enumerate(rows, start=2):
++        if len(row) != 3:
++            raise ValueError(f"line {idx}: expected 3 fields, got {len(row)}")
++        name, deadline_str, max_score_str = row
++        try:
++            deadline = parse_timestamp(deadline_str)
++        except Exception as e:
++            raise ValueError(f"line {idx}: {e}")
++        try:
++            max_score = float(max_score_str)
++        except Exception:
++            raise ValueError(f"line {idx}: invalid max_score '{max_score_str}'")
++        out[name] = Assignment(name, deadline, max_score)
+     return out
+diff --git a/submissions/grading.py b/submissions/grading.py
+index 4e08f49..669eee6 100644
+--- a/submissions/grading.py
++++ b/submissions/grading.py
+@@ -8,10 +8,35 @@ from .policy import LatePolicy
+ 
+ def final_grades(submissions: Iterable[Submission], assignments: Dict[str, Assignment],
+                  policy: LatePolicy, roster: Optional[Iterable[str]] = None) -> Dict[Tuple[str, str], float]:
+-    """Final score per (student_id, assignment); the latest submission counts."""
+-    latest: Dict[Tuple[str, str], Submission] = {}
++    """Compute final grades per (student_id, assignment).
++    Applies late policy, validates scores, and selects the highest adjusted score per student/assignment.
++    If a roster is provided, ensures every student in the roster has an entry for each assignment,
++    using 0.0 when there is no submission.
++    """
++    # Map to best adjusted score
++    best: Dict[Tuple[str, str], float] = {}
+     for sub in submissions:
++        # Validate assignment exists
++        if sub.assignment not in assignments:
++            raise ValueError(f"unknown assignment {sub.assignment}")
++        assignment_obj = assignments[sub.assignment]
++        # Validate raw score bounds
++        if not (0 <= sub.score <= assignment_obj.max_score):
++            raise ValueError(f"score {sub.score} out of bounds for assignment {sub.assignment}")
++        # Compute adjusted score
++        penalty = policy.penalty(sub.submitted_at, assignment_obj.deadline)
++        adjusted = sub.score * (1 - penalty)
+         key = (sub.student_id, sub.assignment)
+-        if key not in latest or sub.submitted_at > latest[key].submitted_at:
+-            latest[key] = sub
+-    return {key: round(sub.score, 2) for key, sub in latest.items()}
++        # Keep highest adjusted score
++        if key not in best or adjusted > best[key]:
++            best[key] = adjusted
++    # Round scores to two decimals
++    final: Dict[Tuple[str, str], float] = {k: round(v, 2) for k, v in best.items()}
++    # Handle roster inclusion
++    if roster is not None:
++        for student in roster:
++            for assignment_name in assignments.keys():
++                key = (student, assignment_name)
++                if key not in final:
++                    final[key] = 0.0
++    return final
+diff --git a/submissions/policy.py b/submissions/policy.py
+index f6b0165..5049f19 100644
+--- a/submissions/policy.py
++++ b/submissions/policy.py
+@@ -1,7 +1,7 @@
+ """Late-submission policy."""
+ 
+ from dataclasses import dataclass
+-from datetime import datetime
++from datetime import datetime, timedelta
+ 
+ 
+ @dataclass(frozen=True)
+@@ -13,4 +13,18 @@ class LatePolicy:
+ 
+     def penalty(self, submitted_at: datetime, deadline: datetime) -> float:
+         """Fraction of the score removed for a late submission (see SPEC.md)."""
+-        return 0.0
++        # No penalty if submitted on time or within grace period
++        if submitted_at <= deadline + timedelta(minutes=self.grace_minutes):
++            return 0.0
++        # Compute total lateness from deadline (ignore grace period for day counting)
++        late_by = submitted_at - deadline
++        # If lateness exceeds zero_after_days, full penalty
++        if late_by > timedelta(days=self.zero_after_days):
++            return 1.0
++        # Number of started days late (ceil)
++        days_late = (late_by.total_seconds() / 86400)
++        # Use math.ceil to count started days
++        import math
++        days_late = math.ceil(days_late)
++        penalty = min(days_late * self.penalty_per_day, self.max_penalty)
++        return penalty
+diff --git a/submissions/timeparse.py b/submissions/timeparse.py
+index 01c7891..fb49ebb 100644
+--- a/submissions/timeparse.py
++++ b/submissions/timeparse.py
+@@ -4,5 +4,10 @@ from datetime import datetime
+ 
+ 
+ def parse_timestamp(text: str) -> datetime:
+-    """Parse an ISO 8601 timestamp such as 2026-10-12T23:59:00+02:00."""
+-    return datetime.fromisoformat(text.strip())
++    """Parse an ISO 8601 timestamp such as 2026-10-12T23:59:00+02:00.
++    Requires an explicit UTC offset; otherwise raises ValueError.
++    """
++    dt = datetime.fromisoformat(text.strip())
++    if dt.tzinfo is None:
++        raise ValueError("timestamp missing UTC offset")
++    return dt

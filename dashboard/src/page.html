@@ -22,9 +22,10 @@
   <nav class="tabs" aria-label="Storyline">
     <a href="#run" data-view="run"><b>1</b> Run an agent</a>
     <a href="#measure" data-view="measure"><b>2</b> Measure it</a>
-    <a href="#dedicated" data-view="dedicated"><b>3</b> Dedicated, measured</a>
-    <a href="#economics" data-view="economics"><b>4</b> Cost curves</a>
-    <a href="#classroom" data-view="classroom"><b>5</b> Scale to a classroom</a>
+    <a href="#workloads" data-view="workloads"><b>3</b> Bigger tasks</a>
+    <a href="#dedicated" data-view="dedicated"><b>4</b> Dedicated, measured</a>
+    <a href="#economics" data-view="economics"><b>5</b> Cost curves</a>
+    <a href="#classroom" data-view="classroom"><b>6</b> Scale to a classroom</a>
     <a href="#method" data-view="method" class="aside">Method &amp; sources</a>
   </nav>
 </header>
@@ -89,10 +90,26 @@
     </details>
   </section>
 
-  <!-- ======================================================== 3. DEDICATED (measured) -->
+  <!-- ======================================================== 3. WORKLOADS -->
+  <section id="view-workloads" class="view" aria-labelledby="h-wl" hidden>
+    <div class="section-head">
+      <h2 id="h-wl">3 · Are the small tasks representative?</h2>
+      <p>Two more realistic tasks on the public endpoint (2 Nov), with the same DSH setup, medium effort and independent hidden tests. <b>M1</b> (medium): fix a CSV importer and implement a late-penalty grading policy across four modules. <b>H1</b> (heavy): add per-user token accounting and budget enforcement to a small university LLM gateway. 3 formal runs each, plus 2 pilot runs reported separately. With n = 3, read these as examples, not statistics.</p>
+    </div>
+    <div class="tiles" id="w-tiles"></div>
+    <div class="panel table-wrap"><table id="w-table"></table></div>
+    <div class="grid two">
+      <figure class="panel"><figcaption>Tokens per task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-tokens"></canvas></div><p class="note">Provider-reported usage. Bigger tasks resend a longer, mostly cached context on every one of ~30 requests.</p></figure>
+      <figure class="panel"><figcaption>Context growth within a task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-context"></canvas></div><p class="note">Prompt tokens per LLM request, one line per run.</p></figure>
+      <figure class="panel"><figcaption>Time and cost per task <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-w-cost"></canvas></div><p class="note">Bars: mean public cost per task. Line: median task time.</p></figure>
+      <div class="panel callout" id="w-econ"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== 4. DEDICATED (measured) -->
   <section id="view-dedicated" class="view" aria-labelledby="h-ded" hidden>
     <div class="section-head">
-      <h2 id="h-ded">3 · The same agent on a dedicated endpoint</h2>
+      <h2 id="h-ded">4 · The same agent on a dedicated endpoint</h2>
       <p>Real DSH runs on <code>ecole-demo</code>, a Token Factory dedicated endpoint: <span id="d-hw"></span>. It ran the same tasks, hidden tests, DSH version and reasoning effort as the public runs, plus paired public controls in the same window. Every request was checked against the endpoint it is labelled with.</p>
     </div>
     <div class="tiles" id="d-tiles"></div>
@@ -111,14 +128,14 @@
   <!-- ======================================================== 4. ECONOMICS -->
   <section id="view-economics" class="view" aria-labelledby="h-econ" hidden>
     <div class="section-head">
-      <h2 id="h-econ">4 · Pay per token or pay per GPU-hour?</h2>
+      <h2 id="h-econ">5 · Pay per token or pay per GPU-hour?</h2>
       <p>Public endpoint: measured tokens per task × verified prices. Dedicated endpoint: GPU-hours × an assumed price. The number of GPUs is sized from benchmark throughput, so <strong>bigger volume means more GPUs</strong>, not one GPU that absorbs everything.</p>
     </div>
     <div class="grid econ-grid">
       <form class="panel controls" id="econ-form" autocomplete="off">
         <h3>Workload <span class="ev ev-measured">Measured</span></h3>
-        <label class="field" for="e-effort">Agent profile</label>
-        <select id="e-effort"><option value="medium" selected>medium effort, all 3 tasks</option><option value="low">low effort</option><option value="high">high effort</option></select>
+        <label class="field" for="e-effort">Workload</label>
+        <select id="e-effort"><option value="medium" selected>Small T1–T3, medium effort (33-run baseline)</option><option value="low">Small, low effort</option><option value="high">Small, high effort</option><option value="wl-medium">Medium M1 (3 measured traces)</option><option value="wl-heavy">Heavy H1 (3 measured traces)</option></select>
         <h3>Dedicated endpoint <span class="ev ev-measured">Measured</span> <span class="ev ev-assumption">Assumption</span></h3>
         <label class="field" for="e-gpu">Replica configuration</label>
         <select id="e-gpu"></select>
@@ -160,7 +177,7 @@
   <!-- ======================================================== 4. CLASSROOM -->
   <section id="view-classroom" class="view" aria-labelledby="h-class" hidden>
     <div class="section-head">
-      <h2 id="h-class">5 · A classroom of agents</h2>
+      <h2 id="h-class">6 · A classroom of agents</h2>
       <p>Every simulated student runs real recorded DSH trajectories: the same sequence of LLM requests, token counts and tool gaps that we measured. The simulation then asks whether each backend keeps up, and at what cost.</p>
     </div>
     <div class="grid econ-grid">
@@ -180,8 +197,8 @@
         <label class="field" for="s-review">Student review time between tasks (min) <output id="s-review-o"></output></label>
         <input id="s-review" type="range" min="0" max="15" step="0.5" value="2">
         <label class="check"><input id="s-retry" type="checkbox" checked> Students re-run a task once when it fails</label>
-        <label class="field" for="s-effort">Agent profile</label>
-        <select id="s-effort"><option value="medium" selected>medium effort</option><option value="low">low effort</option><option value="high">high effort</option></select>
+        <label class="field" for="s-effort">Workload</label>
+        <select id="s-effort"><option value="medium" selected>Small T1–T3, medium effort (baseline)</option><option value="low">Small, low effort</option><option value="high">Small, high effort</option><option value="wl-medium">Medium M1 (3 measured traces)</option><option value="wl-heavy">Heavy H1 (3 measured traces)</option></select>
         <h3>Public endpoint <span class="ev ev-verified">Verified</span></h3>
         <label class="field" for="s-mult">Rate-limit multiplier <output id="s-mult-o"></output></label>
         <input id="s-mult" type="range" min="1" max="20" step="1" value="1">

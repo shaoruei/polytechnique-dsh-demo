@@ -1,0 +1,192 @@
+diff --git a/gateway/ledger.py b/gateway/ledger.py
+index 5de462b..9bb2c84 100644
+--- a/gateway/ledger.py
++++ b/gateway/ledger.py
+@@ -2,7 +2,7 @@
+ 
+ from dataclasses import dataclass
+ from decimal import Decimal
+-from typing import List, Tuple
++from typing import List, Tuple, Dict
+ 
+ from .upstream import Usage
+ 
+@@ -25,10 +25,35 @@ class Ledger:
+         self.entries.append(entry)
+ 
+     def spent(self, user_id: str, month: str) -> Decimal:
+-        return sum((e.cost for e in self.entries if e.user_id == user_id), Decimal("0"))
++        # Sum costs for given user and month (both successful and failed attempts)
++        return sum((e.cost for e in self.entries if e.user_id == user_id and e.month == month), Decimal("0"))
+ 
+     def usage_report(self, user_id: str, month: str) -> dict:
+-        raise NotImplementedError
+-
++        # Sum over all entries for this user and month, including both successful and charged failed attempts.
++        filtered = [e for e in self.entries if e.user_id == user_id and e.month == month]
++        requests = sum(1 for e in filtered if e.status == "ok")
++        failed_attempts = sum(1 for e in filtered if e.status == "failed_attempt")
++        prompt_tokens = sum(e.usage.prompt_tokens for e in filtered)
++        cached_tokens = sum(e.usage.cached_tokens for e in filtered)
++        completion_tokens = sum(e.usage.completion_tokens for e in filtered)
++        cost_usd = sum((e.cost for e in filtered), Decimal("0"))
++        return {
++            "requests": requests,
++            "failed_attempts": failed_attempts,
++            "prompt_tokens": prompt_tokens,
++            "cached_tokens": cached_tokens,
++            "completion_tokens": completion_tokens,
++            "cost_usd": cost_usd,
++        }
+     def top_spenders(self, month: str, n: int) -> List[Tuple[str, Decimal]]:
+-        raise NotImplementedError
++        # Aggregate total cost per user for given month, omit zero cost.
++        costs: Dict[str, Decimal] = {}
++        for e in self.entries:
++            if e.month != month:
++                continue
++            costs[e.user_id] = costs.get(e.user_id, Decimal("0")) + e.cost
++        # Remove zero-cost users
++        filtered = [(uid, amt) for uid, amt in costs.items() if amt != Decimal("0")]
++        # Sort by cost descending, then user_id ascending
++        filtered.sort(key=lambda x: (-x[1], x[0]))
++        return filtered[:n]
+diff --git a/gateway/pricing.py b/gateway/pricing.py
+index 1598469..5d5d5f0 100644
+--- a/gateway/pricing.py
++++ b/gateway/pricing.py
+@@ -22,6 +22,12 @@ PRICES = {
+ 
+ 
+ def request_cost(model: str, usage) -> Decimal:
+-    """Cost of one provider call."""
++    """Cost of one provider call, including cached token pricing.
++    Rounds half-up to 6 decimal places as per SPEC.
++    """
+     price = PRICES[model]
+-    return (usage.prompt_tokens * price.input + usage.completion_tokens * price.output) / 1_000_000
++    # cached_tokens are part of prompt_tokens
++    uncached_prompt = usage.prompt_tokens - usage.cached_tokens
++    cost = (uncached_prompt * price.input + usage.cached_tokens * price.cached_input + usage.completion_tokens * price.output) / 1_000_000
++    # Round half-up to exactly 6 decimal places
++    return cost.quantize(Decimal('0.000001'))
+diff --git a/gateway/service.py b/gateway/service.py
+index d1fae5e..56d95fc 100644
+--- a/gateway/service.py
++++ b/gateway/service.py
+@@ -2,11 +2,13 @@
+ 
+ from dataclasses import dataclass, field
+ from datetime import datetime, timezone
+-from typing import Callable, Dict
++from typing import Callable, Dict, Tuple
+ 
+-from .ledger import Ledger
+-from .upstream import Upstream
++from .ledger import Ledger, Entry
++from .upstream import Upstream, UpstreamError, Usage
+ from .users import UserDirectory
++from .pricing import request_cost, PRICES
++from decimal import Decimal
+ 
+ 
+ @dataclass
+@@ -27,12 +29,79 @@ class Gateway:
+         self.upstream = upstream
+         self.ledger = ledger
+         self.clock = clock
++        # Store successful responses for idempotent replay
++        self._idempotent_store: Dict[Tuple[str, str], Response] = {}
+ 
+     def handle(self, request: dict) -> Response:
+-        completion = self.upstream(request)
+-        usage = completion.usage
+-        return Response(200, {
+-            "content": completion.content,
+-            "usage": {"prompt_tokens": usage.prompt_tokens, "cached_tokens": usage.cached_tokens,
+-                      "completion_tokens": usage.completion_tokens},
+-        })
++        user_id = request.get("user")
++        # Unknown user
++        try:
++            _ = self.directory.get(user_id)
++        except KeyError:
++            return Response(403, {"error": "unknown_user"})
++
++        model = request.get("model")
++        if model not in PRICES:
++            return Response(400, {"error": "unknown_model"})
++
++        request_id = request.get("request_id")
++        if request_id is not None:
++            stored = self._idempotent_store.get((user_id, request_id))
++            if stored:
++                headers = dict(stored.headers)
++                headers["X-Idempotent-Replay"] = "true"
++                return Response(stored.status, stored.body, headers)
++
++        month = self.clock().strftime("%Y-%m")
++        budget = self.directory.budget(user_id)
++        # Admission control: worst case cost
++        worst_usage = Usage(prompt_tokens=request.get("input_tokens", 0), cached_tokens=0,
++                            completion_tokens=request.get("max_tokens", 0))
++        worst_cost = request_cost(model, worst_usage)
++        spent = self.ledger.spent(user_id, month)
++        if budget is not None and spent + worst_cost > budget:
++            remaining = budget - spent
++            if remaining < Decimal("0"):
++                remaining = Decimal("0")
++            return Response(402, {"error": "budget_exceeded", "remaining": f"{remaining.quantize(Decimal('0.000001'))}"})
++
++        attempts = 0
++        max_attempts = 3
++        while attempts < max_attempts:
++            attempts += 1
++            try:
++                completion = self.upstream(request)
++                usage = completion.usage
++                cost = request_cost(model, usage)
++                entry = Entry(user_id=user_id, month=month, model=model, usage=usage, cost=cost, status="ok")
++                self.ledger.record(entry)
++                body = {
++                    "content": completion.content,
++                    "usage": {"prompt_tokens": usage.prompt_tokens, "cached_tokens": usage.cached_tokens,
++                              "completion_tokens": usage.completion_tokens},
++                    "cost_usd": f"{cost.quantize(Decimal('0.000001'))}",
++                }
++                headers: Dict[str, str] = {}
++                if budget is not None:
++                    new_spent = self.ledger.spent(user_id, month)
++                    remaining = budget - new_spent
++                    if remaining < Decimal("0"):
++                        remaining = Decimal("0")
++                    headers["X-Budget-Remaining"] = f"{remaining.quantize(Decimal('0.000001'))}"
++                    if new_spent >= budget:
++                        headers["X-Budget-Warning"] = "100%"
++                    elif new_spent >= budget * Decimal("0.8"):
++                        headers["X-Budget-Warning"] = "80%"
++                response = Response(200, body, headers)
++                if request_id is not None:
++                    self._idempotent_store[(user_id, request_id)] = response
++                return response
++            except UpstreamError as e:
++                if e.usage is not None:
++                    cost = request_cost(model, e.usage)
++                    entry = Entry(user_id=user_id, month=month, model=model, usage=e.usage, cost=cost, status="failed_attempt")
++                    self.ledger.record(entry)
++                if not e.retryable or attempts >= max_attempts:
++                    return Response(502, {"error": "upstream_failed", "attempts": attempts})
++                # else retry
++        return Response(502, {"error": "upstream_failed", "attempts": attempts})
+diff --git a/gateway/users.py b/gateway/users.py
+index af34b59..6dd18cf 100644
+--- a/gateway/users.py
++++ b/gateway/users.py
+@@ -38,4 +38,7 @@ class UserDirectory:
+         self._overrides[user_id] = budget
+ 
+     def budget(self, user_id: str) -> Optional[Decimal]:
++        # Return per-user override if present (including None for unlimited), otherwise role default.
++        if user_id in self._overrides:
++            return self._overrides[user_id]
+         return ROLE_BUDGETS[self.get(user_id).role]

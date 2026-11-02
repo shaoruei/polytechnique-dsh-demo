@@ -47,3 +47,18 @@ class FixtureIsolationTest(unittest.TestCase):
                 self.assertNotIn(hidden.name, names, task.name)
             text = "\n".join(p.read_text() for p in (task / "workspace").rglob("*.py"))
             self.assertNotIn("hidden", text.lower(), task.name)
+
+
+class WorkloadRunsTest(unittest.TestCase):
+    def test_formal_runs_used_frozen_fixtures(self):
+        import json
+        sys.path.insert(0, str(ROOT / "harness"))
+        import run_task
+        for task in ("m1-late-penalties", "h1-usage-budgets"):
+            current = run_task.fixture_hash(ROOT / "tasks" / task)
+            seen = set()
+            for f in (ROOT / "runs").glob("*/result.json"):
+                r = json.loads(f.read_text())
+                if r.get("task") == task and (r.get("cohort") or "").startswith("workload-"):
+                    seen.add(r.get("fixture_sha256"))
+            self.assertEqual(seen, {current}, task)

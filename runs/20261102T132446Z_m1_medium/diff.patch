@@ -1,0 +1,156 @@
+diff --git a/submissions/csvio.py b/submissions/csvio.py
+index 3457051..5a1cf16 100644
+--- a/submissions/csvio.py
++++ b/submissions/csvio.py
+@@ -6,23 +6,68 @@ from .models import Assignment, Submission
+ from .timeparse import parse_timestamp
+ 
+ 
++import csv
++import io
++from typing import List
++
+ def _rows(text: str) -> List[List[str]]:
+-    lines = text.splitlines()
+-    return [line.split(",") for line in lines[1:]]
++    """Parse CSV text according to SPEC.md.
++    Returns list of rows (excluding header) with whitespace stripped, ignoring blank lines.
++    """
++    f = io.StringIO(text)
++    reader = csv.reader(f)
++    rows: List[List[str]] = []
++    for line_no, row in enumerate(reader, start=1):
++        if line_no == 1:
++            # header row, ignore
++            continue
++        if not row:
++            # blank line
++            continue
++        # Strip whitespace around each field
++        rows.append([field.strip() for field in row])
++    return rows
+ 
+ 
+ def read_submissions(text: str) -> List[Submission]:
+     """Parse the submissions export (header: student_id,name,assignment,submitted_at,score)."""
+-    out = []
+-    for row in _rows(text):
+-        student_id, name, assignment, submitted_at, score = row
+-        out.append(Submission(student_id, name, assignment, parse_timestamp(submitted_at), float(score)))
++    out: List[Submission] = []
++    for line_no, row in enumerate(_rows(text), start=2):  # data rows start at line 2
++        if len(row) != 5:
++            raise ValueError(f"line {line_no}: expected 5 fields, got {len(row)}")
++        student_id, name, assignment, submitted_at_str, score_str = row
++        # Parse timestamp, ensure timezone present
++        try:
++            submitted_at = parse_timestamp(submitted_at_str)
++        except Exception as e:
++            raise ValueError(f"line {line_no}: invalid timestamp") from e
++        if submitted_at.tzinfo is None:
++            raise ValueError(f"line {line_no}: missing timezone info")
++        # Parse score
++        try:
++            score = float(score_str)
++        except Exception as e:
++            raise ValueError(f"line {line_no}: invalid score") from e
++        out.append(Submission(student_id, name, assignment, submitted_at, score))
+     return out
+ 
+ 
+ def read_assignments(text: str) -> Dict[str, Assignment]:
+     """Parse the assignments file (header: assignment,deadline,max_score)."""
+-    out = {}
+-    for name, deadline, max_score in _rows(text):
+-        out[name] = Assignment(name, parse_timestamp(deadline), float(max_score))
++    out: Dict[str, Assignment] = {}
++    for line_no, row in enumerate(_rows(text), start=2):
++        if len(row) != 3:
++            raise ValueError(f"line {line_no}: expected 3 fields, got {len(row)}")
++        name, deadline_str, max_score_str = row
++        try:
++            deadline = parse_timestamp(deadline_str)
++        except Exception as e:
++            raise ValueError(f"line {line_no}: invalid deadline") from e
++        if deadline.tzinfo is None:
++            raise ValueError(f"line {line_no}: missing timezone info")
++        try:
++            max_score = float(max_score_str)
++        except Exception as e:
++            raise ValueError(f"line {line_no}: invalid max_score") from e
++        out[name] = Assignment(name, deadline, max_score)
+     return out
+diff --git a/submissions/grading.py b/submissions/grading.py
+index 4e08f49..4a05f77 100644
+--- a/submissions/grading.py
++++ b/submissions/grading.py
+@@ -9,9 +9,29 @@ from .policy import LatePolicy
+ def final_grades(submissions: Iterable[Submission], assignments: Dict[str, Assignment],
+                  policy: LatePolicy, roster: Optional[Iterable[str]] = None) -> Dict[Tuple[str, str], float]:
+     """Final score per (student_id, assignment); the latest submission counts."""
+-    latest: Dict[Tuple[str, str], Submission] = {}
++    # Validate assignments existence and score bounds, compute adjusted scores, keep highest.
++    best: Dict[Tuple[str, str], float] = {}
+     for sub in submissions:
++        # Assignment must exist
++        if sub.assignment not in assignments:
++            raise ValueError(f"Unknown assignment {sub.assignment}")
++        assignment_obj = assignments[sub.assignment]
++        # Validate raw score bounds
++        if sub.score < 0 or sub.score > assignment_obj.max_score:
++            raise ValueError(f"Invalid score {sub.score} for assignment {sub.assignment}")
++        # Compute penalty and adjusted score
++        penalty = policy.penalty(sub.submitted_at, assignment_obj.deadline)
++        adjusted = sub.score * (1 - penalty)
+         key = (sub.student_id, sub.assignment)
+-        if key not in latest or sub.submitted_at > latest[key].submitted_at:
+-            latest[key] = sub
+-    return {key: round(sub.score, 2) for key, sub in latest.items()}
++        # Keep highest adjusted score
++        if key not in best or adjusted > best[key]:
++            best[key] = adjusted
++    # Apply roster if given
++    if roster is not None:
++        for student in roster:
++            for assignment_name in assignments:
++                key = (student, assignment_name)
++                if key not in best:
++                    best[key] = 0.0
++    # Round to 2 decimals
++    return {k: round(v, 2) for k, v in best.items()}
+diff --git a/submissions/policy.py b/submissions/policy.py
+index f6b0165..6ea0db4 100644
+--- a/submissions/policy.py
++++ b/submissions/policy.py
+@@ -1,7 +1,7 @@
+ """Late-submission policy."""
+ 
+ from dataclasses import dataclass
+-from datetime import datetime
++from datetime import datetime, timedelta
+ 
+ 
+ @dataclass(frozen=True)
+@@ -13,4 +13,21 @@ class LatePolicy:
+ 
+     def penalty(self, submitted_at: datetime, deadline: datetime) -> float:
+         """Fraction of the score removed for a late submission (see SPEC.md)."""
+-        return 0.0
++        # Compute lateness
++        if submitted_at <= deadline:
++            return 0.0
++        # Grace period
++        grace_delta = timedelta(minutes=self.grace_minutes)
++        if submitted_at <= deadline + grace_delta:
++            return 0.0
++        late_by = submitted_at - deadline
++        # Days late: ceil(late_by / 1 day)
++        days_late = (late_by + timedelta(days=1) - timedelta(seconds=1)).days  # alternative: use math.ceil
++        # Using math.ceil for clarity
++        import math
++        days_late = math.ceil(late_by.total_seconds() / 86400)
++        # Zero after cutoff
++        if late_by > timedelta(days=self.zero_after_days):
++            return 1.0
++        penalty = min(days_late * self.penalty_per_day, self.max_penalty)
++        return penalty

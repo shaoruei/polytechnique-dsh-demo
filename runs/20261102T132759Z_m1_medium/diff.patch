@@ -1,0 +1,191 @@
+diff --git a/submissions/csvio.py b/submissions/csvio.py
+index 3457051..5b588a1 100644
+--- a/submissions/csvio.py
++++ b/submissions/csvio.py
+@@ -7,22 +7,63 @@ from .timeparse import parse_timestamp
+ 
+ 
+ def _rows(text: str) -> List[List[str]]:
+-    lines = text.splitlines()
+-    return [line.split(",") for line in lines[1:]]
++    """Parse CSV text into rows, handling quoted fields and stripping whitespace.
++
++    Returns a list of rows (each a list of strings) for all non‑empty data lines
++    after the header. Blank lines are ignored. Whitespace around each field is
++    stripped, matching the specification.
++    """
++    import csv
++    from io import StringIO
++    # Use csv reader to respect quoting and commas inside quoted fields.
++    f = StringIO(text)
++    reader = csv.reader(f)
++    rows: List[List[str]] = []
++    for i, row in enumerate(reader):
++        if i == 0:
++            # Skip header line
++            continue
++        # Skip blank lines (row may be empty)
++        if not row:
++            continue
++        # Strip whitespace around each field
++        rows.append([field.strip() for field in row])
++    return rows
+ 
+ 
+ def read_submissions(text: str) -> List[Submission]:
+     """Parse the submissions export (header: student_id,name,assignment,submitted_at,score)."""
+-    out = []
+-    for row in _rows(text):
+-        student_id, name, assignment, submitted_at, score = row
+-        out.append(Submission(student_id, name, assignment, parse_timestamp(submitted_at), float(score)))
++    out: List[Submission] = []
++    for idx, row in enumerate(_rows(text), start=2):  # data rows start at line 2
++        if len(row) != 5:
++            raise ValueError(f"line {idx}: expected 5 fields, got {len(row)}")
++        student_id, name, assignment, submitted_at_str, score_str = row
++        try:
++            submitted_at = parse_timestamp(submitted_at_str)
++        except ValueError as e:
++            raise ValueError(f"line {idx}: {e}")
++        try:
++            score = float(score_str)
++        except ValueError as e:
++            raise ValueError(f"line {idx}: {e}")
++        out.append(Submission(student_id, name, assignment, submitted_at, score))
+     return out
+ 
+ 
+ def read_assignments(text: str) -> Dict[str, Assignment]:
+     """Parse the assignments file (header: assignment,deadline,max_score)."""
+-    out = {}
+-    for name, deadline, max_score in _rows(text):
+-        out[name] = Assignment(name, parse_timestamp(deadline), float(max_score))
++    out: Dict[str, Assignment] = {}
++    for idx, row in enumerate(_rows(text), start=2):
++        if len(row) != 3:
++            raise ValueError(f"line {idx}: expected 3 fields, got {len(row)}")
++        name, deadline_str, max_score_str = row
++        try:
++            deadline = parse_timestamp(deadline_str)
++        except ValueError as e:
++            raise ValueError(f"line {idx}: {e}")
++        try:
++            max_score = float(max_score_str)
++        except ValueError as e:
++            raise ValueError(f"line {idx}: {e}")
++        out[name] = Assignment(name, deadline, max_score)
+     return out
+diff --git a/submissions/grading.py b/submissions/grading.py
+index 4e08f49..6cbaa2d 100644
+--- a/submissions/grading.py
++++ b/submissions/grading.py
+@@ -6,12 +6,44 @@ from .models import Assignment, Submission
+ from .policy import LatePolicy
+ 
+ 
+-def final_grades(submissions: Iterable[Submission], assignments: Dict[str, Assignment],
+-                 policy: LatePolicy, roster: Optional[Iterable[str]] = None) -> Dict[Tuple[str, str], float]:
+-    """Final score per (student_id, assignment); the latest submission counts."""
+-    latest: Dict[Tuple[str, str], Submission] = {}
++def final_grades(
++    submissions: Iterable[Submission],
++    assignments: Dict[str, Assignment],
++    policy: LatePolicy,
++    roster: Optional[Iterable[str]] = None,
++) -> Dict[Tuple[str, str], float]:
++    """Compute final grades per (student_id, assignment).
++
++    Validates inputs, applies the late‑submission policy, selects the highest
++    adjusted score for each student/assignment pair and optionally fills missing
++    entries from a roster.
++    """
++    # Determine the best adjusted score for each (student, assignment).
++    best: Dict[Tuple[str, str], float] = {}
+     for sub in submissions:
++        # Ensure the assignment exists.
++        if sub.assignment not in assignments:
++            raise ValueError(f"unknown assignment: {sub.assignment}")
++        assignment_obj = assignments[sub.assignment]
++        # Validate raw score bounds.
++        if not (0 <= sub.score <= assignment_obj.max_score):
++            raise ValueError(
++                f"score {sub.score} out of bounds for assignment {sub.assignment} (max {assignment_obj.max_score})"
++            )
++        # Apply late penalty.
++        penalty = policy.penalty(sub.submitted_at, assignment_obj.deadline)
++        adjusted = sub.score * (1 - penalty)
+         key = (sub.student_id, sub.assignment)
+-        if key not in latest or sub.submitted_at > latest[key].submitted_at:
+-            latest[key] = sub
+-    return {key: round(sub.score, 2) for key, sub in latest.items()}
++        # Keep the highest adjusted score.
++        if key not in best or adjusted > best[key]:
++            best[key] = adjusted
++    # If a roster is supplied, ensure every student/assignment pair appears.
++    if roster is not None:
++        for student_id in roster:
++            for assignment_name in assignments:
++                key = (student_id, assignment_name)
++                if key not in best:
++                    best[key] = 0.0
++    # Round final scores to two decimals.
++    return {key: round(score, 2) for key, score in best.items()}
++
+diff --git a/submissions/policy.py b/submissions/policy.py
+index f6b0165..7f9074b 100644
+--- a/submissions/policy.py
++++ b/submissions/policy.py
+@@ -1,7 +1,7 @@
+ """Late-submission policy."""
+ 
+ from dataclasses import dataclass
+-from datetime import datetime
++from datetime import datetime, timedelta
+ 
+ 
+ @dataclass(frozen=True)
+@@ -12,5 +12,22 @@ class LatePolicy:
+     zero_after_days: int = 7
+ 
+     def penalty(self, submitted_at: datetime, deadline: datetime) -> float:
+-        """Fraction of the score removed for a late submission (see SPEC.md)."""
+-        return 0.0
++        """Fraction of the score removed for a late submission (see SPEC.md).
++
++        Returns a value in ``[0.0, 1.0]`` representing the fraction of the original
++        score that should be deducted.
++        """
++        # Compute raw lateness
++        late_by = submitted_at - deadline
++        # On time or within the grace period → no penalty
++        if late_by <= timedelta(minutes=self.grace_minutes):
++            return 0.0
++        # If lateness exceeds zero_after_days (strictly) → full penalty
++        if late_by > timedelta(days=self.zero_after_days):
++            return 1.0
++        # Compute started days late, counted from the deadline (not from end of grace)
++        # ``ceil`` of total seconds divided by a day.
++        from math import ceil
++        days_late = ceil(late_by.total_seconds() / 86400)
++        penalty = min(days_late * self.penalty_per_day, self.max_penalty)
++        return penalty
+diff --git a/submissions/timeparse.py b/submissions/timeparse.py
+index 01c7891..2327092 100644
+--- a/submissions/timeparse.py
++++ b/submissions/timeparse.py
+@@ -4,5 +4,13 @@ from datetime import datetime
+ 
+ 
+ def parse_timestamp(text: str) -> datetime:
+-    """Parse an ISO 8601 timestamp such as 2026-10-12T23:59:00+02:00."""
+-    return datetime.fromisoformat(text.strip())
++    """Parse an ISO 8601 timestamp with a required UTC offset.
++
++    The platform export mandates that timestamps include a timezone offset.
++    ``datetime.fromisoformat`` accepts naive timestamps, so we enforce the
++    presence of ``tzinfo`` and raise ``ValueError`` otherwise.
++    """
++    dt = datetime.fromisoformat(text.strip())
++    if dt.tzinfo is None:
++        raise ValueError("timestamp missing UTC offset")
++    return dt

@@ -1,14 +1,16 @@
 {
  "schema": 2,
  "note": "Public: measured spend = provider-reported usage x verified public prices (excludes a handful of tiny manual probe requests). Dedicated: GPU-hour billing, see data/dedicated_benchmark.json.",
- "runs": 36,
- "llm_requests": 346,
- "prompt_tokens": 2089516,
- "output_tokens": 66698,
- "total_cost_usd": 0.260056,
+ "runs": 44,
+ "llm_requests": 604,
+ "prompt_tokens": 5057328,
+ "output_tokens": 125019,
+ "total_cost_usd": 0.597958,
  "public_runs_by_cohort": {
   "public-control": 3,
-  "public-historical": 33
+  "public-historical": 33,
+  "workload-formal": 6,
+  "workload-pilot": 2
  },
  "dedicated": {
   "runs": 29,

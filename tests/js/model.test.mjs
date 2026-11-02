@@ -48,12 +48,13 @@ test('measured runs carry exact provider usage and an independently recomputed c
   const usable = runs.runs.filter((r) => r.usable && (r.endpoint ?? 'public') === 'public');
   assert.ok(usable.length >= 9, 'enough measured runs');
   for (const r of usable) {
-    assert.ok(Math.abs(r.metrics.cost_usd - r.metrics.cost_usd_recomputed) < 1e-6, r.run_id);
+    // both are rounded to 6 decimals, so an exact half-micro tie may round apart by 1e-6 (exact check: analysis/check_costs.py)
+    assert.ok(Math.abs(r.metrics.cost_usd - r.metrics.cost_usd_recomputed) <= 1.0001e-6, r.run_id);
     const t = r.trajectory.steps.reduce((a, s) => ({ u: a.u + s.u, c: a.c + s.c, o: a.o + s.o }), { u: 0, c: 0, o: 0 });
     assert.equal(t.u, r.metrics.uncached_input_tokens);
     assert.equal(t.c, r.metrics.cached_input_tokens);
     assert.equal(t.o, r.metrics.output_tokens);
-    assert.ok(Math.abs(cost.publicCost({ uncached: t.u, cached: t.c, output: t.o }, PRICES) - r.metrics.cost_usd) < 1e-6);
+    assert.ok(Math.abs(cost.publicCost({ uncached: t.u, cached: t.c, output: t.o }, PRICES) - r.metrics.cost_usd) <= 1.0001e-6);
   }
 });
 
@@ -299,4 +300,44 @@ test('replica granularity: 4xH100 capacity is bought 4 GPUs at a time and break-
   for (let v = top / 20000; v <= top; v += top / 20000) if (first === null && dedAt(v) <= pubAt(v)) { first = v; break; }
   if (be.tasks === null) assert.equal(first, null);
   else assert.ok(Math.abs(first - be.tasks) <= 2 * (top / 20000), `${first} vs ${be.tasks}`);
+});
+
+// ---------------------------------------------------------------- medium / heavy workloads (2026-11-02)
+const wc = JSON.parse(readFileSync(new URL('../../data/workload_comparison.json', import.meta.url)));
+
+test('workload traces: formal M1/H1 only, pilot excluded, baseline untouched', () => {
+  const wl = trajectoriesFrom(runs, { cohorts: ['workload-formal'] });
+  assert.equal(wl.filter((t) => t.task.startsWith('m1-')).length, 3);
+  assert.equal(wl.filter((t) => t.task.startsWith('h1-')).length, 3);
+  assert.ok(wl.every((t) => t.endpoint === 'public' && t.effort === 'medium'));
+  assert.equal(trajectoriesFrom(runs).length, 33);
+  assert.equal(wc.groups.small.runs, 18);
+  assert.equal(wc.groups.pilot.runs, 2);
+  assert.equal(wc.experiment.paid_attempts, 8);
+  assert.ok(wc.experiment.provider_reported_spend_usd < 3);
+});
+
+test('workload comparison costs equal tokens x prices for every group', () => {
+  for (const k of ['small', 'medium', 'heavy']) {
+    const g = wc.groups[k];
+    const recomputed = runs.runs.filter((r) => g.run_ids.includes(r.run_id))
+      .reduce((a, r) => a + cost.publicCost({ uncached: r.metrics.uncached_input_tokens, cached: r.metrics.cached_input_tokens,
+        output: r.metrics.output_tokens }, PRICES), 0);
+    assert.ok(Math.abs(recomputed - g.cost_total_usd) < 1e-6, `${k}: ${recomputed} vs ${g.cost_total_usd}`);
+  }
+});
+
+test('heavy traces replay through the simulator: deterministic and token-conserving', () => {
+  const heavy = trajectoriesFrom(runs, { cohorts: ['workload-formal'] }).filter((t) => t.task.startsWith('h1-'));
+  const sc = { ...baseScenario, students: 30, tasksPerStudent: 2, retryFailed: false };
+  const a = simulate(heavy, sc, { kind: 'public', rpm: 1e9, tpm: 1e12 }, PRICES).summary;
+  const b = simulate(heavy, sc, { kind: 'dedicated', profile: H100X4, replicas: 2 }, PRICES).summary;
+  assert.deepEqual(a.tokens, b.tokens);
+  assert.deepEqual(a, simulate(heavy, sc, { kind: 'public', rpm: 1e9, tpm: 1e12 }, PRICES).summary);
+  // a heavy task sends ~6x the tokens of a small one, so the same class hits a TPM limit much sooner
+  const small = trajectoriesFrom(runs).filter((t) => t.effort === 'medium');
+  const lim = { kind: 'public', rpm: 600, tpm: 500000 };
+  const sh = simulate(heavy, sc, lim, PRICES).summary;
+  const ss = simulate(small, sc, lim, PRICES).summary;
+  assert.ok(sh.meanWaitPerTask > ss.meanWaitPerTask, `${sh.meanWaitPerTask} vs ${ss.meanWaitPerTask}`);
 });
