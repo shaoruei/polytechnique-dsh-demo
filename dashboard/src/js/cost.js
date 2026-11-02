@@ -1,37 +1,33 @@
 // Page 4 · Cost curves: a month of class usage. Public pays per measured SWE-bench task; one dedicated replica
 // pays per billed hour and can only serve so many tasks in those hours (scenario capacity).
-const COST_KEYS = ['gpuHour', 'gpus', 'reqPerReplica'];
+const TASKS_PER_STUDENT = 40; // per month, assumption
+const BILLING = { class: { label: 'Class sessions only', hours: 32, note: '8 sessions × 4 h' }, always: { label: 'Always on', hours: 730, note: '24/7' } };
 PAGES.economics = {
   html: () => `
     <div class="section-head">
       <h2>4 · Pay per token or pay per GPU-hour?</h2>
-      <p>One month of class usage. Public cost grows with every task; one dedicated replica costs the same for its billed hours, and can only carry so many tasks in them.</p>
+      <p>One month of class usage. Public cost grows with every task; the dedicated replica costs the same for its billed hours, and can only carry so many tasks in them.</p>
     </div>
     <div class="grid econ-grid">
       <div class="stack">
-        <form class="panel controls" id="usage-form" autocomplete="off"><h3>Usage</h3>
-          <label class="field" for="u-tasks">SWE-bench tasks per student per month <output id="u-tasks-o"></output></label>
-          <input id="u-tasks" type="range" min="5" max="200" step="5" value="40">
-          <label class="field" for="u-hours">Billed dedicated hours per month <output id="u-hours-o"></output></label>
-          <input id="u-hours" type="range" min="8" max="730" step="2" value="32">
-          <p class="hint">e.g. 8 class sessions × 4 h; 730 h = always on.</p>
-        </form>
-        ${assumptionControls('economics', COST_KEYS)}
+        <div class="panel controls"><h3>Billing schedule</h3>
+          <select id="e-billing" aria-label="Billing schedule">${Object.entries(BILLING).map(([k, v]) => `<option value="${k}">${v.label} · ${v.hours} h/month</option>`).join('')}</select>
+          <p class="hint">Hours the replica is running and billed each month.</p>
+        </div>
+        ${scenarioControl('economics')}
       </div>
       <div class="econ-out">
         <div class="tiles tiles-3" id="e-tiles"></div>
-        <figure class="panel"><figcaption>Cost per month vs number of students</figcaption><div class="chart tall"><canvas id="c-curve"></canvas></div><p class="note" id="e-note"></p></figure>
+        <figure class="panel"><figcaption>Cost per month vs number of students · ${TASKS_PER_STUDENT} SWE-bench tasks per student per month ${ev('assumption')}</figcaption><div class="chart tall"><canvas id="c-curve"></canvas></div><p class="note" id="e-note"></p></figure>
       </div>
     </div>`,
   init() {
     bindAssumptions('economics', () => this.draw());
-    $('usage-form').addEventListener('input', () => this.draw());
+    $('e-billing').addEventListener('change', () => this.draw());
   },
   draw() {
-    const tasks = +$('u-tasks').value;
-    const hours = +$('u-hours').value;
-    $('u-tasks-o').textContent = tasks;
-    $('u-hours-o').textContent = `${hours} h`;
+    const tasks = TASKS_PER_STUDENT;
+    const hours = BILLING[$('e-billing').value].hours;
     const dedMonth = replicaHour() * hours;
     const perStudent = tasks * costPerTask; // public, per month
     const beStudents = dedMonth / perStudent; // where one replica costs the same as public
@@ -42,8 +38,8 @@ PAGES.economics = {
     const attractive = beStudents <= capStudents;
     $('e-tiles').innerHTML = [
       tile('Public per student', `${usd(perStudent, 2)} / month`, `${tasks} tasks × ${usd(costPerTask, 4)} measured`, 'measured'),
-      tile('One dedicated replica', `${usd(dedMonth, 0)} / month`, `${hours} h × ${usd(replicaHour(), 2)} (${scenarioName()})`, 'assumption'),
-      tile('Break-even', `${num(beStudents)} students`, `one replica fits ≈ ${num(capStudents)} · ${attractive ? 'feasible' : 'not feasible'}`, 'estimate'),
+      tile('One dedicated replica', `${usd(dedMonth, 0)} / month`, `${hours} h × ${usd(replicaHour(), 2)} console estimate`, 'assumption'),
+      tile('Break-even', `${num(beStudents)} students`, `one replica fits ≈ ${num(capStudents)} (${scenarioName()}) · ${attractive ? 'feasible' : 'not feasible'}`, 'estimate'),
     ].join('');
     const vline = (x, label, color, dash) => ({ label, data: [{ x, y: 0 }, { x, y: ymax }], borderColor: color, backgroundColor: color, borderWidth: 1.5, borderDash: dash, pointRadius: 0 });
     chart('c-curve', {

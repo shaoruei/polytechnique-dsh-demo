@@ -91,25 +91,36 @@ const fs = require('fs');
         // dedicated is not assumed faster: conservative is slower than public for a request alone (1.5 + 512/120 s vs measured)
         if (!(cons[0] > pub[0]) || Math.abs(cons[0] - (1.5 + 512 / 120)) > 1e-9 || cons[0] === base[0]) problems.push(`[${scheme}] endpoints: scenario model wrong (${pub[0]}, ${base[0]}, ${cons[0]})`);
         await page.selectOption('#a-endpoints-scenario', 'baseline');
+        const controls = await page.locator('#view-endpoints input, #view-endpoints select').count();
+        if (controls !== 1) problems.push(`[${scheme}] endpoints: ${controls} controls, expected only the scenario selector`);
+        const lim = await page.locator('#ep-limits .tile').count();
+        if (lim !== 3) problems.push(`[${scheme}] endpoints: rate-limit tiles missing`);
       }
       if (view === 'economics') {
-        await page.fill('#a-economics-gpuHour', '15');
-        await page.dispatchEvent('#a-economics-gpuHour', 'input');
-        await page.waitForTimeout(300);
-        const t = await page.locator('#e-tiles').innerText();
-        // break-even students = (15 $/GPU-h × 2 GPUs × 32 h) / (40 tasks × measured cost per task)
-        const expect = Math.round((15 * 2 * 32) / (40 * 0.0754 / 9)).toLocaleString('en-US');
-        if (!t.includes(`${expect.slice(0, 3)}`) || !/students/.test(t)) problems.push(`[${scheme}] economics: break-even did not follow the price (expected ≈${expect}; ${t.replace(/\n/g, ' ')})`);
-        let note = await page.locator('#e-note').innerText();
-        if (!/^Not a recommendation/.test(note)) problems.push(`[${scheme}] economics: infeasible break-even shown as attractive (${note})`);
-        await page.fill('#a-economics-gpuHour', '8.5');
-        await page.dispatchEvent('#a-economics-gpuHour', 'input');
-        await page.fill('#a-economics-reqPerReplica', '100');
-        await page.dispatchEvent('#a-economics-reqPerReplica', 'input');
-        await page.waitForTimeout(300);
-        note = await page.locator('#e-note').innerText();
-        if (!/^Dedicated is cheaper from 1,6\d\d to/.test(note)) problems.push(`[${scheme}] economics: feasible break-even not reported (${note})`);
+        // no technical sliders: one billing schedule and the shared scenario only
+        const sliders = await page.locator('#view-economics input[type=range]').count();
+        if (sliders) problems.push(`[${scheme}] economics: ${sliders} sliders, expected none`);
+        // mean measured public cost per SWE-bench task, from the 9 recorded runs embedded in the page
+        const costPerTask = await page.evaluate(() => { const r = window.DEMO_DATA.swe.runs; return r.reduce((a, x) => a + x.metrics.cost_usd, 0) / r.length; });
+        for (const scenario of ['conservative', 'baseline', 'optimistic']) {
+          await page.selectOption('#a-economics-scenario', scenario);
+          for (const billing of ['class', 'always']) {
+            await page.selectOption('#e-billing', billing);
+            await page.waitForTimeout(150);
+            const r = await page.evaluate(() => ({ tiles: document.getElementById('e-tiles').innerText, note: document.getElementById('e-note').innerText,
+              cap: document.querySelector('#view-economics [data-assume-values]').innerText }));
+            const hours = billing === 'class' ? 32 : 730;
+            const be = Math.round((17.4 * hours) / (40 * costPerTask)).toLocaleString('en-US');
+            if (!r.tiles.includes(`$${(17.4 * hours).toLocaleString('en-US', { maximumFractionDigits: 0 })} / month`)) problems.push(`[${scheme}] economics ${scenario}/${billing}: replica cost is not 17.40 × ${hours} h`);
+            if (!r.tiles.includes(be.slice(0, -1))) problems.push(`[${scheme}] economics ${scenario}/${billing}: break-even ≠ ${be} (${r.tiles.replace(/\n/g, ' ')})`);
+            // feasibility is consistent: cheaper is only claimed if the replica's capacity covers the break-even
+            const capTph = +r.cap.match(/≈ ([\d,]+) tasks\/h/)[1].replace(/,/g, '');
+            const feasible = capTph >= 17.4 / costPerTask;
+            if (feasible !== /^Dedicated is cheaper/.test(r.note) || (!feasible && !/^Not a recommendation/.test(r.note))) problems.push(`[${scheme}] economics ${scenario}/${billing}: verdict inconsistent with capacity (${capTph} tasks/h; ${r.note})`);
+          }
+        }
         await page.selectOption('#a-economics-scenario', 'baseline');
+        await page.selectOption('#e-billing', 'class');
       }
       if (view === 'classroom') {
         const before = await page.locator('#s-tiles').innerText();

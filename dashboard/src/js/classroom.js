@@ -1,6 +1,7 @@
 // Page 5 · Classroom: students replay the 9 recorded runs against the public limits; dedicated cost from the assumptions.
 const SWE_TRAJ = SWE.runs.map((r) => ({ task: r.instance_id, effort: r.effort, success: r.success, lead_s: r.trajectory.lead_s, steps: r.trajectory.steps }));
 let simTimer = null;
+const SESSION_HOURS = 2;
 PAGES.classroom = {
   html: () => `
     <div class="section-head">
@@ -14,9 +15,7 @@ PAGES.classroom = {
         <input id="s-students" type="range" min="5" max="200" step="5" value="30">
         <label class="field" for="s-tasks">Agent tasks per student <output id="s-tasks-o"></output></label>
         <input id="s-tasks" type="range" min="1" max="6" step="1" value="3">
-        <label class="field" for="s-hours">Session length <output id="s-hours-o"></output></label>
-        <input id="s-hours" type="range" min="1" max="3" step="0.5" value="2">
-        <p class="hint">Dedicated: one 2× B200 replica, scenario from pages 3–4 ${ev('assumption')}.</p>
+        <p class="hint" id="s-ded-hint"></p>
       </form>
       <div class="econ-out">
         <div class="tiles tiles-3" id="s-tiles"></div>
@@ -29,11 +28,11 @@ PAGES.classroom = {
     for (const b of document.querySelectorAll('.presets button')) b.addEventListener('click', () => { $('s-students').value = b.dataset.n; again(); });
   },
   draw() {
-    const sc = { students: +$('s-students').value, tasksPerStudent: +$('s-tasks').value, pattern: 'class', windowHours: +$('s-hours').value,
+    const sc = { students: +$('s-students').value, tasksPerStudent: +$('s-tasks').value, pattern: 'class', windowHours: SESSION_HOURS,
       syncMinutes: 3, releaseSpan: 0.8, reviewMinutes: 2, retryFailed: false, seed: 7 };
     $('s-students-o').textContent = sc.students;
     $('s-tasks-o').textContent = sc.tasksPerStudent;
-    $('s-hours-o').textContent = num(sc.windowHours, 1) + ' h';
+    $('s-ded-hint').innerHTML = `${SESSION_HOURS} h session. Dedicated: ${DEDICATED.hardware}, ${usd(DEDICATED.replicaHour, 2)}/h, ${scenarioName()} scenario (page 3) ${ev('assumption')}.`;
     for (const b of document.querySelectorAll('.presets button')) b.setAttribute('aria-pressed', String(+b.dataset.n === sc.students));
     const pubBackend = { kind: 'public', rpm: LIMITS.requests_per_minute, tpm: LIMITS.tokens_per_minute, tpmCountsCached: true };
     const res = simulate(SWE_TRAJ, sc, pubBackend, PR); // public, measured limits

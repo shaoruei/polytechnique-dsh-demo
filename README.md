@@ -10,13 +10,15 @@
 
 Sources: [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) (agent runs) and [`docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md`](docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md) (API load test). Build: `npm run build` (= `node dashboard/build.mjs`) inlines `dashboard/src/` (`index.html` shell, `style.css`, `js/core.js` plus one module per page) and the existing exports `data/swebench.json` and `data/deepseek_v4_endpoint_load/summary.json` into one offline `dashboard/dist/index.html`. `npm run export:swebench` regenerates `data/swebench.json` only when new runs are added. Dedicated speed, capacity and GPU-hour price are adjustable **Assumptions** (the dedicated endpoint was never measured). Scenarios for one 2× B200 replica:
 
-| Scenario | Speed per request | TTFT | Requests at that speed | GPU-hour |
-|---|---|---|---|---|
-| Conservative | 120 tok/s | 1.5 s | 10 | $9.00 |
-| Baseline | 200 tok/s | 1.0 s | 20 | $8.50 |
-| Optimistic | 300 tok/s | 0.6 s | 40 | $7.15 |
+Fixed dedicated configuration (Token Factory console): `deepseek-ai/DeepSeek-V4-Flash-0731`, 2× NVIDIA B200, one replica, us-central1, FP8, **$17.40 per replica-hour** ($8.70/GPU-hour, console estimate, not invoice billing). Performance scenarios for that same replica and price:
 
-Public reference (measured, ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s, so Conservative is slower than public. Dedicated is called attractive only when it is cheaper **and** the replica's scenario capacity covers the traffic (Cost curves and Classroom verdicts).
+| Scenario | Speed per request | TTFT | Requests at that speed |
+|---|---|---|---|
+| Conservative | 120 tok/s | 1.5 s | 10 |
+| Baseline | 200 tok/s | 1.0 s | 20 |
+| Optimistic | 300 tok/s | 0.6 s | 40 |
+
+Cost curves assume 40 SWE-bench tasks per student per month and a billing schedule of 32 h/month (class sessions) or 730 h/month (always on). Public reference (measured, ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s, so Conservative is slower than public. Dedicated is called attractive only when it is cheaper **and** the replica's scenario capacity covers the traffic (Cost curves and Classroom verdicts).
 
 Check locally in Firefox (the build is self-contained):
 

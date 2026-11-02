@@ -65,21 +65,16 @@ const publicTasksPerHour = () => Math.min(LIMITS.tokens_per_minute / tokensPerTa
 
 // ------------------------------------------------------------------ dedicated: assumptions only (never measured)
 // The DeepSeek dedicated endpoint never became ready, so every dedicated number is a labelled, adjustable assumption.
-// Scenarios for ONE 2x B200 replica (the offered DeepSeek-V4-Flash dedicated configuration). Inputs, not results.
-// Public reference (measured, agent-sized request ~10k in / 512 out): ~200 tok/s and TTFT ~1.2 s when alone.
+// The dedicated configuration from the Token Factory console. The price is the console's estimate, not an invoice.
+const DEDICATED = { hardware: '2× NVIDIA B200, 1 replica', region: 'us-central1', quantization: 'FP8', gpuHour: 8.7, replicaHour: 17.4 };
+// Performance scenarios for that same replica (same hardware, same price). Inputs, not measurements.
+// Public reference (measured, agent-sized request ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s.
 const SCENARIOS = {
-  conservative: { label: 'Conservative', reqSpeed: 120, ttft: 1.5, reqPerReplica: 10, gpuHour: 9.0, gpus: 2 },
-  baseline: { label: 'Baseline', reqSpeed: 200, ttft: 1.0, reqPerReplica: 20, gpuHour: 8.5, gpus: 2 },
-  optimistic: { label: 'Optimistic', reqSpeed: 300, ttft: 0.6, reqPerReplica: 40, gpuHour: 7.15, gpus: 2 },
+  conservative: { label: 'Conservative', reqSpeed: 120, ttft: 1.5, reqPerReplica: 10 },
+  baseline: { label: 'Baseline', reqSpeed: 200, ttft: 1.0, reqPerReplica: 20 },
+  optimistic: { label: 'Optimistic', reqSpeed: 300, ttft: 0.6, reqPerReplica: 40 },
 };
 const ASSUME = { scenario: 'baseline', ...SCENARIOS.baseline };
-const ASSUME_UI = {
-  reqSpeed: { label: 'Speed per request', min: 50, max: 500, step: 10, fmt: (v) => `${v} tok/s` },
-  ttft: { label: 'Time to first token', min: 0.2, max: 3, step: 0.1, fmt: (v) => `${num(v, 1)} s` },
-  reqPerReplica: { label: 'Requests the replica serves at that speed', min: 5, max: 100, step: 5, fmt: (v) => `${v}` },
-  gpuHour: { label: 'Price per GPU-hour', min: 2, max: 20, step: 0.05, fmt: (v) => usd(v, 2) },
-  gpus: { label: 'GPUs per replica', min: 1, max: 8, step: 1, fmt: (v) => `${v}` },
-};
 // dedicated agent-step latency (s) for a request of `out` output tokens with c requests running at once
 const dedicatedSpeed = (c) => ASSUME.reqSpeed * Math.min(1, ASSUME.reqPerReplica / c);
 const dedicatedLatency = (c, out = 512) => ASSUME.ttft + out / dedicatedSpeed(c);
@@ -88,29 +83,26 @@ const llmShare = mean(SWE.runs.map((r) => r.metrics.llm_time_s / r.wall_time_s))
 const meanTaskSeconds = mean(SWE.runs.map((r) => r.wall_time_s));
 const dedicatedAgents = () => ASSUME.reqPerReplica / llmShare; // agents working at once that keep it at its rated load
 const dedicatedTasksPerHour = () => (dedicatedAgents() * 3600) / meanTaskSeconds;
-const scenarioName = () => `${SCENARIOS[ASSUME.scenario].label}${ASSUME.adjusted ? ', adjusted' : ''}`;
-const replicaHour = () => ASSUME.gpuHour * ASSUME.gpus;
-/** Assumption panel for one page (ids are prefixed with the page, so pages never share element ids). */
-function assumptionControls(page, keys) {
-  return `<form class="panel controls assume" id="a-${page}" autocomplete="off"><h3>Dedicated · 2× B200 ${ev('assumption')}</h3>
-    <label class="field" for="a-${page}-scenario">Scenario</label>
-    <select id="a-${page}-scenario" data-assume="scenario">${Object.entries(SCENARIOS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select>${keys.map((k) => {
-    const u = ASSUME_UI[k];
-    return `<label class="field" for="a-${page}-${k}">${u.label} <output data-assume-out="${k}"></output></label>
-      <input id="a-${page}-${k}" data-assume="${k}" type="range" min="${u.min}" max="${u.max}" step="${u.step}">`;
-  }).join('')}<p class="hint">Scenario inputs, not measurements: no dedicated endpoint was run.</p></form>`;
+const scenarioName = () => SCENARIOS[ASSUME.scenario].label;
+const replicaHour = () => DEDICATED.replicaHour;
+/** Scenario selector with the scenario's values read-only, and the fixed configuration. Ids are prefixed per page. */
+function scenarioControl(page) {
+  return `<div class="panel controls assume" id="a-${page}"><h3>Dedicated scenario ${ev('assumption')}</h3>
+    <select id="a-${page}-scenario" data-assume="scenario" aria-label="Dedicated performance scenario">${Object.entries(SCENARIOS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select>
+    <dl class="kv" data-assume-values></dl>
+    <p class="hint">${DEDICATED.hardware} · ${DEDICATED.quantization} · ${DEDICATED.region}<br>${usd(DEDICATED.replicaHour, 2)} per replica-hour (${usd(DEDICATED.gpuHour, 2)}/GPU-h), console estimate, same for every scenario.</p></div>`;
 }
-/** Show the shared ASSUME values in every assumption control on the page. */
+/** Show the shared scenario in every scenario control. */
 function syncAssumptions() {
-  for (const el of document.querySelectorAll('[data-assume]')) el.value = ASSUME[el.dataset.assume];
-  for (const el of document.querySelectorAll('[data-assume-out]')) el.textContent = ASSUME_UI[el.dataset.assumeOut].fmt(ASSUME[el.dataset.assumeOut]);
+  for (const el of document.querySelectorAll('[data-assume]')) el.value = ASSUME.scenario;
+  for (const el of document.querySelectorAll('[data-assume-values]')) {
+    el.innerHTML = `<dt>Speed per request</dt><dd>${ASSUME.reqSpeed} tok/s</dd><dt>Time to first token</dt><dd>${num(ASSUME.ttft, 1)} s</dd>
+      <dt>Requests at that speed</dt><dd>${ASSUME.reqPerReplica}</dd><dt>Capacity</dt><dd>≈ ${num(dedicatedTasksPerHour())} tasks/h</dd>`;
+  }
 }
 function bindAssumptions(page, redraw) {
-  $(`a-${page}`).addEventListener('input', (e) => {
-    const k = e.target.dataset.assume;
-    if (!k) return;
-    if (k === 'scenario') Object.assign(ASSUME, SCENARIOS[e.target.value], { scenario: e.target.value, adjusted: false });
-    else Object.assign(ASSUME, { [k]: +e.target.value, adjusted: true });
+  $(`a-${page}-scenario`).addEventListener('change', (e) => {
+    Object.assign(ASSUME, SCENARIOS[e.target.value], { scenario: e.target.value });
     syncAssumptions();
     for (const p of Object.keys(PAGES)) dirty.add(p);
     redraw();

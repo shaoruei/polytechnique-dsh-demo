@@ -138,8 +138,7 @@ async function diagnosticsControl(browser, root) {
   }));
   // transient failure ends: restore the scale and redraw through a real input change
   await page.evaluate(() => { window.Chart.registry.getScale('linear').prototype.buildTicks = window.__origBuildTicks; });
-  await page.fill('#a-economics-gpuHour', '10');
-  await page.dispatchEvent('#a-economics-gpuHour', 'input');
+  await page.selectOption('#e-billing', 'always');
   await page.waitForTimeout(1200);
   const recovered = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
