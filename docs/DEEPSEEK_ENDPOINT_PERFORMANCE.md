@@ -103,7 +103,24 @@ was not the bottleneck.
 Charts: `docs/img/dsv4_scaling_profile_A.png`, `docs/img/dsv4_scaling_profile_B.png` (p50/p95 latency and aggregate
 throughput against concurrency).
 
-<!-- SCALING-FINDINGS -->
+**Public [M]** (14:48–15:00 UTC, 2 × 378 requests incl. 68 warm-ups per profile, 0 errors, 0 timeouts, 0 model mismatches):
+
+- **Single request:** profile A has TTFT 0.83 s, latency 2.1 s and decode ~196 tok/s. Profile B has TTFT 1.2 s,
+  latency 3.9 s and decode ~203 tok/s. TTFT grows with prompt length (≈3k → ≈10k tokens: +0.4 s).
+- **Throughput scales almost linearly to C = 5**: ×4.2 (A) and ×4.0 (B) aggregate output against C = 1.
+  - It keeps rising to C = 10: ×6.7 and ×6.6.
+  - Profile A flattens between C = 20 and C = 30: 1,317 → 1,395 tok/s, +6% for +50% concurrency.
+  - Profile B is irregular: 861 → 955 → 1,402 tok/s at C = 10/20/30.
+- **Per-stream speed degrades first.** Decode p50 falls from ~200 tok/s to 150 (C = 10), 113/77 (C = 20, A/B) and
+  88/63 tok/s (C = 30).
+  - Latency p95, A: 2.7 s (C = 1), 3.5 s (C = 10), 4.6 s (C = 20), **7.9 s (C = 30)**.
+  - Latency p95, B: 5.1 s (C = 1), 6.7 s (C = 10), **13.6 s (C = 20)**, 13.2 s (C = 30). Latency p50 for B doubles
+    from C = 10 (4.9 s) to C = 20 (9.4 s).
+- **This is serving-capacity saturation, not rate limiting.** There was no 429 at any level, and the limiter headers
+  stayed far from zero: at B, C = 30 (≈1.7M TPM offered), the minimum remaining was 1.745M tokens and 981 requests.
+  The public pool slows each stream as this account adds concurrent streams. The irregular B curve (C = 20 slower
+  than both neighbours) is one run per level on a shared multi-tenant pool. It is consistent with backend load
+  or routing varying over time and cannot be separated from client side.
 
 ## 4. Experiment B: Public rate-limit behaviour [M]
 
@@ -111,7 +128,36 @@ throughput against concurrency).
 
 Chart: `docs/img/dsv4_ratelimit_429.png`.
 
-<!-- RATELIMIT-FINDINGS -->
+**Both limiters are token buckets holding one minute of quota, refilled continuously [M].**
+
+| | Request limiter | Token limiter |
+|---|---|---|
+| Limit (headers) | 1,000 requests/min | 2,000,000 tokens/min |
+| Bucket behaviour | `remaining-requests` stayed ≥ 976 up to 1,000 RPM. It fell to 869 at 1,100 and 770 at 1,250 (60 s steps). At 1,500 RPM it declined linearly by ≈8.3/s (= 25/s offered − 16.7/s refill), from 917 to 0 in ≈120 s | `remaining-tokens` ≥ 1.92M up to 190 RPM of Bc (≈1.94M TPM offered). At 300 RPM (≈3.1M TPM) it fell from 1.70M to 0 in ≈105 s |
+| First 429 | 123 s into the 1,500 RPM step | 106 s into the 300 RPM step |
+| What counts | every request, including ones later rejected | prompt + `max_tokens` (reserved up front). **Cached prompt tokens count in full**: 88% of Bc prompt tokens were cache hits, and the bucket still drained at the uncached rate |
+| 429 body | `rate_limit_error`, "You exceeded your requests quota for `deepseek-ai/DeepSeek-V4-Flash-0731`" | same, "…tokens quota…" |
+
+- **429 handling:** no `Retry-After` header. `x-ratelimit-reset-requests` / `-tokens` read 60–61 s, the time to
+  refill the bucket completely.
+- **Over-limit requests are held, then rejected or admitted.** Every 429 arrived ≥ 10.3 s after the request was
+  sent (p50 10.5 s). Successful requests started after the bucket emptied had p95 latency 10.5 s, against 4.0 s
+  before. The gateway appears to queue an over-limit request for ~10 s, waiting for quota, before it answers 429.
+  A client sees **10-second stalls**, not fast rejections.
+- **Dynamic scaling did not trigger.** `x-ratelimit-dynamic-scale-*` stayed 1.00. The highest usage reported for
+  a 15-minute period was 54% of requests and 24% of tokens, below the documented 80% trigger.
+- **Serving errors distinct from rate limiting [M]:**
+  - HTTP 529 "worker overloaded" ×3 (2 at R 1,500 RPM, 1 at Bc 300 RPM)
+  - HTTP 502 "upstream request failed" ×2 (R 1,100 RPM)
+  - 5 of 11,430 public requests (0.04%), all at ≥ 1,100 RPM or above the TPM limit
+- **Latency rises with offered rate before any limit.** Tiny requests went from p50 0.75 s (100 RPM) to 1.50 s
+  (1,000 RPM).
+  - TTFT stayed flat (0.70 → 0.85 s, including connection setup). The growth is in the time from first token to
+    end of stream (0.04 → 0.55 s for 8 tokens).
+  - Bc requests went from p50 3.5 s (25% of TPM) to 5.2 s (95% of TPM), and p95 from 5.0 to 9.0 s.
+  - This is serving load, not the limiter. The client's arrival schedule kept p99 dispatch lag ≤ 4 ms.
+- The ramp stopped by its own rule ≈25 s (requests) and ≈20 s (tokens) after the first 429, then paused 60 s.
+  181 requests in total received 429.
 
 ## 5. Observed sustainable range [M][E]
 
