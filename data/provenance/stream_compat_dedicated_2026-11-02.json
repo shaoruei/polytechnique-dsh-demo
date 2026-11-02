@@ -1,0 +1,645 @@
+{
+ "endpoint": "dedicated",
+ "label": "Dedicated endpoint ecole-demo (4x H100, 1 replica, eu-north1)",
+ "origin": "https://api.tokenfactory.nebius.com",
+ "model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+ "run_at": "2026-11-02T10:52:07+00:00",
+ "models_listed": true,
+ "non_streaming": {
+  "status": 200,
+  "latency_s": 2.157,
+  "response_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+  "usage": {
+   "completion_tokens": 19,
+   "prompt_tokens": 74,
+   "total_tokens": 93,
+   "completion_tokens_details": null,
+   "prompt_tokens_details": null
+  },
+  "finish_reason": "stop",
+  "content": "OK"
+ },
+ "streaming": {
+  "status": 200,
+  "latency_s": 0.343,
+  "ttft_s": 0.257,
+  "response_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+  "usage": {
+   "prompt_tokens": 74,
+   "total_tokens": 92,
+   "completion_tokens": 18
+  },
+  "finish_reason": "stop"
+ },
+ "tool_trials": [
+  {
+   "status": 200,
+   "latency_s": 0.576,
+   "ttft_s": 0.268,
+   "response_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 214,
+    "completion_tokens": 53
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 30,
+   "anomalies": 0,
+   "calls_seen_by_spec_client": 1,
+   "all_calls_valid_without_repair": true,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-b30b4b0e73b6f886",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grade"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "book"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "/"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grades"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ".py"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "1"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "limit"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "200"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "0"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "}"
+     }
+    }
+   ]
+  },
+  {
+   "status": 200,
+   "latency_s": 0.566,
+   "ttft_s": 0.271,
+   "response_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 214,
+    "completion_tokens": 53
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 30,
+   "anomalies": 0,
+   "calls_seen_by_spec_client": 1,
+   "all_calls_valid_without_repair": true,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-96181b5888e0d2e9",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grade"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "book"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "/"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grades"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ".py"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "1"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "limit"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "200"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "0"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "}"
+     }
+    }
+   ]
+  },
+  {
+   "status": 200,
+   "latency_s": 0.551,
+   "ttft_s": 0.256,
+   "response_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 214,
+    "completion_tokens": 53
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 30,
+   "anomalies": 0,
+   "calls_seen_by_spec_client": 1,
+   "all_calls_valid_without_repair": true,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-95b45c675aac81bb",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grade"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "book"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "/"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "grades"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ".py"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "0"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ",\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " \""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "limit"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " "
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "200"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "0"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "}"
+     }
+    }
+   ]
+  }
+ ],
+ "summary": {
+  "all_responses_from_expected_model": true,
+  "tool_trials": 3,
+  "tool_trials_with_index_anomaly": 0,
+  "relay_repair_needed": false
+ }
+}

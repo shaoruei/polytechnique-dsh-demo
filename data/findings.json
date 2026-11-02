@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-30T15:24:56.131Z",
+ "generatedAt": "2026-11-02T11:10:40.796Z",
  "perTaskMedium": {
   "n": 18,
   "tokens": {
@@ -16,6 +16,138 @@
  "costPerTask": 0.006091633333333334,
  "breakEven": [
   {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.749324039960312
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.749324039960312
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.749324039960312
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.2695688663988341
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.2695688663988341
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 90,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.2695688663988341
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 1.3311912964487018
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 1.3311912964487018
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 1,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 1.3311912964487018
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "class-only (8 x 2h + 15 min warm-up)",
+   "billedHours": 18,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.3014844293037465
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "business hours (10h x 22d)",
+   "billedHours": 220,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.3014844293037465
+  },
+  {
+   "gpu": "h100x4",
+   "speed": 143,
+   "efficiency": 2,
+   "schedule": "always-on 24/7",
+   "billedHours": 730,
+   "tasksPerMonth": null,
+   "permanentFrom": null,
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.3014844293037465
+  },
+  {
    "gpu": "h100",
    "speed": 90,
    "efficiency": 1,
@@ -23,7 +155,7 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.41407591014788153
   },
   {
@@ -34,7 +166,7 @@
    "billedHours": 220,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.41407591014788153
   },
   {
@@ -45,7 +177,7 @@
    "billedHours": 730,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.41407591014788153
   },
   {
@@ -89,7 +221,7 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6350894263164957
   },
   {
@@ -100,7 +232,7 @@
    "billedHours": 220,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6350894263164957
   },
   {
@@ -111,7 +243,7 @@
    "billedHours": 730,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6350894263164957
   },
   {
@@ -155,7 +287,7 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.465022231308177
   },
   {
@@ -166,7 +298,7 @@
    "billedHours": 220,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.465022231308177
   },
   {
@@ -177,7 +309,7 @@
    "billedHours": 730,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.465022231308177
   },
   {
@@ -188,8 +320,8 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
-   "breakEvenUtil": 0.21516978436527978
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
+   "breakEvenUtil": 0.21516978436527986
   },
   {
    "gpu": "h200",
@@ -198,9 +330,9 @@
    "schedule": "business hours (10h x 22d)",
    "billedHours": 220,
    "tasksPerMonth": 195021.5869854281,
-   "permanentFrom": 2537811.9198752707,
+   "permanentFrom": 2537811.9198752698,
    "reason": null,
-   "breakEvenUtil": 0.21516978436527978
+   "breakEvenUtil": 0.21516978436527986
   },
   {
    "gpu": "h200",
@@ -209,9 +341,9 @@
    "schedule": "always-on 24/7",
    "billedHours": 730,
    "tasksPerMonth": 647117.0840880114,
-   "permanentFrom": 8420921.370495217,
+   "permanentFrom": 8420921.370495213,
    "reason": null,
-   "breakEvenUtil": 0.21516978436527978
+   "breakEvenUtil": 0.21516978436527986
   },
   {
    "gpu": "h200",
@@ -221,7 +353,7 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6845433366030725
   },
   {
@@ -232,7 +364,7 @@
    "billedHours": 220,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6845433366030725
   },
   {
@@ -243,7 +375,7 @@
    "billedHours": 730,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.6845433366030725
   },
   {
@@ -254,7 +386,7 @@
    "billedHours": 18,
    "tasksPerMonth": null,
    "permanentFrom": null,
-   "reason": "never: one GPU saturates before its cost is covered by public pricing",
+   "reason": "never: one replica saturates before its cost is covered by public pricing",
    "breakEvenUtil": 0.22468185429579512
   },
   {
@@ -264,7 +396,7 @@
    "schedule": "business hours (10h x 22d)",
    "billedHours": 220,
    "tasksPerMonth": 195021.5869854281,
-   "permanentFrom": 5265805.575413005,
+   "permanentFrom": 5265805.575413004,
    "reason": null,
    "breakEvenUtil": 0.22468185429579512
   },
@@ -275,7 +407,7 @@
    "schedule": "always-on 24/7",
    "billedHours": 730,
    "tasksPerMonth": 647117.0840880114,
-   "permanentFrom": 17472900.31841588,
+   "permanentFrom": 17472900.318415876,
    "reason": null,
    "breakEvenUtil": 0.22468185429579512
   },
@@ -437,8 +569,23 @@
     "tasks": 157,
     "requests": 1409
    },
+   "dedicated_h100x4": {
+    "replicas": 1,
+    "gpus": 4,
+    "maxPerReplica": 4,
+    "beyondMeasured": false,
+    "costSession": 42.300000000000004,
+    "p50": 12.69999999998845,
+    "p95": 30.619999999972144,
+    "slowdownP95": 1.1208365271781784,
+    "vsPublicP95": 1.7202789641547853,
+    "slotUtil": 0.0013470347293664596
+   },
    "dedicated_h100": {
     "replicas": 1,
+    "gpus": 1,
+    "maxPerReplica": 4,
+    "beyondMeasured": null,
     "costSession": 10.125,
     "p50": 10.60000000000241,
     "p95": 27.55999999997493,
@@ -448,6 +595,9 @@
    },
    "dedicated_b200": {
     "replicas": 1,
+    "gpus": 1,
+    "maxPerReplica": 4,
+    "beyondMeasured": null,
     "costSession": 19.125,
     "p50": 10.099999999990814,
     "p95": 26.29999999997608,
@@ -480,8 +630,23 @@
     "tasks": 778,
     "requests": 6890
    },
+   "dedicated_h100x4": {
+    "replicas": 1,
+    "gpus": 4,
+    "maxPerReplica": 16,
+    "beyondMeasured": true,
+    "costSession": 42.300000000000004,
+    "p50": 13.799999999987449,
+    "p95": 33.07500000009746,
+    "slowdownP95": 1.3010397762543626,
+    "vsPublicP95": 1.991964285712474,
+    "slotUtil": 0.00713355392070138
+   },
    "dedicated_h100": {
     "replicas": 2,
+    "gpus": 2,
+    "maxPerReplica": 8,
+    "beyondMeasured": null,
     "costSession": 20.25,
     "p50": 11.300000000020603,
     "p95": 27.900000000006344,
@@ -491,6 +656,9 @@
    },
    "dedicated_b200": {
     "replicas": 1,
+    "gpus": 1,
+    "maxPerReplica": 11,
+    "beyondMeasured": null,
     "costSession": 19.125,
     "p50": 10.099999999990814,
     "p95": 26.29999999997608,
@@ -523,8 +691,23 @@
     "tasks": 1546,
     "requests": 13667
    },
+   "dedicated_h100x4": {
+    "replicas": 2,
+    "gpus": 8,
+    "maxPerReplica": 13,
+    "beyondMeasured": true,
+    "costSession": 84.60000000000001,
+    "p50": 13.59999999999971,
+    "p95": 31.575000000079058,
+    "slowdownP95": 1.270909411538496,
+    "vsPublicP95": 1.9354489917332294,
+    "slotUtil": 0.006806580483886124
+   },
    "dedicated_h100": {
     "replicas": 4,
+    "gpus": 4,
+    "maxPerReplica": 6,
+    "beyondMeasured": null,
     "costSession": 40.5,
     "p50": 11.200000000040745,
     "p95": 27.175000000068053,
@@ -534,6 +717,9 @@
    },
    "dedicated_b200": {
     "replicas": 1,
+    "gpus": 1,
+    "maxPerReplica": 20,
+    "beyondMeasured": null,
     "costSession": 19.125,
     "p50": 10.099999999990814,
     "p95": 26.29999999997608,
@@ -566,8 +752,23 @@
     "tasks": 3848,
     "requests": 34179
    },
+   "dedicated_h100x4": {
+    "replicas": 3,
+    "gpus": 12,
+    "maxPerReplica": 20,
+    "beyondMeasured": true,
+    "costSession": 126.9,
+    "p50": 14.50000000005275,
+    "p95": 34.565000000070796,
+    "slowdownP95": 1.4945917002214626,
+    "vsPublicP95": 2.252100840341471,
+    "slotUtil": 0.011623086304939575
+   },
    "dedicated_h100": {
     "replicas": 8,
+    "gpus": 8,
+    "maxPerReplica": 7,
+    "beyondMeasured": null,
     "costSession": 81,
     "p50": 11.6000000000422,
     "p95": 27.300000000006207,
@@ -577,6 +778,9 @@
    },
    "dedicated_b200": {
     "replicas": 2,
+    "gpus": 2,
+    "maxPerReplica": 22,
+    "beyondMeasured": null,
     "costSession": 38.25,
     "p50": 10.099999999999426,
     "p95": 26.29999999997608,
@@ -585,5 +789,25 @@
     "slotUtil": 0.011514677064606123
    }
   }
- ]
+ ],
+ "calibration": {
+  "t1-grade-average": {
+   "predictedDedicatedSolo": 8.886429154840744,
+   "measuredDedicatedSeqMedian": 9.688,
+   "measuredPublicMedian": 6.4775,
+   "ratioPredictedToMeasured": 0.9172614734558984
+  },
+  "t2-duration-parser": {
+   "predictedDedicatedSolo": 20.00803957742037,
+   "measuredDedicatedSeqMedian": 23.069,
+   "measuredPublicMedian": 13.439999999999998,
+   "ratioPredictedToMeasured": 0.8673128257583931
+  },
+  "t3-schedule-conflicts": {
+   "predictedDedicatedSolo": 11.992567865026807,
+   "measuredDedicatedSeqMedian": 13.223,
+   "measuredPublicMedian": 10.256999999999998,
+   "ratioPredictedToMeasured": 0.9069475811107015
+  }
+ }
 }

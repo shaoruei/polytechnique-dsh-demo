@@ -1,0 +1,16 @@
+{
+ "wave": "20261102T105615Z_c2_dedicated",
+ "endpoint": "dedicated",
+ "level": 2,
+ "tasks": [
+  "t2",
+  "t3"
+ ],
+ "run_ids": [
+  "20261102T105615Z_t2_medium_dedicated_c2a0",
+  "20261102T105615Z_t3_medium_dedicated_c2a1"
+ ],
+ "t_start": 1793616975.1390622,
+ "t_end": 1793616998.653588,
+ "wall_s": 23.515
+}

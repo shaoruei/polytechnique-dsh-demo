@@ -34,6 +34,7 @@ const data = {
   replays: json('data/replays.json').runs,
   tasks: json('data/tasks.json').tasks,
   rateLimitInference: json('data/rate_limit_inference.json'),
+  dedicatedBenchmark: json('data/dedicated_benchmark.json'),
   apiSnapshot: { retrieved_at: provenance.retrieved_at, pricing: provenance.entry.pricing, limits: provenance.entry.per_request_limits },
 };
 // keep the bundle small: per-request detail is only needed for the context-growth chart

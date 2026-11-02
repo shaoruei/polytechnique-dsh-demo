@@ -23,7 +23,7 @@ const fs = require('fs');
     page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_FAILED/.test(m.text())) problems.push(`[${scheme}] console: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`[${scheme}] pageerror: ${e.message}`));
     await page.goto('file://' + path.join(root, 'dashboard/dist/index.html'));
-    for (const view of ['run', 'measure', 'economics', 'classroom', 'method']) {
+    for (const view of ['run', 'measure', 'dedicated', 'economics', 'classroom', 'method']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 700);
       if (view === 'run') {
@@ -46,7 +46,7 @@ const fs = require('fs');
     }
     // phone width: no horizontal page scroll
     await page.setViewportSize({ width: 400, height: 900 });
-    for (const view of ['run', 'measure', 'classroom']) {
+    for (const view of ['run', 'measure', 'dedicated', 'classroom']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(600);
       const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

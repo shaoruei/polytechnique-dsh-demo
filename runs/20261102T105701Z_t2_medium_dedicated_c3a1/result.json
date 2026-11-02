@@ -1,0 +1,260 @@
+{
+  "schema": 1,
+  "run_id": "20261102T105701Z_t2_medium_dedicated_c3a1",
+  "label": "concurrency",
+  "task": "t2-duration-parser",
+  "model": "openai/gpt-oss-120b",
+  "endpoint": "dedicated",
+  "endpoint_label": "Dedicated endpoint ecole-demo (4x H100, 1 replica, eu-north1)",
+  "request_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+  "provider": "Nebius Token Factory (Dedicated endpoint ecole-demo (4x H100, 1 replica, eu-north1))",
+  "base_url": "https://api.tokenfactory.nebius.com/v1",
+  "cohort": "conc-3",
+  "wave": "20261102T105701Z_c3_dedicated",
+  "endpoint_verification": {
+    "expected_model": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+    "chat_requests": 7,
+    "request_model_matches": 7,
+    "responses_with_model": 7,
+    "response_model_matches": 7,
+    "guard_rejections": 0,
+    "upstreams": [
+      "https://api.tokenfactory.nebius.com"
+    ],
+    "verified": true
+  },
+  "reasoning_effort": "medium",
+  "dsh_version": "0.2.1-rc.5",
+  "permission_mode": "workspace-write",
+  "relay": true,
+  "started_at": "2026-11-02T10:57:01.126776+00:00",
+  "ended_at": "2026-11-02T10:57:23.609000+00:00",
+  "wall_time_s": 22.482,
+  "wall_time_source": "reconstructed: wave start -> last DSH session event (harness post-processing crashed)",
+  "timeout_s": 300,
+  "timed_out": false,
+  "dsh_exit_code": null,
+  "dsh_stderr_tail": "",
+  "turn_end_reason": {
+    "kind": "completed"
+  },
+  "agent_final_answer": "Implemented full `parse_duration` functionality with comprehensive validation, whitespace handling, unit order enforcement, and case-insensitivity. Added extensive unit tests covering valid parsing, round\u2011trip consistency, and numerous invalid scenarios. All tests now pass successfully.",
+  "success": false,
+  "acceptance": {
+    "ok": false,
+    "exit_code": 1,
+    "tests_run": 5,
+    "failures": 1,
+    "errors": 0,
+    "duration_s": 0.065,
+    "output_tail": "..F..\n======================================================================\nFAIL: test_invalid (test_hidden_duration.HiddenParseDurationTest.test_invalid) (text='1h  30m')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/tmp/tmpm2_hrhnj/judge/tests/test_hidden_duration.py\", line 21, in test_invalid\n    with self.assertRaises(ValueError):\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 5 tests in 0.002s\n\nFAILED (failures=1)\n"
+  },
+  "agent_test_suite": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 4,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.066,
+    "output_tail": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK\n"
+  },
+  "modified_test_files": [
+    "tests/test_duration.py"
+  ],
+  "diff_stats": {
+    "files_changed": 2,
+    "lines_added": 63,
+    "lines_removed": 2,
+    "untracked_files": []
+  },
+  "metrics": {
+    "usage_source": "provider (relay wire log)",
+    "llm_requests": 7,
+    "llm_requests_failed": 0,
+    "prompt_tokens": 40835,
+    "cached_input_tokens": 0,
+    "uncached_input_tokens": 40835,
+    "output_tokens": 2636,
+    "cache_hit_rate": 0.0,
+    "max_prompt_tokens": 7785,
+    "cost_usd": 0.007707,
+    "cost_usd_without_cache_discount": 0.007707,
+    "llm_time_s": 19.281,
+    "tool_time_s": 0.174,
+    "session_span_s": 19.953,
+    "ttft_s_p50": 0.372,
+    "ttft_s_p90": 0.394,
+    "ttft_s_mean": 0.372,
+    "decode_tps_p50": 174.2,
+    "decode_tps_mean": 173.9,
+    "latency_s_p50": 0.677,
+    "tool_calls": 6,
+    "tool_calls_failed": 0,
+    "tool_calls_by_name": {
+      "bash": 2,
+      "read": 2,
+      "edit": 2
+    },
+    "tool_index_repairs": 0,
+    "http": {
+      "errors": 0,
+      "statuses": [],
+      "recovery_s": [],
+      "messages": []
+    },
+    "requests": [
+      {
+        "t_start": 1793617023.9733024,
+        "status": 200,
+        "prompt_tokens": 4146,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 4146,
+        "completion_tokens": 69,
+        "latency_s": 0.768,
+        "ttft_s": 0.372,
+        "decode_tps": 174.2,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 3,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617024.8310122,
+        "status": 200,
+        "prompt_tokens": 4246,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 4246,
+        "completion_tokens": 37,
+        "latency_s": 0.547,
+        "ttft_s": 0.343,
+        "decode_tps": 181.9,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 5,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617025.4330199,
+        "status": 200,
+        "prompt_tokens": 4882,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 4882,
+        "completion_tokens": 36,
+        "latency_s": 0.574,
+        "ttft_s": 0.354,
+        "decode_tps": 164.2,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 7,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617026.04003,
+        "status": 200,
+        "prompt_tokens": 5144,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 5144,
+        "completion_tokens": 1795,
+        "latency_s": 12.172,
+        "ttft_s": 0.368,
+        "decode_tps": 152.1,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 9,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617038.2518473,
+        "status": 200,
+        "prompt_tokens": 6987,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 6987,
+        "completion_tokens": 600,
+        "latency_s": 3.901,
+        "ttft_s": 0.378,
+        "decode_tps": 170.3,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 11,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617042.1883526,
+        "status": 200,
+        "prompt_tokens": 7645,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 7645,
+        "completion_tokens": 48,
+        "latency_s": 0.642,
+        "ttft_s": 0.386,
+        "decode_tps": 187.2,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 0,
+        "n_messages": 13,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793617042.9296463,
+        "status": 200,
+        "prompt_tokens": 7785,
+        "cached_tokens": 0,
+        "uncached_input_tokens": 7785,
+        "completion_tokens": 51,
+        "latency_s": 0.677,
+        "ttft_s": 0.405,
+        "decode_tps": 187.3,
+        "finish_reason": "stop",
+        "tool_index_repairs": 0,
+        "n_messages": 15,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      }
+    ],
+    "tools": [
+      {
+        "name": "bash",
+        "step": 1,
+        "duration_s": 0.053,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 2,
+        "duration_s": 0.015,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 3,
+        "duration_s": 0.006,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 4,
+        "duration_s": 0.014,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 5,
+        "duration_s": 0.01,
+        "is_error": false
+      },
+      {
+        "name": "bash",
+        "step": 6,
+        "duration_s": 0.076,
+        "is_error": false
+      }
+    ]
+  },
+  "finalized_offline": "2026-11-02T11:01:18+00:00",
+  "events_lines_unparseable": 1
+}

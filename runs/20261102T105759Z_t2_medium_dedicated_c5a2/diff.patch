@@ -1,0 +1,99 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..f18eeb4 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,28 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_cases(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("45s"), 45)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("2d"), 2 * 86400)
++        self.assertEqual(parse_duration("1d 2h 3m 4s"), 1*86400 + 2*3600 + 3*60 + 4)
++        self.assertEqual(parse_duration("1h 30m"), 5400)
++        self.assertEqual(parse_duration("1H30M"), 5400)
++        self.assertEqual(parse_duration("120"), 120)
++        # round‑trip property for several values
++        for n in [0, 1, 59, 60, 61, 3599, 3600, 86400, 90061, 172800 + 3661]:
++            self.assertEqual(parse_duration(format_duration(n)), n)
++
++    def test_invalid_cases(self):
++        invalid = ["", " ", "-1h", "1.5h", "3w", "h", "1h1h", "30m1h", "1h 30"]
++        for txt in invalid:
++            with self.subTest(txt=txt):
++                self.assertRaises(ValueError, parse_duration, txt)
++
+ if __name__ == "__main__":
+     unittest.main()
++    unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..ead3935 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,52 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip whitespace and handle empty input
++    stripped = text.strip()
++    if not stripped:
++        raise ValueError("invalid duration: empty string")
++
++    # Bare integer interpreted as seconds
++    if stripped.isdigit():
++        # Leading zeros are fine, int conversion handles it
++        return int(stripped)
++
++    # Remove all whitespace for easier parsing
++    compact = "".join(stripped.split())
++    # Ensure the compact form consists only of <int><unit> sequences
++    import re
++    if not re.fullmatch(r"(?i)(?:\d+[dhms])+$", compact):
++        raise ValueError(f"invalid duration: {text!r}")
++
++    # Mapping of units to seconds and ordering index (smaller index = larger unit)
++    unit_seconds = {"d": 86400, "h": 3600, "m": 60, "s": 1}
++    order_index = {"d": 0, "h": 1, "m": 2, "s": 3}
++    seen = set()
++    last_idx = -1
++    total = 0
++    i = 0
++    while i < len(compact):
++        # parse number
++        start = i
++        while i < len(compact) and compact[i].isdigit():
++            i += 1
++        if start == i:
++            raise ValueError(f"invalid duration component in {text!r}")
++        number = int(compact[start:i])
++        # parse unit
++        if i >= len(compact):
++            # No unit after number – this should have been caught by the regex unless the whole string was a bare integer, which we handled earlier.
++            raise ValueError(f"missing unit in duration {text!r}")
++        unit = compact[i].lower()
++        i += 1
++        if unit not in unit_seconds:
++            raise ValueError(f"unknown unit {unit!r} in duration {text!r}")
++        if unit in seen:
++            raise ValueError(f"duplicate unit {unit!r} in duration {text!r}")
++        idx = order_index[unit]
++        if idx < last_idx:
++            raise ValueError(f"units out of order in duration {text!r}")
++        seen.add(unit)
++        last_idx = idx
++        total += number * unit_seconds[unit]
++    return total

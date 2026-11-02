@@ -1,0 +1,89 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..366a483 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,25 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_basic(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1d 2h 3m 4s"), 1*86400 + 2*3600 + 3*60 + 4)
++        self.assertEqual(parse_duration("1H 30M"), 5400)  # case-insensitive
++        # round‑trip property
++        for n in [0, 1, 59, 60, 61, 3599, 3600, 86400, 90061]:
++            self.assertEqual(parse_duration(format_duration(n)), n)
++
++    def test_invalid_cases(self):
++        invalids = ["", "   ", "-5s", "1.5h", "3w", "h", "30m1h", "1h1h", "1h 30m 10h"]
++        for s in invalids:
++            with self.subTest(s=s):
++                with self.assertRaises(ValueError):
++                    parse_duration(s)
++
++
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..2d1aa38 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,45 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Trim whitespace
++    txt = text.strip()
++    if not txt:
++        raise ValueError("invalid duration: empty string")
++
++    # If the string is just digits, interpret as seconds.
++    if txt.isdigit():
++        return int(txt)
++
++    # Mapping unit to seconds and order index
++    unit_to_seconds = {unit: seconds for unit, seconds in _UNITS}
++    unit_order = {unit: idx for idx, (unit, _) in enumerate(_UNITS)}
++
++    import re
++    token_re = re.compile(r"(\d+)([dhms])", re.IGNORECASE)
++    pos = 0
++    total = 0
++    seen_units = set()
++    last_order = -1
++    length = len(txt)
++    while pos < length:
++        # Skip whitespace between components
++        if txt[pos].isspace():
++            pos += 1
++            continue
++        m = token_re.match(txt, pos)
++        if not m:
++            raise ValueError(f"invalid duration component at position {pos}: '{txt[pos:]}'")
++        number_str, unit = m.groups()
++        unit = unit.lower()
++        if unit in seen_units:
++            raise ValueError(f"duplicate unit '{unit}' in duration")
++        order = unit_order[unit]
++        if order < last_order:
++            raise ValueError("units not in decreasing order")
++        seen_units.add(unit)
++        last_order = order
++        # number_str is digits only, safe to convert
++        value = int(number_str)
++        total += value * unit_to_seconds[unit]
++        pos = m.end()
++    return total

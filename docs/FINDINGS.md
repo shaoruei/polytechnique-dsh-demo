@@ -1,5 +1,7 @@
 # Findings
 
+> **Update 2026-11-02.** A real dedicated endpoint (4× H100) was benchmarked; see `docs/DEDICATED_BENCHMARK.md`. Sections 1–2 and the public parts of section 4 below are unchanged measurements. The dedicated parts of sections 3–4 were benchmark-based estimates (single H100 / B200 at list prices). They are superseded by the measured 4× H100 profile at $18.80 per replica-hour; the conclusion holds and is stronger: for classroom traffic, public with raised limits is cheaper, and dedicated buys capacity rather than cost.
+
 Data: 33 DSH runs on 2026-10-30 (`runs/`, summarised in `data/workload.json`). Model outputs were
 regenerated with `node analysis/key_findings.mjs` (`data/findings.json`). Labels: **[M]** measured,
 **[V]** verified published value, **[B]** third-party benchmark, **[E]** estimate/simulation,

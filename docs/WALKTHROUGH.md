@@ -36,37 +36,55 @@ Fallback without network: pick any recorded run and use **Replay** at 3×.
 - **Where the time goes.** The agent is LLM-bound: tool execution is a few hundred ms per task.
 - **Reasoning effort.** High effort costs ~3× more on T2 and still fails, so effort is not free accuracy.
 
-## 3. Public vs Dedicated (5 min), tab 3
+## 3. Dedicated, measured (4 min), tab 3
 
-- Start with the defaults (H100, $4.50/GPU-h list-price proxy, class-only schedule).
-  - The dedicated curve **steps up**: more volume needs more GPUs to keep 90 tok/s per user.
-  - Break-even: **none**. One H100 saturates before its cost is covered by $0.006 tasks.
-- Switch the GPU to **B200**. Break-even appears at about 25k tasks/month on class-only billing.
-- Move **serving efficiency** to 2× (e.g. speculative decoding, or the lighter prefill of agent traffic). Break-even moves sharply. *This is the assumption to validate with a real dedicated endpoint.*
-- **Cost per task vs utilisation.** A dedicated GPU must stay ~40–65% busy over its billed hours to match public pricing.
-- Read the feasibility box. Break-even is not feasibility:
-  - per-stream speed on dedicated (benchmark ~197 tok/s) is lower than the measured public endpoint (~460 tok/s);
-  - the public default limit covers only about 10 task starts per minute.
+The dedicated endpoint `ecole-demo` is **stopped** (to stop billing). Present the recorded runs from 2 November. A live dedicated run would need the endpoint re-enabled, with a few minutes of provisioning, billing at $0.31/min while it runs, and no guarantee that capacity is available.
 
-## 4. Classroom (6 min), tab 4
+- Tiles:
+  - same success (20/29 dedicated, the same T2 failure);
+  - similar TTFT (0.35 s);
+  - **decode 181 tok/s against ~409 on public**, so tasks take 1.3–1.7× longer;
+  - 0 errors, and 256/256 requests verified as served by the dedicated model.
+- **Task time** chart: dedicated is slower for every task. In tab 1, pick a `DEDICATED` run and replay it next to a public one.
+- **Concurrency** chart: from 1 to 5 agents on one 4× H100 replica, throughput ×2.4 and tasks/min ×2.8, while each task takes only ×1.28 longer. *The replica was not saturated; we did not measure its limit.*
+- **Decode vs requests in flight**: dots are measured. The dashed line beyond 5 is the extrapolation used in tabs 4–5.
+- **Cost box:**
+  - $0.069 per task for the measurement window, and $0.033 at the best measured rate, against **$0.0054** on public;
+  - matching public pricing needs ~58 tasks/min per replica.
+- **Compatibility box:** dedicated does *not* have the public endpoint's tool-call streaming bug. It does not report cached tokens.
 
-1. Defaults: 100 students, 6 tasks each, 2-hour session, students start within ~3 minutes of each exercise.
-   - **Public at default limits: "severely slowed".** Tokens/min hits the 500k ceiling, agents pile up and p95 task time is ~5 min. The documented auto-scaling (+20% per busy 15 min) is too slow for a classroom burst.
-   - **Dedicated (auto-sized 2× H100): keeps up**, at ~$20 per session against ~$5 for public.
-2. Set **Rate-limit multiplier** to 20× (an Enterprise / raised-limit scenario). Public now keeps up at the lowest cost.
-3. Click the **20 / 200 / 500** presets. Watch GPUs needed and the peak agents working.
-4. **Run sweep**: cost per month against class size, with capacity-aware GPU sizing. Triangles mark class sizes where the public endpoint, at the chosen limits, is cheaper but not usable.
-5. Try **Start spread** = 0.25 min (everyone clicks at once) against 15 min. Synchronisation, not average volume, drives capacity.
+## 4. Cost curves (4 min), tab 4
+
+- Defaults: **4× H100 replica (ecole-demo, measured)** at **$18.80 per replica-hour**, class-only schedule.
+  - The dedicated curve steps up one 4-GPU replica at a time.
+  - Break-even: **none**. One replica must average ~75% utilisation to match $0.006 tasks, and classroom bursts never get there.
+- Move **serving efficiency** to 2× and **peak-to-average** to 1 (flat, campus-wide traffic). Break-even appears only for large, steady volumes.
+- Other GPU rows (1× H100 TP1, H200, B200) are labelled benchmark references, not Token Factory options for this model in eu-north1.
+- **Feasibility box:**
+  - single-stream speed is measured at 181 tok/s on dedicated against ~460 on public;
+  - the public default limit covers about 10 task starts per minute.
+
+## 5. Classroom (5 min), tab 5
+
+1. Defaults: 100 students, 6 tasks each, 2-hour session, starts within ~3 minutes of each exercise. Three cards:
+   - **Public at account limits:** "severely slowed". Tokens/min sits at the 500k ceiling and p95 task time is ~5 min.
+   - **Public with raised limits (×20, hypothetical):** keeps up, about $4.70 per session.
+   - **Dedicated 4× H100 (auto-sized):** keeps up with 1 replica, about $42 per session. The card is flagged **extrapolated**: the peak of 16 requests per replica is above the 5 measured.
+2. Click **20**: the dedicated card turns *within measured range*. Click **200 / 500**: 2–3 replicas.
+3. **Run sweep**: cost per month against class size. Hollow dedicated points are extrapolations beyond the measured load.
+4. Try **Start spread** = 0.25 min against 15 min. Synchronisation, not average volume, drives capacity.
 
 ## Conclusion (1 min)
 
-- A coding-agent task on Token Factory costs well under a cent, and the measurements are reproducible.
-- For classroom use the binding constraint is **rate limits**, not price. Plan for raised limits, or use Dedicated capacity for guaranteed sessions.
-- Dedicated becomes *cheaper* only at sustained high utilisation (B200, large volume) or with better-than-benchmark serving efficiency. That is the next experiment: measure a real dedicated endpoint.
+- A coding-agent task costs well under a cent on the public endpoint, with identical quality on dedicated.
+- For classrooms the binding constraint is the public **rate limit**, not price. Ask for raised limits.
+- Dedicated (4× H100) gives capacity without rate-limit negotiation and has no tool-call streaming bug. It is slower per stream here and costs about 5–44× more per classroom session. It pays off only with sustained high utilisation.
+- Next experiments: push one replica beyond 5 agents to find its real limit, and compare the 8-GPU option and the "fast" flavor.
 
 ## Likely questions
 
-- *Are dedicated numbers measured?* No. They come from SemiAnalysis InferenceX benchmark points plus labelled assumptions (Method tab). Only public-endpoint numbers are measured.
-- *Why not use the agent's own success claim?* T2 shows why.
-- *What does the relay do?* It works around a Token Factory streaming bug in tool-call indices and timestamps each request. It never touches the credential.
-- *What did all this cost?* $0.24 for 33 runs (`data/experiment_ledger.json`).
+- *Are dedicated numbers measured?* Yes, for 1–5 concurrent agents on one 4× H100 replica (tab 3). Capacity beyond 5 concurrent requests is extrapolated from benchmark data and labelled as such. 100+ students on dedicated has **not** been tested.
+- *Why is dedicated slower?* Per-stream decode on this base-flavor 4× H100 deployment is ~181 tok/s; the public serverless endpoint streamed ~409–453 tok/s in our runs. The serving configuration of the public fleet is not visible to us.
+- *Why not use the agent's own success claim?* T2 shows why, on both endpoints.
+- *What does the relay do?* It works around the public endpoint's streaming bug in tool-call indices and timestamps each request. It also refuses any request whose model does not match the selected endpoint. It never touches the credential.
+- *What did all this cost?* Public tokens: $0.26 for 36 runs. Dedicated: $1.99 of GPU time during the 6-minute benchmark, at most $10.33 billed from deployment to shutdown (`data/dedicated_benchmark.json`).

@@ -110,6 +110,15 @@ Timing is observed from this cloud container (Token Factory region eu-north1) th
 - **Auto-sizing:** smallest replica count with p95 contention slowdown ≤ 1.5× (task time ÷ the same task on an idle replica) that finishes within the window.
 - **Session cost:** public = simulated tokens × prices; dedicated = GPUs × (window + warm-up) × price.
 
+## Endpoint selection and verification (added 2026-11-02)
+
+- `harness/endpoints.py` names every endpoint explicitly: `origin` (host the relay forwards to) and `model` (exact model id or dedicated routing key). `run_task.py --endpoint public|dedicated` rewrites the per-run DSH overlay (provider model id, default model, base URL), and starts the relay with that origin and an **expected model**.
+- The relay refuses any chat request for another model (HTTP 400, logged as `guard_rejected`). It records `response_model` from every response, so each saved request can be checked (`metrics.verify_endpoint`, `endpoint_verified` in each result).
+- The dedicated routing key comes from the control plane (`GET /v0/dedicated_endpoints`). The regional base URL returned 401 in this session (no Network Secret for that host), so dedicated traffic uses the global host. `TOFA_DEDICATED_ORIGIN` overrides this once a regional credential exists.
+- Dedicated runs carry no per-token cost (`cost_usd = null`). Their tokens at public prices are kept as `public_equivalent_cost_usd`, labelled as a counterfactual. Dedicated cost = GPU billing time × $18.80/h (`analysis/dedicated_analysis.py`).
+- Cohorts: `public-historical` (30 Oct, the original simulation demand, unchanged), `public-control`, `dedicated-seq`, `conc-2/3/5`.
+- The sanitiser now redacts inside JSON string values (`sanitize_jsonl`) and matches only upper-case variable names. The old rule corrupted one dedicated session line (agent code `token_re = …`). That run was rebuilt with `harness/finalize_run.py`.
+
 ## Engineering decisions
 
 - **Local relay instead of patching DSH or pi-ai:** it is transparent, leaves the installed tool untouched, works with any client, and doubles as the measurement point. It forwards only to `api.tokenfactory.nebius.com` through the session's egress proxy, logs no headers and binds to 127.0.0.1.

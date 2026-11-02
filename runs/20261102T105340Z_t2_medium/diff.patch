@@ -1,0 +1,76 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..04cdf03 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,21 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1d1h1m1s"), 90061)
++        self.assertEqual(parse_duration("1d 2h 3m 4s"), 93784)
++        self.assertEqual(parse_duration("2D"), 172800)
++        self.assertEqual(parse_duration("   5m   "), 300)
++
++    def test_invalid(self):
++        for txt in ["", "-5s", "1.5h", "30m1h", "1h1h", "1h 30x", "h10"]:
++            with self.subTest(txt=txt):
++                self.assertRaises(ValueError, parse_duration, txt)
++
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..4b52cdd 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,36 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    import re
++    # Strip leading/trailing whitespace
++    text = text.strip()
++    if not text:
++        raise ValueError("invalid duration string")
++    # If the string is just digits (no unit), interpret as seconds
++    if re.fullmatch(r"\d+", text):
++        return int(text)
++    # Remove internal spaces for easier parsing
++    compact = text.replace(" ", "")
++    total = 0
++    last_index = -1
++    used = set()
++    i = 0
++    while i < len(compact):
++        m = re.match(r"(\d+)([dhmsDHMS])", compact[i:])
++        if not m:
++            raise ValueError("invalid duration string")
++        value_str, unit = m.group(1), m.group(2).lower()
++        value = int(value_str)
++        # Find unit order index
++        unit_order = {"d": 0, "h": 1, "m": 2, "s": 3}
++        idx = unit_order[unit]
++        if idx <= last_index:
++            # Units must appear in decreasing order (i.e., increasing index) and not repeat
++            raise ValueError("invalid unit order or duplicate unit")
++        if unit in used:
++            raise ValueError("duplicate unit")
++        used.add(unit)
++        total += value * dict(_UNITS)[unit]
++        last_index = idx
++        i += m.end()
++    return total

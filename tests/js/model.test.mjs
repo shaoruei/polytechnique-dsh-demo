@@ -9,6 +9,7 @@ import * as cap from '../../model/capacity.js';
 import * as cost from '../../model/cost.js';
 import { simulate, autoSize } from '../../model/sim.js';
 import { trajectoriesFrom, perTaskProfile } from '../../model/data.js';
+const bench = JSON.parse(readFileSync(new URL('../../data/dedicated_benchmark.json', import.meta.url)));
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const load = (f) => JSON.parse(readFileSync(path.join(ROOT, f), 'utf8'));
@@ -44,7 +45,7 @@ test('benchmark points imply a consistent ~4-GPU serving instance for H100 (inte
 });
 
 test('measured runs carry exact provider usage and an independently recomputed cost', () => {
-  const usable = runs.runs.filter((r) => r.usable);
+  const usable = runs.runs.filter((r) => r.usable && (r.endpoint ?? 'public') === 'public');
   assert.ok(usable.length >= 9, 'enough measured runs');
   for (const r of usable) {
     assert.ok(Math.abs(r.metrics.cost_usd - r.metrics.cost_usd_recomputed) < 1e-6, r.run_id);
@@ -232,4 +233,70 @@ test('a 500-student scenario completes quickly enough for live interaction', () 
   const t0 = Date.now();
   simulate(tr, { ...baseScenario, students: 500, tasksPerStudent: 6, windowHours: 2 }, { kind: 'dedicated', profile: H100, replicas: 4 }, PRICES);
   assert.ok(Date.now() - t0 < 5000, `${Date.now() - t0} ms`);
+});
+
+// ---------------------------------------------------------------- dedicated (measured 2026-11-02)
+const H100X4 = profiles.gpus.h100x4;
+
+test('original classroom scenarios still replay only the 33 historical public runs', () => {
+  const tr = trajectoriesFrom(runs);
+  assert.equal(tr.length, 33);
+  assert.ok(tr.every((t) => t.cohort === 'public-historical' && t.endpoint === 'public'));
+  const ded = trajectoriesFrom(runs, { cohorts: ['dedicated-seq', 'conc-2', 'conc-3', 'conc-5'] });
+  assert.ok(ded.length >= 20 && ded.every((t) => t.endpoint === 'dedicated'));
+});
+
+test('dedicated runs never carry a per-token cost; every dedicated run is endpoint-verified', () => {
+  const ded = runs.runs.filter((r) => r.endpoint === 'dedicated');
+  assert.ok(ded.length >= 20);
+  for (const r of ded) {
+    assert.equal(r.metrics.cost_usd, null, r.run_id);
+    assert.equal(r.endpoint_verified, true, r.run_id);
+  }
+  assert.equal(bench.verification.dedicated_requests, bench.verification.dedicated_requests_answered_by_dedicated);
+  assert.equal(bench.verification.public_labelled_requests_answered_by_dedicated, 0);
+  assert.equal(bench.verification.dedicated_labelled_requests_answered_by_public, 0);
+});
+
+test('measured 4xH100 profile reproduces its measured points and is labelled', () => {
+  for (const p of H100X4.points.filter((x) => x.source === 'measured')) {
+    const c = p.per_replica_concurrency / H100X4.gpus_per_replica;
+    assert.ok(Math.abs(cap.interactivityAt(H100X4, c) - p.interactivity) < 1e-6);
+    assert.ok(Math.abs(p.interactivity - bench.load_curve[String(p.per_replica_concurrency)].decode_tps.p50) < 0.1);
+  }
+  assert.equal(H100X4.measured_max_per_replica_concurrency, 5);
+  assert.ok(H100X4.points.filter((x) => x.source === 'extrapolated').every((x) => x.per_replica_concurrency > 5));
+});
+
+test('dedicated latency model is calibrated: predicted vs measured request latency within 20% (median)', () => {
+  const ratios = bench.per_request_dedicated
+    .filter((q) => q.output_tokens > 0)
+    .map((q) => {
+      const c = Math.max(q.inflight, 1) / H100X4.gpus_per_replica;
+      const pred = cap.prefillSeconds(H100X4, { u: q.prompt_tokens, c: 0, o: 0 }) + q.output_tokens / cap.interactivityAt(H100X4, c);
+      return pred / q.latency_s;
+    })
+    .sort((a, b) => a - b);
+  const med = ratios[Math.floor(ratios.length / 2)];
+  assert.ok(ratios.length > 200, `${ratios.length} requests`);
+  assert.ok(med > 0.8 && med < 1.2, `median predicted/measured ${med}`);
+});
+
+test('replica granularity: 4xH100 capacity is bought 4 GPUs at a time and break-even matches brute force', () => {
+  const tr = trajectoriesFrom(runs).filter((t) => t.effort === 'medium');
+  const perTask = perTaskProfile(tr);
+  const gpu = { profile: H100X4, pricePerGpuHour: pricing.dedicated.gpus.h100x4.price_per_gpu_hour };
+  const schedule = { kind: 'always-on' };
+  const s1 = cost.dedicatedSizing({ tasksPerMonth: 10, outputPerTask: perTask.tokens.output, schedule, gpu, targetInteractivity: 90 });
+  assert.equal(s1.gpus, 4);
+  assert.ok(Math.abs(s1.monthlyCost - 18.8 * 730) < 1e-6);
+  const be = cost.breakEvenTasks({ perTask, prices: PRICES, schedule, gpu, targetInteractivity: 90, targetUtilization: 0.9, peakFactor: 1 });
+  const dedAt = (v) => cost.dedicatedSizing({ tasksPerMonth: v, outputPerTask: perTask.tokens.output, schedule, gpu,
+    targetInteractivity: 90, targetUtilization: 0.9, peakFactor: 1 }).monthlyCost;
+  const pubAt = (v) => v * cost.publicCost(perTask.tokens, PRICES);
+  const top = (be.tasks ?? be.publicTasksPerGpuMonthCost) * 3;
+  let first = null;
+  for (let v = top / 20000; v <= top; v += top / 20000) if (first === null && dedAt(v) <= pubAt(v)) { first = v; break; }
+  if (be.tasks === null) assert.equal(first, null);
+  else assert.ok(Math.abs(first - be.tasks) <= 2 * (top / 20000), `${first} vs ${be.tasks}`);
 });

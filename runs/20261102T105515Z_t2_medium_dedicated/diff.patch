@@ -1,0 +1,48 @@
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..c4e9457 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,42 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    import re
++    s = text.strip()
++    if not s:
++        raise ValueError("invalid duration string")
++    # pure integer means seconds
++    if s.isdigit():
++        return int(s)
++    # pattern for number+unit (case-insensitive)
++    pattern = re.compile(r"(\d+)([dhmsDHMS])")
++    pos = 0
++    total = 0
++    seen_units = set()
++    last_order = -1  # ensures decreasing order (d=0, h=1, m=2, s=3)
++    unit_order = {"d": 0, "h": 1, "m": 2, "s": 3}
++    unit_seconds = dict(_UNITS)
++    while pos < len(s):
++        if s[pos].isspace():
++            pos += 1
++            continue
++        m = pattern.match(s, pos)
++        if not m:
++            raise ValueError("invalid duration component")
++        number_str, unit = m.groups()
++        unit_l = unit.lower()
++        # duplicate unit check
++        if unit_l in seen_units:
++            raise ValueError("duplicate unit")
++        # order check: must not go backwards
++        order = unit_order[unit_l]
++        if order < last_order:
++            raise ValueError("units not in decreasing order")
++        last_order = order
++        seen_units.add(unit_l)
++        value = int(number_str)
++        total += value * unit_seconds[unit_l]
++        pos = m.end()
++    # ensure no leftover non-space characters
++    # (the loop already consumed all matched parts; any remaining non-space would have failed above)
++    return total

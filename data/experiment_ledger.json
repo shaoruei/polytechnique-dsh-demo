@@ -1,9 +1,20 @@
 {
- "schema": 1,
- "note": "Measured spend of every saved experiment run: provider-reported usage x verified public prices. Excludes a handful of tiny manual probe requests (<1k tokens each) made while debugging.",
- "runs": 33,
- "llm_requests": 322,
- "prompt_tokens": 1963542,
- "output_tokens": 63054,
- "total_cost_usd": 0.243773
+ "schema": 2,
+ "note": "Public: measured spend = provider-reported usage x verified public prices (excludes a handful of tiny manual probe requests). Dedicated: GPU-hour billing, see data/dedicated_benchmark.json.",
+ "runs": 36,
+ "llm_requests": 346,
+ "prompt_tokens": 2089516,
+ "output_tokens": 66698,
+ "total_cost_usd": 0.260056,
+ "public_runs_by_cohort": {
+  "public-control": 3,
+  "public-historical": 33
+ },
+ "dedicated": {
+  "runs": 29,
+  "llm_requests": 256,
+  "benchmark_window_usd": 1.99,
+  "max_billable_usd": 10.33,
+  "price_per_hour": 18.8
+ }
 }

@@ -1,0 +1,45 @@
+diff --git a/scheduler/conflicts.py b/scheduler/conflicts.py
+index e6a3cbc..a2262e6 100644
+--- a/scheduler/conflicts.py
++++ b/scheduler/conflicts.py
+@@ -10,12 +10,15 @@ def _shares_resource(a: Session, b: Session) -> bool:
+ 
+ 
+ def find_conflicts(sessions: Sequence[Session]) -> List[Tuple[Session, Session]]:
+-    """Return every pair of sessions that clash (same room or group, overlapping time)."""
+-    conflicts = []
++    """Return every pair of sessions that clash (same room or group, overlapping time).
++
++    The result contains each conflicting pair exactly once, ordered by the
++    positions of the sessions in the input sequence. Only pairs where the first
++    session appears earlier in the list are included.
++    """
++    conflicts: List[Tuple[Session, Session]] = []
+     for i, a in enumerate(sessions):
+-        for j, b in enumerate(sessions):
+-            if i == j:
+-                continue
++        for b in sessions[i + 1:]:
+             if a.overlaps(b) and _shares_resource(a, b):
+                 conflicts.append((a, b))
+     return conflicts
+diff --git a/scheduler/models.py b/scheduler/models.py
+index c45fc88..f27b3c5 100644
+--- a/scheduler/models.py
++++ b/scheduler/models.py
+@@ -32,5 +32,13 @@ class Session:
+         return to_minutes(self.end)
+ 
+     def overlaps(self, other: "Session") -> bool:
+-        """True when the two sessions' time intervals overlap."""
+-        return self.start_minutes <= other.end_minutes and other.start_minutes <= self.end_minutes
++        """True when the two sessions' time intervals overlap.
++
++        Overlap requires sessions to be on the same day and their time intervals to
++        intersect with positive duration. Touching end‑to‑start (e.g. one ends at
++        10:00 and the other starts at 10:00) is **not** considered an overlap.
++        """
++        if self.day != other.day:
++            return False
++        # Strict overlap: start < other.end and other.start < end
++        return self.start_minutes < other.end_minutes and other.start_minutes < self.end_minutes

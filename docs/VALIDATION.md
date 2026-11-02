@@ -41,3 +41,20 @@ The $0.000002 difference between the wire-log total and the ledger is rounding o
 - Timeline minutes after the window overran were merged into one bucket, so the rate-limit test failed. Fixed.
 - Random draws depended on simulation timing, so backends saw different demand. All randomness is now pre-drawn per student.
 - Dashboard bugs, each caught by the headless check: `String.replace` `$'` expansion broke the inlined script; views were not hidden; a select widened grid tracks at phone width.
+
+## Dedicated benchmark (2026-11-02)
+
+| Requirement | Evidence | Command |
+|---|---|---|
+| Requests reached the intended endpoint | Relay guard refuses mismatched models. `response_model` is recorded per request. 256/256 dedicated requests were answered by `dedicated/openai/gpt-oss-120b-ZkdOyl`, and 0 cross-labelled requests | `tests/python/test_endpoints.py`; `data/dedicated_benchmark.json` → `verification` |
+| Public traffic never labelled dedicated | `verify_endpoint` fails if any response model differs (tested both ways) | `tests/python/test_endpoints.py::VerifyEndpointTest` |
+| Streaming compatibility documented | Direct tool-call trials on both endpoints, raw deltas saved | `python3 harness/endpoint_check.py dedicated` → `data/provenance/stream_compat_*` |
+| Original public data preserved | Workload statistics and simulator demand still use exactly the 33 historical runs | `tests/js`: "original classroom scenarios still replay only the 33 historical public runs" |
+| No fictional dedicated token price | Dedicated runs have `cost_usd = null`; `check_costs.py` covers public runs only | `tests/js`: "dedicated runs never carry a per-token cost" |
+| Measured profile honest | Measured points reproduce the benchmark load curve; extrapolated points only above 5 concurrent | `tests/js`: "measured 4xH100 profile …" |
+| Latency model calibrated | Median predicted ÷ measured request latency within ±20% over 256 requests. Task level: model 8–15% faster than measured (reported) | `tests/js`: "dedicated latency model is calibrated …"; `data/findings.json` → `calibration` |
+| Replica granularity | 4× H100 bought 4 GPUs at a time; break-even checked by brute force | `tests/js`: "replica granularity …" |
+| Sanitiser cannot corrupt JSON | Regression test with the exact agent code that broke a session line | `tests/python/test_harness.py::SanitizeTest` |
+| Endpoint stopped | PATCH `enabled:false` → HTTP 200; poll shows `stopped`, `not_ready`, 0 ready replicas at 10:59:39 UTC | `data/provenance/dedicated_endpoint_stopped_2026-11-02.json` |
+
+Last results: `node --test` 22/22 pass · `python3 -m unittest` 19 OK · `check_costs.py` 36 public runs OK · dashboard headless check OK, with network blocked, in light and dark, including the new Dedicated view.

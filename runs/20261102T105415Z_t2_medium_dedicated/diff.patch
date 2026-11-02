@@ -1,0 +1,59 @@
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..08edb3f 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -1,6 +1,10 @@
++import re
++
+ """Human-friendly durations such as "1h30m" or "45s"."""
+ 
+ _UNITS = (("d", 86400), ("h", 3600), ("m", 60), ("s", 1))
++_UNIT_MAP = {unit: seconds for unit, seconds in _UNITS}
++_UNIT_ORDER = {unit: index for index, (unit, _) in enumerate(_UNITS)}
+ 
+ 
+ def format_duration(seconds: int) -> str:
+@@ -34,4 +38,42 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    if not isinstance(text, str):
++        raise ValueError("duration must be a string")
++
++    stripped = text.strip()
++    if not stripped:
++        raise ValueError("empty duration string")
++
++    # Bare integer case (seconds)
++    if stripped.isdigit():
++        return int(stripped)
++
++    # Remove internal spaces and normalize case
++    compact = "".join(stripped.split()).lower()
++
++    pattern = re.compile(r"(\d+)([dhms])")
++    pos = 0
++    total_seconds = 0
++    seen_units = set()
++    last_order = -1
++    for m in pattern.finditer(compact):
++        start, end = m.span()
++        if start != pos:
++            raise ValueError("invalid duration format")
++        number_str, unit = m.groups()
++        if unit in seen_units:
++            raise ValueError(f"duplicate unit '{unit}' in duration")
++        order = _UNIT_ORDER[unit]
++        if order <= last_order:
++            raise ValueError("units must appear in decreasing order (d, h, m, s)")
++        seen_units.add(unit)
++        last_order = order
++        value = int(number_str)
++        total_seconds += value * _UNIT_MAP[unit]
++        pos = end
++
++    if pos != len(compact):
++        raise ValueError("invalid duration format")
++
++    return total_seconds

@@ -1,10 +1,15 @@
 // Turn the raw data bundle (data/*.json) into model inputs. Pure: no file or network access.
 
-/** Replayable trajectories from usable measured runs. */
-export function trajectoriesFrom(runsDoc) {
+/**
+ * Replayable trajectories from usable measured runs. By default only the original public cohort
+ * (2026-10-30), so the original classroom scenarios stay unchanged; pass {cohorts} to choose.
+ */
+export function trajectoriesFrom(runsDoc, { cohorts = ['public-historical'] } = {}) {
   return runsDoc.runs
     .filter((r) => r.usable && r.trajectory && r.trajectory.steps.length)
-    .map((r) => ({ runId: r.run_id, task: r.task, effort: r.effort, success: r.success, ...r.trajectory }));
+    .filter((r) => !cohorts || cohorts.includes(r.cohort ?? 'public-historical'))
+    .map((r) => ({ runId: r.run_id, task: r.task, effort: r.effort, success: r.success, endpoint: r.endpoint ?? 'public',
+      cohort: r.cohort ?? 'public-historical', ...r.trajectory }));
 }
 
 /** Mean per-task token mix, request count and GPU work over a set of trajectories. */

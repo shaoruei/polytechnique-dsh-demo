@@ -1,0 +1,96 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..4949c1c 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -16,3 +16,23 @@ class FormatDurationTest(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class ParseDurationTest(unittest.TestCase):
++    def test_bare_and_zero(self):
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++
++    def test_examples(self):
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1d 2h 3m 4s"), 1*86400 + 2*3600 + 3*60 + 4)
++        self.assertEqual(parse_duration("1H 30M"), 5400)
++
++    def test_invalid(self):
++        invalids = ["", "-5s", "1.5h", "1h30", "30m1h", "1h1h", "3w", "h", "1h 30m 2h"]
++        for txt in invalids:
++            with self.subTest(txt=txt):
++                with self.assertRaises(ValueError):
++                    parse_duration(txt)
++
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..16feab3 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,54 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip surrounding whitespace
++    text = text.strip()
++    if not text:
++        raise ValueError("empty duration string")
++
++    # If the text is a plain integer, interpret as seconds
++    if text.isdigit():
++        return int(text)
++
++    # Mapping of unit to its multiplier and order index (case‑insensitive)
++    unit_map = {}
++    for idx, (suffix, size) in enumerate(_UNITS):
++        unit_map[suffix] = (size, idx)
++        unit_map[suffix.upper()] = (size, idx)
++
++    total_seconds = 0
++    seen_units = set()
++    last_order = -1
++    i = 0
++    n = len(text)
++    while i < n:
++        # skip spaces
++        while i < n and text[i].isspace():
++            i += 1
++        if i >= n:
++            break
++        # parse number
++        start_num = i
++        while i < n and text[i].isdigit():
++            i += 1
++        if start_num == i:
++            raise ValueError(f"expected number at position {start_num}")
++        number = int(text[start_num:i])
++        # after number, there must be a unit character
++        if i >= n:
++            raise ValueError("missing unit after number")
++        unit_char = text[i]
++        i += 1
++        if unit_char not in unit_map:
++            raise ValueError(f"unknown unit '{unit_char}'")
++        size, order = unit_map[unit_char]
++        # enforce order and uniqueness
++        if order < last_order:
++            raise ValueError("units out of order")
++        if unit_char.lower() in seen_units:
++            raise ValueError("duplicate unit")
++        seen_units.add(unit_char.lower())
++        last_order = order
++        total_seconds += number * size
++        # continue loop, whitespace will be skipped automatically
++    return total_seconds

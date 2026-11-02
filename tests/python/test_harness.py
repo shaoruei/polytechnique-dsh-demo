@@ -87,6 +87,17 @@ class SanitizeTest(unittest.TestCase):
         self.assertNotIn("abcdefghijklmnopqrstuvwxyz123456", out)
         self.assertNotIn("supersecretvalue123", out)
 
+    def test_code_with_token_variable_is_not_redacted_and_json_stays_valid(self):
+        # regression: this exact agent code once broke a session line
+        from sanitize import sanitize_jsonl
+        code = '    token_re = re.compile(r"(\\d+)([dhms])", re.IGNORECASE)'
+        line = json.dumps({"type": "tool/call", "data": {"arguments": code}}) + "\n"
+        self.assertEqual(sanitize_text(code), code)
+        out = sanitize_jsonl(line)
+        self.assertEqual(json.loads(out)["data"]["arguments"], code)
+        secret = json.dumps({"text": "export NEBIUS_API_KEY=abcdefghijklmnopqrstuvwxyz"}) + "\n"
+        self.assertNotIn("abcdefghijklmnop", json.loads(sanitize_jsonl(secret))["text"])
+
     def test_keeps_placeholder_and_code(self):
         txt = "TOFA_API_KEY=proxy-injected\ndef final_grade(items):"
         self.assertEqual(sanitize_text(txt), txt)

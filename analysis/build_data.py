@@ -155,8 +155,19 @@ def main() -> None:
         r = json.loads(f.read_text())
         m = r.get("metrics") or {}
         usable = bool(r.get("relay")) and (m.get("llm_requests") or 0) > 0 and m.get("usage_source", "").startswith("provider (relay")
+        endpoint = r.get("endpoint", "public")  # runs before 2026-11-02 predate endpoint selection: all public
+        cohort = r.get("cohort") or ("public-historical" if endpoint == "public" else "dedicated")
+        m = dict(m)
+        if endpoint != "public":
+            # dedicated is billed per GPU-hour: no per-token cost exists. Keep only a labelled counterfactual.
+            m["public_equivalent_cost_usd"] = m.pop("cost_usd", None)
+            m.pop("cost_usd_without_cache_discount", None)
+            m["cost_usd"] = None
         rec = {
             "run_id": r["run_id"], "label": r.get("label", ""), "task": r["task"],
+            "endpoint": endpoint, "cohort": cohort, "wave": r.get("wave") or None,
+            "endpoint_verified": (r.get("endpoint_verification") or {}).get("verified"),
+            "finalized_offline": r.get("finalized_offline"),
             "task_title": TASK_TITLES.get(r["task"], r["task"]), "effort": r["reasoning_effort"],
             "started_at": r["started_at"], "success": r["success"], "timed_out": r["timed_out"],
             "dsh_exit_code": r["dsh_exit_code"], "turn_end_reason": r.get("turn_end_reason"),
@@ -171,18 +182,21 @@ def main() -> None:
             "metrics": {k: v for k, v in m.items() if k != "tools"},
             "tools": m.get("tools", []),
         }
-        if usable:
+        if usable and endpoint == "public":
             # independent recomputation of cost from per-request provider usage
             rec["metrics"]["cost_usd_recomputed"] = round(sum(
                 cost_usd(q["uncached_input_tokens"], q["cached_tokens"], q["completion_tokens"])
                 for q in m["requests"] if q["status"] == 200), 6)
+        if usable:
             rec["trajectory"] = trajectory(r)
         runs.append(rec)
 
     DATA.mkdir(exist_ok=True)
     (DATA / "runs.json").write_text(json.dumps({"schema": 1, "runs": runs}, indent=1) + "\n")
 
-    workload: dict = {"schema": 1, "groups": {}, "by_effort": {}, "tasks": TASK_TITLES}
+    all_runs = runs
+    runs = [r for r in all_runs if r["cohort"] == "public-historical"]  # original workload statistics
+    workload: dict = {"schema": 1, "cohort": "public-historical (2026-10-30)", "groups": {}, "by_effort": {}, "tasks": TASK_TITLES}
     for task in sorted({r["task"] for r in runs}):
         for effort in ("low", "medium", "high"):
             sel = [r for r in runs if r["task"] == task and r["effort"] == effort]
@@ -195,24 +209,38 @@ def main() -> None:
     workload["pooled"] = group_stats(runs)
     (DATA / "workload.json").write_text(json.dumps(workload, indent=1) + "\n")
 
+    runs = all_runs
     replays = {r["run_id"]: replay_events(RUNS / r["run_id"]) for r in runs}
     tasks = {d.name: {"title": TASK_TITLES.get(d.name, d.name), "prompt": (d / "task.md").read_text()}
              for d in sorted((ROOT / "tasks").iterdir()) if (d / "task.md").exists()}
     (DATA / "tasks.json").write_text(json.dumps({"schema": 1, "tasks": tasks}, indent=1) + "\n")
     (DATA / "replays.json").write_text(json.dumps({"schema": 1, "runs": replays}, separators=(",", ":")) + "\n")
 
+    pub = [r for r in runs if r["endpoint"] == "public"]
+    ded = [r for r in runs if r["endpoint"] != "public"]
+    bench_path = DATA / "dedicated_benchmark.json"
+    billing = json.loads(bench_path.read_text())["billing"] if bench_path.exists() else {}
     ledger = {
-        "schema": 1,
-        "note": "Measured spend of every saved experiment run: provider-reported usage x verified public prices. "
-                "Excludes a handful of tiny manual probe requests (<1k tokens each) made while debugging.",
-        "runs": len(runs),
-        "llm_requests": sum((r["metrics"].get("llm_requests") or 0) for r in runs),
-        "prompt_tokens": sum((r["metrics"].get("prompt_tokens") or 0) for r in runs),
-        "output_tokens": sum((r["metrics"].get("output_tokens") or 0) for r in runs),
-        "total_cost_usd": round(sum((r["metrics"].get("cost_usd") or 0) for r in runs), 6),
+        "schema": 2,
+        "note": "Public: measured spend = provider-reported usage x verified public prices (excludes a handful of "
+                "tiny manual probe requests). Dedicated: GPU-hour billing, see data/dedicated_benchmark.json.",
+        "runs": len(pub),
+        "llm_requests": sum((r["metrics"].get("llm_requests") or 0) for r in pub),
+        "prompt_tokens": sum((r["metrics"].get("prompt_tokens") or 0) for r in pub),
+        "output_tokens": sum((r["metrics"].get("output_tokens") or 0) for r in pub),
+        "total_cost_usd": round(sum((r["metrics"].get("cost_usd") or 0) for r in pub), 6),
+        "public_runs_by_cohort": {c: sum(1 for r in pub if r["cohort"] == c) for c in sorted({r["cohort"] for r in pub})},
+        "dedicated": {
+            "runs": len(ded),
+            "llm_requests": sum((r["metrics"].get("llm_requests") or 0) for r in ded),
+            "benchmark_window_usd": billing.get("benchmark_window_usd"),
+            "max_billable_usd": billing.get("max_billable_usd"),
+            "price_per_hour": billing.get("price_per_hour"),
+        },
     }
     (DATA / "experiment_ledger.json").write_text(json.dumps(ledger, indent=1) + "\n")
-    print(f"{len(runs)} runs ({sum(r['usable'] for r in runs)} usable); spend ${ledger['total_cost_usd']:.4f}")
+    print(f"{len(runs)} runs ({len(pub)} public, {len(ded)} dedicated); public token spend ${ledger['total_cost_usd']:.4f}; "
+          f"dedicated GPU time benchmark window ${billing.get('benchmark_window_usd')} (upper bound ${billing.get('max_billable_usd')})")
 
 
 if __name__ == "__main__":

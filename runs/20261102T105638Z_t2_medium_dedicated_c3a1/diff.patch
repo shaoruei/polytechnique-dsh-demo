@@ -1,0 +1,89 @@
+diff --git a/tests/test_duration.py b/tests/test_duration.py
+index 9fc0965..94dfe82 100644
+--- a/tests/test_duration.py
++++ b/tests/test_duration.py
+@@ -1,6 +1,6 @@
+ import unittest
+ 
+-from timeutil import format_duration
++from timeutil import format_duration, parse_duration
+ 
+ 
+ class FormatDurationTest(unittest.TestCase):
+@@ -14,5 +14,25 @@ class FormatDurationTest(unittest.TestCase):
+             format_duration(-1)
+ 
+ 
++class ParseDurationTest(unittest.TestCase):
++    def test_valid_cases(self):
++        self.assertEqual(parse_duration("0s"), 0)
++        self.assertEqual(parse_duration("0"), 0)
++        self.assertEqual(parse_duration("120"), 120)
++        self.assertEqual(parse_duration("1h30m"), 5400)
++        self.assertEqual(parse_duration("1h 30m"), 5400)
++        self.assertEqual(parse_duration("1d2h3m4s"), 1*86400 + 2*3600 + 3*60 + 4)
++        self.assertEqual(parse_duration("5m"), 300)
++        self.assertEqual(parse_duration("2D"), 2*86400)
++        self.assertEqual(parse_duration("  2h  "), 7200)
++
++    def test_invalid_cases(self):
++        invalids = ["", "   ", "-5s", "1.5h", "30m1h", "1h1h", "h", "1x", "1h 30", "1h -30m"]
++        for val in invalids:
++            with self.subTest(val=val):
++                with self.assertRaises(ValueError):
++                    parse_duration(val)
++
+ if __name__ == "__main__":
+     unittest.main()
++    unittest.main()
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..c1fcf9b 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,45 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip whitespace
++    s = text.strip()
++    if not s:
++        raise ValueError("invalid duration string")
++
++    # Bare integer seconds
++    if s.isdigit():
++        return int(s)
++
++    # Remove spaces for token parsing
++    compact = s.replace(" ", "")
++    total = 0
++    seen = set()
++    order = {"d": 0, "h": 1, "m": 2, "s": 3}
++    # Mapping unit to seconds
++    unit_seconds = {suffix: size for suffix, size in _UNITS}
++    prev_idx = -1
++    i = 0
++    while i < len(compact):
++        # Expect digits for the number
++        if not compact[i].isdigit():
++            raise ValueError("invalid duration string")
++        j = i
++        while j < len(compact) and compact[j].isdigit():
++            j += 1
++        number = int(compact[i:j])
++        # Must have a unit character after the number
++        if j >= len(compact):
++            raise ValueError("missing unit in duration string")
++        unit = compact[j].lower()
++        if unit not in order:
++            raise ValueError("unknown unit in duration string")
++        if unit in seen:
++            raise ValueError("duplicate unit in duration string")
++        idx = order[unit]
++        if idx < prev_idx:
++            raise ValueError("units not in decreasing order")
++        seen.add(unit)
++        prev_idx = idx
++        total += number * unit_seconds[unit]
++        i = j + 1
++    return total

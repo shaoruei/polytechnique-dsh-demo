@@ -155,7 +155,7 @@ export function simulate(trajectories, scenario, backend, prices) {
           agent: a,
           remaining: step.o,
           fixed: prefillSeconds(backend.profile, step, {
-            baseLatency: backend.baseLatency ?? 0.15, cachedWorkWeight: backend.cachedWorkWeight ?? 0,
+            baseLatency: backend.baseLatency, cachedWorkWeight: backend.cachedWorkWeight,
           }),
           replica: best, startT: t, readyT: a.readyT,
         });
@@ -299,7 +299,7 @@ export function simulate(trajectories, scenario, backend, prices) {
   // measured: the trajectory's real duration on the public endpoint (no contention)
   const measured = done.map((a) => a.traj.lead_s + a.traj.steps.reduce((s, x) => s + x.lat + x.gap, 0));
   // unloaded: the same trajectory on this backend with no other traffic
-  const soloOpts = { baseLatency: backend.baseLatency ?? 0.15, cachedWorkWeight: backend.cachedWorkWeight ?? 0,
+  const soloOpts = { baseLatency: backend.baseLatency, cachedWorkWeight: backend.cachedWorkWeight,
     efficiency: backend.efficiency ?? 1 };
   const unloaded = backend.kind === 'dedicated'
     ? done.map((a) => a.traj.lead_s + a.traj.steps.reduce((s, x) => s + soloRequestSeconds(backend.profile, x, soloOpts) + x.gap, 0))

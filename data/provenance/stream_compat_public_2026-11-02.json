@@ -1,0 +1,276 @@
+{
+ "endpoint": "public",
+ "label": "Public serverless endpoint",
+ "origin": "https://api.tokenfactory.nebius.com",
+ "model": "openai/gpt-oss-120b",
+ "run_at": "2026-11-02T10:52:12+00:00",
+ "models_listed": true,
+ "non_streaming": {
+  "status": 200,
+  "latency_s": 0.323,
+  "response_model": "openai/gpt-oss-120b",
+  "usage": {
+   "completion_tokens": 20,
+   "prompt_tokens": 74,
+   "total_tokens": 94,
+   "completion_tokens_details": null,
+   "prompt_tokens_details": {
+    "audio_tokens": null,
+    "cached_tokens": 64
+   }
+  },
+  "finish_reason": "stop",
+  "content": "OK"
+ },
+ "streaming": {
+  "status": 200,
+  "latency_s": 0.3,
+  "ttft_s": 0.27,
+  "response_model": "openai/gpt-oss-120b",
+  "usage": {
+   "prompt_tokens": 74,
+   "total_tokens": 91,
+   "completion_tokens": 17,
+   "prompt_tokens_details": {
+    "cached_tokens": 64
+   }
+  },
+  "finish_reason": "stop"
+ },
+ "tool_trials": [
+  {
+   "status": 200,
+   "latency_s": 0.399,
+   "ttft_s": 0.277,
+   "response_model": "openai/gpt-oss-120b",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 214,
+    "completion_tokens": 53,
+    "prompt_tokens_details": {
+     "cached_tokens": 48
+    }
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 9,
+   "anomalies": 1,
+   "calls_seen_by_spec_client": 2,
+   "all_calls_valid_without_repair": false,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-b579111938b57a2b",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\n  \"file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path\": \"grade"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "book/grades.py"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\",\n  \"offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\": 1,\n"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "  \"limit\":"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": " 2000\n"
+     }
+    },
+    {
+     "index": 1,
+     "function": {
+      "arguments": "}"
+     }
+    }
+   ]
+  },
+  {
+   "status": 200,
+   "latency_s": 0.396,
+   "ttft_s": 0.27,
+   "response_model": "openai/gpt-oss-120b",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 204,
+    "completion_tokens": 43,
+    "prompt_tokens_details": {
+     "cached_tokens": 80
+    }
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 8,
+   "anomalies": 0,
+   "calls_seen_by_spec_client": 1,
+   "all_calls_valid_without_repair": true,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-b48fd9eb7dc0addd",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path\":\"gradebook"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "/grades.py\",\""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":0,\"limit"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\":2000}"
+     }
+    }
+   ]
+  },
+  {
+   "status": 200,
+   "latency_s": 0.399,
+   "ttft_s": 0.278,
+   "response_model": "openai/gpt-oss-120b",
+   "usage": {
+    "prompt_tokens": 161,
+    "total_tokens": 215,
+    "completion_tokens": 54,
+    "prompt_tokens_details": {
+     "cached_tokens": 48
+    }
+   },
+   "finish_reason": "tool_calls",
+   "n_deltas": 9,
+   "anomalies": 1,
+   "calls_seen_by_spec_client": 2,
+   "all_calls_valid_without_repair": false,
+   "raw_tool_call_deltas": [
+    {
+     "id": "chatcmpl-tool-b1f9bf5fd2ace5f8",
+     "type": "function",
+     "index": 0,
+     "function": {
+      "name": "read",
+      "arguments": ""
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "{\n  \"file"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "_path\": \"grade"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "book/grades.py"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\",\n  \"offset"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\": 1"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": ",\n  \"limit"
+     }
+    },
+    {
+     "index": 0,
+     "function": {
+      "arguments": "\": 2000"
+     }
+    },
+    {
+     "index": 1,
+     "function": {
+      "arguments": "\n}"
+     }
+    }
+   ]
+  }
+ ],
+ "summary": {
+  "all_responses_from_expected_model": true,
+  "tool_trials": 3,
+  "tool_trials_with_index_anomaly": 2,
+  "relay_repair_needed": true
+ }
+}

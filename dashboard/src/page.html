@@ -22,8 +22,9 @@
   <nav class="tabs" aria-label="Storyline">
     <a href="#run" data-view="run"><b>1</b> Run an agent</a>
     <a href="#measure" data-view="measure"><b>2</b> Measure it</a>
-    <a href="#economics" data-view="economics"><b>3</b> Public vs Dedicated</a>
-    <a href="#classroom" data-view="classroom"><b>4</b> Scale to a classroom</a>
+    <a href="#dedicated" data-view="dedicated"><b>3</b> Dedicated, measured</a>
+    <a href="#economics" data-view="economics"><b>4</b> Cost curves</a>
+    <a href="#classroom" data-view="classroom"><b>5</b> Scale to a classroom</a>
     <a href="#method" data-view="method" class="aside">Method &amp; sources</a>
   </nav>
 </header>
@@ -67,7 +68,7 @@
   <section id="view-measure" class="view" aria-labelledby="h-measure" hidden>
     <div class="section-head">
       <h2 id="h-measure">2 · What one task actually costs</h2>
-      <p>Measured across <span id="m-nruns"></span> DSH runs. Token counts are the provider's own <code>usage</code> fields, recorded per request at the loopback relay. Cost = tokens × the verified public prices.</p>
+      <p>Public endpoint, measured across <span id="m-nruns"></span> DSH runs on 30 October (the historical baseline; dedicated results are in section 3). Token counts are the provider's own <code>usage</code> fields, recorded per request at the loopback relay. Cost = tokens × the verified public prices.</p>
       <div class="filters">
         <label for="m-effort">Reasoning effort</label>
         <select id="m-effort"><option value="medium" selected>medium (demo default)</option><option value="low">low</option><option value="high">high</option><option value="all">all</option></select>
@@ -88,10 +89,29 @@
     </details>
   </section>
 
-  <!-- ======================================================== 3. ECONOMICS -->
+  <!-- ======================================================== 3. DEDICATED (measured) -->
+  <section id="view-dedicated" class="view" aria-labelledby="h-ded" hidden>
+    <div class="section-head">
+      <h2 id="h-ded">3 · The same agent on a dedicated endpoint</h2>
+      <p>Real DSH runs on <code>ecole-demo</code>, a Token Factory dedicated endpoint: <span id="d-hw"></span>. It ran the same tasks, hidden tests, DSH version and reasoning effort as the public runs, plus paired public controls in the same window. Every request was checked against the endpoint it is labelled with.</p>
+    </div>
+    <div class="tiles" id="d-tiles"></div>
+    <div class="grid two">
+      <figure class="panel"><figcaption>Task time, same tasks <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-task"></canvas></div><p class="note">Medians per task. Public historical: 30 Oct. Public control and dedicated: 2 Nov, same measurement window.</p></figure>
+      <figure class="panel"><figcaption>Per-request speed <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-speed"></canvas></div><p class="note" id="d-speed-note"></p></figure>
+      <figure class="panel"><figcaption>Concurrency: agents running at once on one 4× H100 replica <span class="ev ev-measured">Measured</span></figcaption><div class="chart"><canvas id="c-d-conc"></canvas></div><p class="note" id="d-conc-note"></p></figure>
+      <figure class="panel"><figcaption>Per-user decode speed vs requests in flight <span class="ev ev-measured">Measured</span> <span class="ev ev-benchmark">Extrapolated</span></figcaption><div class="chart"><canvas id="c-d-curve"></canvas></div><p class="note">Dots: measured requests (in-flight load averaged over each request). Line: the capacity curve used in sections 4–5, measured up to 5 concurrent requests and extrapolated from the benchmark shape beyond.</p></figure>
+    </div>
+    <div class="grid two">
+      <div class="panel callout" id="d-cost"></div>
+      <div class="panel callout" id="d-compat"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== 4. ECONOMICS -->
   <section id="view-economics" class="view" aria-labelledby="h-econ" hidden>
     <div class="section-head">
-      <h2 id="h-econ">3 · Pay per token or pay per GPU-hour?</h2>
+      <h2 id="h-econ">4 · Pay per token or pay per GPU-hour?</h2>
       <p>Public endpoint: measured tokens per task × verified prices. Dedicated endpoint: GPU-hours × an assumed price. The number of GPUs is sized from benchmark throughput, so <strong>bigger volume means more GPUs</strong>, not one GPU that absorbs everything.</p>
     </div>
     <div class="grid econ-grid">
@@ -99,14 +119,14 @@
         <h3>Workload <span class="ev ev-measured">Measured</span></h3>
         <label class="field" for="e-effort">Agent profile</label>
         <select id="e-effort"><option value="medium" selected>medium effort, all 3 tasks</option><option value="low">low effort</option><option value="high">high effort</option></select>
-        <h3>Dedicated endpoint <span class="ev ev-assumption">Assumption</span></h3>
-        <label class="field" for="e-gpu">GPU per replica</label>
+        <h3>Dedicated endpoint <span class="ev ev-measured">Measured</span> <span class="ev ev-assumption">Assumption</span></h3>
+        <label class="field" for="e-gpu">Replica configuration</label>
         <select id="e-gpu"></select>
-        <label class="field" for="e-price">Price per GPU-hour (USD)</label>
+        <label class="field" for="e-price">Price per replica-hour (USD)</label>
         <input id="e-price" type="number" step="0.05" min="0.1">
         <p class="hint" id="e-price-hint"></p>
         <label class="field" for="e-speed">Per-user speed to guarantee (tok/s)</label>
-        <select id="e-speed"><option value="90" selected>90 (throughput)</option><option value="143">143 (balanced)</option><option value="197">197 (low latency)</option></select>
+        <select id="e-speed"><option value="90" selected>90 (throughput)</option><option value="120">120</option><option value="143">143 (balanced)</option><option value="197">197 (low latency)</option></select>
         <label class="field" for="e-util">Target peak utilisation <output id="e-util-o"></output></label>
         <input id="e-util" type="range" min="0.3" max="0.95" step="0.05" value="0.7">
         <label class="field" for="e-peak">Peak-to-average traffic <output id="e-peak-o"></output></label>
@@ -140,7 +160,7 @@
   <!-- ======================================================== 4. CLASSROOM -->
   <section id="view-classroom" class="view" aria-labelledby="h-class" hidden>
     <div class="section-head">
-      <h2 id="h-class">4 · A classroom of agents</h2>
+      <h2 id="h-class">5 · A classroom of agents</h2>
       <p>Every simulated student runs real recorded DSH trajectories: the same sequence of LLM requests, token counts and tool gaps that we measured. The simulation then asks whether each backend keeps up, and at what cost.</p>
     </div>
     <div class="grid econ-grid">
@@ -167,12 +187,12 @@
         <input id="s-mult" type="range" min="1" max="20" step="1" value="1">
         <label class="check"><input id="s-dyn" type="checkbox" checked> Documented auto-scaling (+20% per busy 15 min)</label>
         <label class="check"><input id="s-cachedtpm" type="checkbox" checked> Cached tokens count towards tokens/min <span class="ev ev-estimate">Estimate</span> <span class="hint">(inferred from response headers)</span></label>
-        <h3>Dedicated endpoint <span class="ev ev-assumption">Assumption</span></h3>
-        <label class="field" for="s-gpu">GPU per replica</label>
+        <h3>Dedicated endpoint <span class="ev ev-measured">Measured</span> <span class="ev ev-assumption">Assumption</span></h3>
+        <label class="field" for="s-gpu">Replica configuration</label>
         <select id="s-gpu"></select>
         <label class="field" for="s-replicas">Replicas</label>
         <select id="s-replicas"><option value="auto" selected>Auto: smallest count with p95 slowdown ≤ 1.5×</option></select>
-        <label class="field" for="s-price">Price per GPU-hour (USD)</label>
+        <label class="field" for="s-price">Price per replica-hour (USD)</label>
         <input id="s-price" type="number" step="0.05" min="0.1">
         <label class="field" for="s-sessions">Sessions per month (for monthly cost)</label>
         <input id="s-sessions" type="number" min="1" max="60" value="8">

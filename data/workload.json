@@ -1,5 +1,6 @@
 {
  "schema": 1,
+ "cohort": "public-historical (2026-10-30)",
  "groups": {
   "t1-grade-average|low": {
    "task": "t1-grade-average",

@@ -1,0 +1,54 @@
+diff --git a/timeutil/duration.py b/timeutil/duration.py
+index ca557cd..e84dd87 100644
+--- a/timeutil/duration.py
++++ b/timeutil/duration.py
+@@ -34,4 +34,48 @@ def parse_duration(text: str) -> int:
+       unknown units like "3w", missing number like "h") raises ValueError.
+     * The result must satisfy parse_duration(format_duration(n)) == n.
+     """
+-    raise NotImplementedError
++    # Strip whitespace
++    stripped = text.strip()
++    if not stripped:
++        raise ValueError("invalid duration string")
++
++    # If the string is just an integer, interpret as seconds
++    if stripped.isdigit():
++        return int(stripped)
++
++    # Remove spaces to simplify parsing of concatenated components
++    compact = stripped.replace(" ", "")
++    import re
++    pattern = re.compile(r"(\d+)([dhmsDHMS])")
++    matches = list(pattern.finditer(compact))
++    if not matches:
++        raise ValueError("invalid duration string")
++
++    # Build helpers for unit sizes and ordering
++    unit_to_seconds = {unit: size for unit, size in _UNITS}
++    unit_rank = {unit: idx for idx, (unit, _) in enumerate(_UNITS)}
++
++    total_seconds = 0
++    seen = set()
++    last_rank = -1
++    pos = 0
++    for m in matches:
++        if m.start() != pos:
++            # There is some unexpected character between matches
++            raise ValueError("invalid duration string")
++        num_str, unit = m.group(1), m.group(2).lower()
++        if unit not in unit_to_seconds:
++            raise ValueError("unknown unit in duration")
++        if unit in seen:
++            raise ValueError("duplicate unit in duration")
++        rank = unit_rank[unit]
++        # Units must be in decreasing order: rank must increase
++        if rank <= last_rank:
++            raise ValueError("units out of order")
++        seen.add(unit)
++        last_rank = rank
++        total_seconds += int(num_str) * unit_to_seconds[unit]
++        pos = m.end()
++    if pos != len(compact):
++        raise ValueError("invalid duration string")
++    return total_seconds

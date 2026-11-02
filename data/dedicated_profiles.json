@@ -17,11 +17,74 @@
     "prefill_tps": "Assumed per-request prefill speed (uncached tokens/s): H100 10k, H200 12k, B200 25k. Not benchmarked here; contributes ~0.1-0.5 s per request.",
     "base_latency_s": 0.15,
     "cached_tokens": "Prefix-cache hits are treated as free (cachedWorkWeight 0); adjustable.",
-    "h100_tp1": "vLLM recipe: TP=1 on H100 needs --gpu-memory-utilization 0.95; KV cache is tight, hence the lower concurrency cap."
+    "h100_tp1": "vLLM recipe: TP=1 on H100 needs --gpu-memory-utilization 0.95; KV cache is tight, hence the lower concurrency cap.",
+    "measured_profile": "h100x4 is calibrated on the 2026-11-02 benchmark of ecole-demo (data/dedicated_benchmark.json); see its extrapolation note for loads above 5 concurrent requests."
   },
   "gpus": {
+    "h100x4": {
+      "label": "4x H100 replica (ecole-demo, measured)",
+      "evidence": "measured (concurrency 1-5) + extrapolated (> 5)",
+      "gpus_per_replica": 4,
+      "points": [
+        {
+          "concurrency_per_gpu": 0.25,
+          "interactivity": 181.2,
+          "source": "measured",
+          "requests": 106,
+          "per_replica_concurrency": 1
+        },
+        {
+          "concurrency_per_gpu": 0.5,
+          "interactivity": 172.9,
+          "source": "measured",
+          "requests": 46,
+          "per_replica_concurrency": 2
+        },
+        {
+          "concurrency_per_gpu": 0.75,
+          "interactivity": 150.9,
+          "source": "measured",
+          "requests": 44,
+          "per_replica_concurrency": 3
+        },
+        {
+          "concurrency_per_gpu": 1.25,
+          "interactivity": 147.1,
+          "source": "measured",
+          "requests": 52,
+          "per_replica_concurrency": 5
+        },
+        {
+          "concurrency_per_gpu": 1.5,
+          "interactivity": 147.1,
+          "source": "extrapolated",
+          "per_replica_concurrency": 6
+        },
+        {
+          "concurrency_per_gpu": 3.25,
+          "interactivity": 106.8,
+          "source": "extrapolated",
+          "per_replica_concurrency": 13
+        },
+        {
+          "concurrency_per_gpu": 8.0,
+          "interactivity": 67.2,
+          "source": "extrapolated",
+          "per_replica_concurrency": 32
+        }
+      ],
+      "measured_max_per_replica_concurrency": 5,
+      "extrapolation": "Beyond 5 concurrent requests per replica: InferenceX 4-GPU H100 instance curve (6/13/32 concurrent at 197/143/90 tok/s/user) scaled by 0.747 = measured p50 decode at 5 concurrent / benchmark 197 tok/s.",
+      "base_latency_s": 0.26,
+      "prefill_tps": 70000,
+      "cached_work_weight": 1,
+      "prefill_note": "Calibrated to measured TTFT: 0.26 s for a 74-token prompt (Phase 1), 0.35 s p50 for prompts < 6k and 0.42 s for >= 9k tokens. The dedicated endpoint reports no cached tokens, so every prompt token is treated as prefilled (cached_work_weight 1).",
+      "max_concurrency_per_gpu": 64,
+      "max_concurrency_note": "Assumption: 256 sequences per replica (vLLM default max_num_seqs); KV cache is not binding on 4x80 GB with ~65 GB of fp4 weights.",
+      "offered": "Token Factory template for openai/gpt-oss-120b (base, eu-north1): gpu-h100-sxm with 4 or 8 GPUs per replica"
+    },
     "h100": {
-      "label": "1x H100 80GB (TP1)",
+      "label": "1x H100 80GB (TP1) (benchmark, not a Token Factory option for this model)",
       "gpus_per_replica": 1,
       "points": [
         {
@@ -42,7 +105,7 @@
       "prefill_tps": 10000
     },
     "h200": {
-      "label": "1x H200 141GB (TP1)",
+      "label": "1x H200 141GB (TP1) (benchmark, us-central1 template)",
       "gpus_per_replica": 1,
       "points": [
         {
@@ -63,7 +126,7 @@
       "prefill_tps": 12000
     },
     "b200": {
-      "label": "1x B200 180GB (TP1)",
+      "label": "1x B200 180GB (TP1) (benchmark, not in the Token Factory template)",
       "gpus_per_replica": 1,
       "points": [
         {

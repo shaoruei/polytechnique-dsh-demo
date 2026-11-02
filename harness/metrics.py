@@ -136,6 +136,42 @@ def tool_calls_from_session(events: list[dict]) -> list[dict]:
     return out
 
 
+def verify_endpoint(wire: list[dict], expected_model: str) -> dict:
+    """Did every recorded chat request go to, and get answered by, the intended endpoint?"""
+    chats = [r for r in wire if r.get("path", "").endswith("/chat/completions") and r.get("method") == "POST"]
+    sent_ok = sum(1 for r in chats if r.get("model") == expected_model)
+    answered = [r for r in chats if r.get("response_model") is not None]
+    answered_ok = sum(1 for r in answered if r["response_model"] == expected_model)
+    return {
+        "expected_model": expected_model,
+        "chat_requests": len(chats),
+        "request_model_matches": sent_ok,
+        "responses_with_model": len(answered),
+        "response_model_matches": answered_ok,
+        "guard_rejections": sum(1 for r in chats if r.get("guard_rejected")),
+        "upstreams": sorted({r.get("upstream") for r in chats if r.get("upstream")}),
+        "verified": bool(chats) and sent_ok == len(chats) and answered_ok == len(answered) and len(answered) > 0,
+    }
+
+
+def http_errors(wire: list[dict]) -> dict:
+    """Non-200 chat responses, and time from the first failure to the next success."""
+    chats = sorted((r for r in wire if r.get("path", "").endswith("/chat/completions")), key=lambda r: r.get("t_recv", 0))
+    errors = [r for r in chats if r.get("status") != 200 or r.get("error")]
+    recovery = []
+    for i, r in enumerate(chats):
+        if r in errors and (i == 0 or chats[i - 1] not in errors):
+            nxt = next((q for q in chats[i + 1:] if q not in errors), None)
+            if nxt:
+                recovery.append(round(nxt["t_recv"] - r["t_recv"], 3))
+    return {
+        "errors": len(errors),
+        "statuses": sorted({r.get("status") for r in errors}),
+        "recovery_s": recovery,
+        "messages": [str(r.get("error"))[:200] for r in errors][:5],
+    }
+
+
 def compute(session_text: str, wire: list[dict]) -> dict | None:
     events = parse_session(session_text) if session_text else []
     reqs = requests_from_wire(wire) if wire else requests_from_session(events)
@@ -181,6 +217,7 @@ def compute(session_text: str, wire: list[dict]) -> dict | None:
         "tool_calls_failed": sum(1 for t in tools if t["is_error"]),
         "tool_calls_by_name": by_name,
         "tool_index_repairs": sum(r.get("tool_index_repairs") or 0 for r in reqs),
+        "http": http_errors(wire) if wire else None,
         "requests": reqs,
         "tools": tools,
     }

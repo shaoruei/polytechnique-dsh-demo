@@ -1,0 +1,187 @@
+{
+  "retrieved_at": "2026-11-02T10:49:42+00:00",
+  "source": "GET https://api.tokenfactory.nebius.com/v0/dedicated_endpoints, /v0/dedicated_endpoints/templates, /v1/models?verbose=true (proxy-injected credential; responses contain no secrets)",
+  "endpoint": [
+    {
+      "id": "3456b982-6f35-4a9e-b4bc-965baf020995",
+      "name": "ecole-demo",
+      "description": "",
+      "enabled": true,
+      "routing_key": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+      "model_name": "openai/gpt-oss-120b",
+      "flavor_name": "base",
+      "region": "eu-north1",
+      "gpu_type": "gpu-h100-sxm",
+      "gpu_count": 4,
+      "custom_weights_id": null,
+      "scaling": {
+        "min_replicas": 1,
+        "max_replicas": 1
+      },
+      "reservation_policy": {
+        "policy": "FORBID",
+        "reservation_ids": []
+      },
+      "deployment": {
+        "ready_replicas": 1,
+        "status": "running",
+        "readiness": "ready"
+      },
+      "created_at": "2026-11-02T10:26:41.708925Z"
+    }
+  ],
+  "gpt_oss_120b_template": [
+    {
+      "name": "openai/gpt-oss-120b",
+      "type": "text2text",
+      "metadata": {
+        "huggingface_url": "https://huggingface.co/openai/gpt-oss-120b",
+        "vendor": "openai",
+        "context_window_k": 131,
+        "size_b": 120.0,
+        "license": {
+          "url": "https://huggingface.co/datasets/choosealicense/licenses/blob/main/markdown/apache-2.0.md",
+          "name": "Apache 2.0 License"
+        }
+      },
+      "flavors": {
+        "base": {
+          "quantization": "fp4",
+          "use_cases": [
+            "text",
+            "code",
+            "fine_tune",
+            "function_calling",
+            "reasoning"
+          ],
+          "tags": [
+            "131K context",
+            "code",
+            "JSON mode",
+            "math",
+            "reasoning"
+          ],
+          "base_model_slug": "openai/gpt-oss-120b-FP4",
+          "available_configurations": {
+            "gpu_configurations": {
+              "gpu-h100-sxm": {
+                "allowed_regions": [
+                  "eu-north1"
+                ],
+                "allowed_gpu_counts": [
+                  4,
+                  8
+                ],
+                "max_replicas_allowed": 32
+              },
+              "gpu-h200-sxm": {
+                "allowed_regions": [
+                  "us-central1"
+                ],
+                "allowed_gpu_counts": [
+                  1,
+                  2,
+                  4,
+                  8
+                ],
+                "max_replicas_allowed": 32
+              }
+            }
+          }
+        },
+        "fast": {
+          "quantization": "fp4",
+          "use_cases": [
+            "text",
+            "code",
+            "fine_tune",
+            "function_calling",
+            "reasoning"
+          ],
+          "tags": [
+            "131K context",
+            "code",
+            "JSON mode",
+            "math",
+            "reasoning"
+          ],
+          "base_model_slug": null,
+          "available_configurations": {
+            "gpu_configurations": {
+              "gpu-h100-sxm": {
+                "allowed_regions": [
+                  "eu-north1"
+                ],
+                "allowed_gpu_counts": [
+                  4,
+                  8
+                ],
+                "max_replicas_allowed": 8
+              },
+              "gpu-h200-sxm": {
+                "allowed_regions": [
+                  "us-central1"
+                ],
+                "allowed_gpu_counts": [
+                  4,
+                  8
+                ],
+                "max_replicas_allowed": 8
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models_entry": [
+    {
+      "id": "dedicated/openai/gpt-oss-120b-ZkdOyl",
+      "name": "ecole-demo",
+      "created": 1793615201,
+      "description": "",
+      "context_length": 131072,
+      "architecture": {
+        "modality": "text->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "fp4",
+      "pricing": {
+        "prompt": "0.0",
+        "completion": "0.0",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0",
+        "input_cache_read": null
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 10000000000.0,
+        "requests_per_minute": 10000000000.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "FI",
+          "name": "eu-north1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "json_mode",
+        "structured_outputs",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty"
+      ]
+    }
+  ]
+}

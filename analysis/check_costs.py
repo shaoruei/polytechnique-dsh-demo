@@ -29,6 +29,11 @@ def main() -> int:
     total, bad, checked = Decimal(0), 0, 0
     for wire_file in sorted((ROOT / "runs").glob("*/requests.jsonl")):
         run_id = wire_file.parent.name
+        # Only public-endpoint traffic is billed per token. Dedicated traffic (routing key
+        # dedicated/...) is billed per GPU-hour and is checked in analysis/dedicated_analysis.py.
+        models = {json.loads(l).get("model") for l in wire_file.read_text().splitlines()} - {None}
+        if not models or any(m != "openai/gpt-oss-120b" for m in models):
+            continue
         cost = Decimal(0)
         for line in wire_file.read_text().splitlines():
             rec = json.loads(line)

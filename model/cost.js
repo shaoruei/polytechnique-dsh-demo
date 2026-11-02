@@ -134,15 +134,17 @@ export function breakEvenTasks({ perTask, prices, schedule, gpu, targetInteracti
   if (perGpu <= 0) return { tasks: null, reason: 'target interactivity not reachable on this GPU' };
   // Tasks one GPU can absorb per month at the target utilisation.
   const activeSeconds = activeHoursPerMonth(schedule) * 3600;
-  const tasksPerGpu = (perGpu * targetUtilization * activeSeconds) / (perTask.tokens.output * peakFactor);
-  const gpuMonthCost = gpu.pricePerGpuHour * hours;
+  // capacity is bought in whole replicas (e.g. 4x H100 for gpt-oss-120b on Token Factory)
+  const gpr = gpu.profile.gpus_per_replica || 1;
+  const tasksPerGpu = (perGpu * gpr * targetUtilization * activeSeconds) / (perTask.tokens.output * peakFactor);
+  const gpuMonthCost = gpu.pricePerGpuHour * gpr * hours;
   // Within the k-th GPU step, dedicated cost = k x gpuMonthCost while volume in ((k-1)T, kT].
   // Public cost reaches k x gpuMonthCost at V = k x gpuMonthCost / costPerTask.
   const vPerGpuBreakEven = gpuMonthCost / costPerTask; // volume where public pays for one GPU-month
   if (vPerGpuBreakEven > tasksPerGpu) {
     return {
       tasks: null,
-      reason: 'never: one GPU saturates before its cost is covered by public pricing',
+      reason: 'never: one replica saturates before its cost is covered by public pricing',
       tasksPerGpu,
       publicTasksPerGpuMonthCost: vPerGpuBreakEven,
       costPerTask,
@@ -160,7 +162,10 @@ export function breakEvenTasks({ perTask, prices, schedule, gpu, targetInteracti
   return {
     tasks: Math.min(g, maxTasks),
     permanentFromTasks: Number.isFinite(permanent) ? permanent : null,
-    gpusAtPermanent: Number.isFinite(k0) ? k0 : null,
+    replicasAtPermanent: Number.isFinite(k0) ? k0 : null,
+    gpusAtPermanent: Number.isFinite(k0) ? k0 * gpr : null,
+    tasksPerReplica: T,
+    replicaMonthCost: gpuMonthCost,
     tasksPerGpu,
     publicTasksPerGpuMonthCost: vPerGpuBreakEven,
     costPerTask,

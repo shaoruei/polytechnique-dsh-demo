@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "run_id": "20261102T105333Z_t1_medium",
+  "label": "public-control",
+  "task": "t1-grade-average",
+  "model": "openai/gpt-oss-120b",
+  "endpoint": "public",
+  "endpoint_label": "Public serverless endpoint",
+  "request_model": "openai/gpt-oss-120b",
+  "provider": "Nebius Token Factory (Public serverless endpoint)",
+  "base_url": "https://api.tokenfactory.nebius.com/v1",
+  "cohort": "public-control",
+  "wave": "",
+  "endpoint_verification": {
+    "expected_model": "openai/gpt-oss-120b",
+    "chat_requests": 6,
+    "request_model_matches": 6,
+    "responses_with_model": 6,
+    "response_model_matches": 6,
+    "guard_rejections": 0,
+    "upstreams": [
+      "https://api.tokenfactory.nebius.com"
+    ],
+    "verified": true
+  },
+  "reasoning_effort": "medium",
+  "dsh_version": "0.2.1-rc.5",
+  "permission_mode": "workspace-write",
+  "relay": true,
+  "started_at": "2026-11-02T10:53:34.079333+00:00",
+  "ended_at": "2026-11-02T10:53:40.518001+00:00",
+  "wall_time_s": 6.439,
+  "timeout_s": 300,
+  "timed_out": false,
+  "dsh_exit_code": 0,
+  "dsh_stderr_tail": "",
+  "turn_end_reason": {
+    "kind": "completed"
+  },
+  "agent_final_answer": "Implemented correct weighted average calculation in `gradebook/grades.py`:\n- Now only includes items with non\u2011None scores.\n- Normalizes by the sum of used weights.\n- Returns `None` when no graded items exist.\n- Updated logic replaces previous incorrect handling.\n\nAll tests now pass:\n\n```\n5 passed in 0.000s\n```",
+  "success": true,
+  "acceptance": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 10,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.059,
+    "output_tail": "..........\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK\n"
+  },
+  "agent_test_suite": {
+    "ok": true,
+    "exit_code": 0,
+    "tests_run": 5,
+    "failures": 0,
+    "errors": 0,
+    "duration_s": 0.058,
+    "output_tail": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n"
+  },
+  "modified_test_files": [],
+  "diff_stats": {
+    "files_changed": 1,
+    "lines_added": 8,
+    "lines_removed": 4,
+    "untracked_files": []
+  },
+  "metrics": {
+    "usage_source": "provider (relay wire log)",
+    "llm_requests": 6,
+    "llm_requests_failed": 0,
+    "prompt_tokens": 28079,
+    "cached_input_tokens": 18864,
+    "uncached_input_tokens": 9215,
+    "output_tokens": 581,
+    "cache_hit_rate": 0.6718,
+    "max_prompt_tokens": 5348,
+    "cost_usd": 0.003617,
+    "cost_usd_without_cache_discount": 0.00456,
+    "llm_time_s": 4.024,
+    "tool_time_s": 0.19,
+    "session_span_s": 4.545,
+    "ttft_s_p50": 0.422,
+    "ttft_s_p90": 0.539,
+    "ttft_s_mean": 0.444,
+    "decode_tps_p50": 432.4,
+    "decode_tps_mean": 407.1,
+    "latency_s_p50": 0.58,
+    "tool_calls": 5,
+    "tool_calls_failed": 1,
+    "tool_calls_by_name": {
+      "glob": 2,
+      "read": 1,
+      "edit": 1,
+      "bash": 1
+    },
+    "tool_index_repairs": 5,
+    "http": {
+      "errors": 0,
+      "statuses": [],
+      "recovery_s": [],
+      "messages": []
+    },
+    "requests": [
+      {
+        "t_start": 1793616815.8649783,
+        "status": 200,
+        "prompt_tokens": 4188,
+        "cached_tokens": 80,
+        "uncached_input_tokens": 4108,
+        "completion_tokens": 46,
+        "latency_s": 0.632,
+        "ttft_s": 0.503,
+        "decode_tps": 356.8,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 3,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793616816.5489697,
+        "status": 200,
+        "prompt_tokens": 4252,
+        "cached_tokens": 80,
+        "uncached_input_tokens": 4172,
+        "completion_tokens": 45,
+        "latency_s": 0.585,
+        "ttft_s": 0.441,
+        "decode_tps": 312.1,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 5,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793616817.2057328,
+        "status": 200,
+        "prompt_tokens": 4326,
+        "cached_tokens": 4272,
+        "uncached_input_tokens": 54,
+        "completion_tokens": 48,
+        "latency_s": 0.45,
+        "ttft_s": 0.343,
+        "decode_tps": 449.5,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 7,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793616817.7063382,
+        "status": 200,
+        "prompt_tokens": 4803,
+        "cached_tokens": 4336,
+        "uncached_input_tokens": 467,
+        "completion_tokens": 319,
+        "latency_s": 1.27,
+        "ttft_s": 0.576,
+        "decode_tps": 459.5,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 9,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793616819.0162039,
+        "status": 200,
+        "prompt_tokens": 5162,
+        "cached_tokens": 4928,
+        "uncached_input_tokens": 234,
+        "completion_tokens": 48,
+        "latency_s": 0.512,
+        "ttft_s": 0.404,
+        "decode_tps": 444.9,
+        "finish_reason": "tool_calls",
+        "tool_index_repairs": 1,
+        "n_messages": 11,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      },
+      {
+        "t_start": 1793616819.6783128,
+        "status": 200,
+        "prompt_tokens": 5348,
+        "cached_tokens": 5168,
+        "uncached_input_tokens": 180,
+        "completion_tokens": 75,
+        "latency_s": 0.575,
+        "ttft_s": 0.396,
+        "decode_tps": 419.9,
+        "finish_reason": "stop",
+        "tool_index_repairs": 0,
+        "n_messages": 13,
+        "usage_source": "provider (relay wire log)",
+        "error": null
+      }
+    ],
+    "tools": [
+      {
+        "name": "glob",
+        "step": 1,
+        "duration_s": 0.012,
+        "is_error": true
+      },
+      {
+        "name": "glob",
+        "step": 2,
+        "duration_s": 0.038,
+        "is_error": false
+      },
+      {
+        "name": "read",
+        "step": 3,
+        "duration_s": 0.008,
+        "is_error": false
+      },
+      {
+        "name": "edit",
+        "step": 4,
+        "duration_s": 0.012,
+        "is_error": false
+      },
+      {
+        "name": "bash",
+        "step": 5,
+        "duration_s": 0.12,
+        "is_error": false
+      }
+    ]
+  }
+}

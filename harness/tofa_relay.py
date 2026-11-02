@@ -38,7 +38,7 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-UPSTREAM = "https://api.tokenfactory.nebius.com"
+UPSTREAM = "https://api.tokenfactory.nebius.com"  # default; see harness/endpoints.py
 HOP_BY_HOP = {"connection", "keep-alive", "transfer-encoding", "te", "trailer", "upgrade",
               "proxy-authorization", "proxy-authenticate", "host", "content-length", "accept-encoding"}
 
@@ -51,7 +51,7 @@ class ToolCallIndexRepair:
         self.current: int | None = None
         self.repairs = 0
 
-    def fix_chunk(self, chunk: dict) -> dict:
+    def fix_chunk(self, chunk: dict, apply: bool = True) -> dict:
         for choice in chunk.get("choices") or []:
             for tc in (choice.get("delta") or {}).get("tool_calls") or []:
                 idx = tc.get("index")
@@ -62,8 +62,9 @@ class ToolCallIndexRepair:
                         self.seen.add(idx)
                         self.current = idx
                 elif self.current is not None and (idx is None or idx not in self.seen):
-                    tc["index"] = self.current
-                    self.repairs += 1
+                    if apply:
+                        tc["index"] = self.current
+                    self.repairs += 1  # counts anomalies even when not applied
         return chunk
 
 
@@ -93,6 +94,9 @@ class Relay(BaseHTTPRequestHandler):
         pass
 
     def _record(self, rec: dict) -> None:
+        if rec.get("response_model") is not None:
+            want = rec.get("expected_model") or rec.get("model")
+            rec["endpoint_verified"] = rec["response_model"] == want
         path = self.server.log_path  # type: ignore[attr-defined]
         if not path:
             return
@@ -110,8 +114,22 @@ class Relay(BaseHTTPRequestHandler):
         t_recv = time.time()
         path = self.path if self.path.startswith("/v1/") else "/v1" + self.path
         headers = {k: v for k, v in self.headers.items() if k.lower() not in HOP_BY_HOP}
-        rec = {"t_recv": t_recv, "method": self.command, "path": path, **summarise_request(body)}
-        req = urllib.request.Request(UPSTREAM + path, data=body or None, headers=headers, method=self.command)
+        srv = self.server
+        rec = {"t_recv": t_recv, "method": self.command, "path": path, **summarise_request(body),
+               "endpoint": srv.endpoint_label, "upstream": srv.upstream, "expected_model": srv.expected_model}
+        # Endpoint guard: a chat request for any model other than the one this relay was started for
+        # is refused locally, so traffic can never be attributed to the wrong endpoint.
+        if srv.expected_model and path.endswith("/chat/completions") and rec.get("model") != srv.expected_model:
+            rec.update(status=400, error="relay endpoint guard: model mismatch", t_end=time.time(), guard_rejected=True)
+            self._record(rec)
+            payload = json.dumps({"error": {"message": f"relay guard: expected model {srv.expected_model}"}}).encode()
+            self.send_response(400)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
+        req = urllib.request.Request(srv.upstream + path, data=body or None, headers=headers, method=self.command)
         try:
             resp = urllib.request.urlopen(req, timeout=600)
             status = resp.status
@@ -149,6 +167,9 @@ class Relay(BaseHTTPRequestHandler):
             try:
                 parsed = json.loads(data)
                 rec["usage"] = parsed.get("usage")
+                if isinstance(parsed, dict) and parsed.get("model"):
+                    rec["response_model"] = parsed.get("model")
+                    rec["response_id"] = parsed.get("id")
                 if status >= 400:
                     rec["error"] = json.dumps(parsed)[:500]
             except ValueError:
@@ -192,11 +213,14 @@ class Relay(BaseHTTPRequestHandler):
                             first_content = now
                         if has_tool and first_tool is None:
                             first_tool = now
+                    if chunk.get("model") and "response_model" not in rec:
+                        rec["response_model"] = chunk.get("model")
+                        rec["response_id"] = chunk.get("id")
                     if chunk.get("usage"):
                         rec["usage"] = chunk["usage"]
                     if chunk.get("error"):
                         rec["error"] = json.dumps(chunk["error"])[:500]
-                    line = "data: " + json.dumps(repair.fix_chunk(chunk), separators=(",", ":")) + "\n"
+                    line = "data: " + json.dumps(repair.fix_chunk(chunk, self.server.repair), separators=(",", ":")) + "\n"
             try:
                 self._write_chunk(line.encode())
             except (BrokenPipeError, ConnectionResetError):
@@ -209,7 +233,7 @@ class Relay(BaseHTTPRequestHandler):
         rec.update(
             t_end=time.time(), t_first_token=first_any, t_first_reasoning=first_reasoning,
             t_first_content=first_content, t_first_tool_call=first_tool, n_chunks=n_chunks,
-            finish_reason=finish_reason, tool_index_repairs=repair.repairs,
+            finish_reason=finish_reason, tool_index_repairs=repair.repairs, repair_applied=self.server.repair,
         )
 
 
@@ -221,10 +245,16 @@ class _Server(ThreadingHTTPServer):
         super().handle_error(request, client_address)
 
 
-def serve(port: int, log_path: str | None) -> ThreadingHTTPServer:
+def serve(port: int, log_path: str | None, upstream: str = UPSTREAM, expected_model: str | None = None,
+          endpoint_label: str | None = None, repair: bool = True) -> ThreadingHTTPServer:
+    """Start a relay. `upstream` is an origin (scheme://host), `expected_model` enables the guard."""
     server = _Server(("127.0.0.1", port), Relay)
     server.daemon_threads = True
     server.log_path = log_path  # type: ignore[attr-defined]
+    server.upstream = upstream.rstrip("/")  # type: ignore[attr-defined]
+    server.expected_model = expected_model  # type: ignore[attr-defined]
+    server.endpoint_label = endpoint_label  # type: ignore[attr-defined]
+    server.repair = repair  # type: ignore[attr-defined]
     return server
 
 
@@ -232,9 +262,12 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--port", type=int, default=8787)
     ap.add_argument("--log", default=None, help="append one JSON line per request")
+    ap.add_argument("--endpoint", default="public", help="endpoint name from harness/endpoints.py")
     args = ap.parse_args()
-    server = serve(args.port, args.log)
-    print(f"tofa-relay listening on http://127.0.0.1:{server.server_address[1]}/v1 -> {UPSTREAM}", flush=True)
+    from endpoints import get_endpoint
+    ep = get_endpoint(args.endpoint)
+    server = serve(args.port, args.log, ep["origin"], ep["model"], ep["name"])
+    print(f"tofa-relay listening on http://127.0.0.1:{server.server_address[1]}/v1 -> {ep['origin']} model={ep['model']}", flush=True)
     server.serve_forever()
 
 

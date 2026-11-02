@@ -17,12 +17,18 @@ const SATURATION_GAIN = 0.15; // aggregate output may grow at most 15% beyond th
 /** Benchmark points converted to per-GPU concurrency, ascending concurrency. */
 export function curvePoints(profile) {
   return profile.points
-    .map((p) => ({
-      interactivity: p.interactivity,
-      tpsPerGpu: p.tps_per_gpu,
-      outputTpsPerGpu: p.tps_per_gpu / (1 + BENCH_RATIO),
-      concurrency: p.tps_per_gpu / (1 + BENCH_RATIO) / p.interactivity,
-    }))
+    .map((p) => {
+      // measured points give per-GPU concurrency directly; benchmark points give tok/s per GPU
+      const concurrency = p.concurrency_per_gpu ?? p.tps_per_gpu / (1 + BENCH_RATIO) / p.interactivity;
+      const outputTpsPerGpu = concurrency * p.interactivity;
+      return {
+        interactivity: p.interactivity,
+        tpsPerGpu: p.tps_per_gpu ?? outputTpsPerGpu * (1 + BENCH_RATIO),
+        outputTpsPerGpu,
+        concurrency,
+        source: p.source ?? 'benchmark',
+      };
+    })
     .sort((a, b) => a.concurrency - b.concurrency);
 }
 
@@ -75,13 +81,17 @@ export function capacityPerGpu(profile, targetInteractivity, efficiency = 1) {
 }
 
 /** Fixed (non-decode) part of a request on a dedicated replica, seconds. */
-export function prefillSeconds(profile, step, { baseLatency = 0.15, cachedWorkWeight = 0 } = {}) {
-  return baseLatency + (step.u + cachedWorkWeight * step.c) / profile.prefill_tps;
+export function prefillSeconds(profile, step, { baseLatency, cachedWorkWeight } = {}) {
+  const base = baseLatency ?? profile.base_latency_s ?? 0.15;
+  const w = cachedWorkWeight ?? profile.cached_work_weight ?? 0;
+  return base + (step.u + w * step.c) / profile.prefill_tps;
 }
 
 /** Request latency on an otherwise idle replica (seconds). */
 export function soloRequestSeconds(profile, step, opts = {}) {
-  return prefillSeconds(profile, step, opts) + step.o / (interactivityAt(profile, 1) * (opts.efficiency ?? 1));
+  // one request alone on a replica = 1 / gpus_per_replica requests per GPU
+  const c = 1 / (profile.gpus_per_replica || 1);
+  return prefillSeconds(profile, step, opts) + step.o / (interactivityAt(profile, c) * (opts.efficiency ?? 1));
 }
 
 export const constants = { BENCH_RATIO, SATURATION_GAIN };

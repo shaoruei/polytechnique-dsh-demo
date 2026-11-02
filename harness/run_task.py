@@ -39,7 +39,8 @@ sys.path.insert(0, str(ROOT / "harness"))
 
 import metrics  # noqa: E402
 import tofa_relay  # noqa: E402
-from sanitize import sanitize_text  # noqa: E402
+from endpoints import get_endpoint  # noqa: E402
+from sanitize import sanitize_jsonl, sanitize_text  # noqa: E402
 
 TASKS_DIR = ROOT / "tasks"
 RUNS_DIR = ROOT / "runs"
@@ -195,6 +196,10 @@ def main() -> int:
                     choices=["workspace-write", "danger-full-access"], help="DSH_PERMISSION_MODE")
     ap.add_argument("--live", action="store_true", help="print the agent trajectory while it runs")
     ap.add_argument("--label", default="", help="free-form label stored with the run (e.g. 'live-demo')")
+    ap.add_argument("--endpoint", default="public", help="public | dedicated (see harness/endpoints.py)")
+    ap.add_argument("--cohort", default="", help="experiment cohort, e.g. dedicated-seq, conc-3, public-control")
+    ap.add_argument("--wave", default="", help="concurrency wave id (runs started together)")
+    ap.add_argument("--suffix", default="", help="extra run-id suffix (unique names for concurrent runs)")
     ap.add_argument("--no-relay", action="store_true",
                     help="talk to Token Factory directly (tool calls break on the current stream bug)")
     ap.add_argument("--keep-workdir", action="store_true", help="keep the scratch workspace and DSH home")
@@ -203,7 +208,12 @@ def main() -> int:
     task_dir = resolve_task(args.task)
     prompt = (task_dir / "task.md").read_text()
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ep = get_endpoint(args.endpoint)
     run_id = f"{stamp}_{task_dir.name.split('-')[0]}_{args.effort}"
+    if ep["name"] != "public":
+        run_id += f"_{ep['name']}"
+    if args.suffix:
+        run_id += f"_{args.suffix}"
     out = RUNS_DIR / run_id
     scratch = CACHE_DIR / run_id
     work, dsh_home = scratch / "workspace", scratch / "dsh-home"
@@ -213,15 +223,19 @@ def main() -> int:
     (out / "prompt.md").write_text(prompt)
 
     # Loopback relay (stream repair + wire-level measurement), see harness/tofa_relay.py.
-    relay = tofa_relay.serve(0, str(out / "requests.jsonl"))
+    relay = tofa_relay.serve(0, str(out / "requests.jsonl"), ep["origin"], ep["model"], ep["name"])
     threading.Thread(target=relay.serve_forever, daemon=True).start()
     relay_url = f"http://127.0.0.1:{relay.server_address[1]}/v1"
 
     # Per-run overlay = the committed overlay with the run's reasoning effort and, unless
     # --no-relay, the loopback relay as base URL.
     overlay = PATCH.read_text().replace("reasoningEffort: medium", f"reasoningEffort: {args.effort}")
+    # endpoint selection: model id / routing key and upstream origin
+    overlay = overlay.replace("- id: openai/gpt-oss-120b", f"- id: {ep['model']}")
+    overlay = overlay.replace("model: openai/gpt-oss-120b", f"model: {ep['model']}")
+    overlay = overlay.replace("baseURL: https://api.tokenfactory.nebius.com/v1", f"baseURL: {ep['origin']}/v1")
     if not args.no_relay:
-        overlay = overlay.replace("baseURL: https://api.tokenfactory.nebius.com/v1", f"baseURL: {relay_url}")
+        overlay = overlay.replace(f"baseURL: {ep['origin']}/v1", f"baseURL: {relay_url}")
     run_patch = scratch / "run.patch.yml"
     run_patch.write_text(overlay)
     (out / "dsh-overlay.yml").write_text(overlay.replace(relay_url, "http://127.0.0.1:<relay-port>/v1"))
@@ -232,7 +246,8 @@ def main() -> int:
     env.setdefault("TOFA_API_KEY", PLACEHOLDER_KEY)
     cmd = ["dsh", "--profile", "headless", "--patch", str(run_patch), "--json", prompt]
 
-    print(f"run {run_id}: task={task_dir.name} effort={args.effort} timeout={args.timeout}s", flush=True)
+    print(f"run {run_id}: task={task_dir.name} effort={args.effort} endpoint={ep['name']} model={ep['model']} "
+          f"timeout={args.timeout}s", flush=True)
     started_at = dt.datetime.now(dt.timezone.utc)
     t0 = time.monotonic()
     proc = subprocess.Popen(cmd, cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -249,7 +264,7 @@ def main() -> int:
     events, session_id = [], None
     with open(out / "events.jsonl", "w") as ev_file:
         for line in proc.stdout:
-            line = sanitize_text(line)
+            line = sanitize_jsonl(line)
             ev_file.write(line)
             try:
                 event = json.loads(line)
@@ -269,45 +284,90 @@ def main() -> int:
     ended_at = dt.datetime.now(dt.timezone.utc)
 
     print(f"agent exited with {code} after {wall:.1f}s{' (TIMEOUT)' if timed_out else ''}; judging...", flush=True)
+    final = next((e.get("text", "") for e in reversed(events) if e.get("type") == "final"), None)
+    turn_end = next((e.get("reason") for e in reversed(events) if e.get("type") == "status" and e.get("phase") == "turn_end"), None)
+    meta = {
+        "run_id": run_id, "label": args.label, "task": task_dir.name, "endpoint": ep["name"], "cohort": args.cohort,
+        "wave": args.wave, "effort": args.effort, "permission_mode": args.permission_mode, "relay": not args.no_relay,
+        "started_at": started_at.isoformat(), "ended_at": ended_at.isoformat(), "wall_time_s": round(wall, 3),
+        "timeout_s": args.timeout, "timed_out": timed_out, "dsh_exit_code": code,
+        "dsh_stderr_tail": sanitize_text(stderr[-2000:]), "turn_end_reason": turn_end, "agent_final_answer": final,
+        "session_id": session_id, "wall_time_source": "harness wall clock",
+    }
+    (scratch / "meta.json").write_text(json.dumps(meta, indent=1))
+    try:
+        result = finalize(meta, scratch, out)
+    except Exception as exc:  # never lose a run: record the failure, keep the workspace for finalize_run.py
+        import traceback
+        (out / "result.json").write_text(json.dumps({**meta, "schema": 1, "success": None,
+                                                      "harness_error": traceback.format_exc()[-3000:]}, indent=2) + "\n")
+        print(f"HARNESS ERROR (workspace kept in {scratch}): {exc}", flush=True)
+        return 3
+    if not args.keep_workdir:
+        shutil.rmtree(scratch, ignore_errors=True)
+    return 0 if result["success"] else 1
+
+
+_DSH_VERSION = None
+
+
+def dsh_version_safe() -> str:
+    global _DSH_VERSION
+    if _DSH_VERSION is None:
+        try:
+            _DSH_VERSION = dsh_version()
+        except Exception:  # noqa: BLE001
+            _DSH_VERSION = "unknown"
+    return _DSH_VERSION
+
+
+def finalize(meta: dict, scratch: Path, out: Path) -> dict:
+    """Judge, decode the session log, compute metrics and write result.json (re-runnable offline)."""
+    task_dir = resolve_task(meta["task"])
+    ep = get_endpoint(meta["endpoint"])
+    work, dsh_home = scratch / "workspace", scratch / "dsh-home"
     judged = acceptance(task_dir, work)
     agent_suite = run_unittests(work)
     diff = git(work, "diff", "--", ".", ":(exclude)**/__pycache__/**")
     untracked = [f for f in git(work, "ls-files", "--others", "--exclude-standard").split() if "__pycache__" not in f]
     (out / "diff.patch").write_text(sanitize_text(diff))
-
     session_text = ""
-    log = find_session_log(dsh_home, session_id)
+    log = find_session_log(dsh_home, meta.get("session_id"))
     if log:
-        session_text = sanitize_text(decode_session(log))
+        session_text = sanitize_jsonl(decode_session(log))
         (out / "session.jsonl").write_text(session_text)
     requests_path = out / "requests.jsonl"
     wire = [json.loads(l) for l in requests_path.read_text().splitlines()] if requests_path.exists() else []
     run_metrics = metrics.compute(session_text, wire)
-
-    final = next((e.get("text", "") for e in reversed(events) if e.get("type") == "final"), None)
-    turn_end = next((e.get("reason") for e in reversed(events) if e.get("type") == "status" and e.get("phase") == "turn_end"), None)
     result = {
         "schema": 1,
-        "run_id": run_id,
-        "label": args.label,
+        "run_id": meta["run_id"],
+        "label": meta["label"],
         "task": task_dir.name,
         "model": "openai/gpt-oss-120b",
-        "provider": "Nebius Token Factory (public endpoint)",
-        "base_url": "https://api.tokenfactory.nebius.com/v1",
-        "reasoning_effort": args.effort,
-        "dsh_version": dsh_version(),
-        "permission_mode": args.permission_mode,
-        "relay": not args.no_relay,
-        "started_at": started_at.isoformat(),
-        "ended_at": ended_at.isoformat(),
-        "wall_time_s": round(wall, 3),
-        "timeout_s": args.timeout,
-        "timed_out": timed_out,
-        "dsh_exit_code": code,
-        "dsh_stderr_tail": sanitize_text(stderr[-2000:]),
-        "turn_end_reason": turn_end,
-        "agent_final_answer": final,
-        "success": bool(judged["ok"]) and not timed_out,
+        "endpoint": ep["name"],
+        "endpoint_label": ep["label"],
+        "request_model": ep["model"],
+        "provider": f"Nebius Token Factory ({ep['label']})",
+        "base_url": f"{ep['origin']}/v1",
+        "cohort": meta["cohort"],
+        "wave": meta["wave"],
+        "endpoint_verification": metrics.verify_endpoint(wire, ep["model"]),
+        "reasoning_effort": meta["effort"],
+        "dsh_version": dsh_version_safe(),
+        "permission_mode": meta["permission_mode"],
+        "relay": meta["relay"],
+        "started_at": meta["started_at"],
+        "ended_at": meta["ended_at"],
+        "wall_time_s": meta["wall_time_s"],
+        "wall_time_source": meta.get("wall_time_source", "harness wall clock"),
+        "timeout_s": meta["timeout_s"],
+        "timed_out": meta["timed_out"],
+        "dsh_exit_code": meta["dsh_exit_code"],
+        "dsh_stderr_tail": meta["dsh_stderr_tail"],
+        "turn_end_reason": meta["turn_end_reason"],
+        "agent_final_answer": meta["agent_final_answer"],
+        "success": bool(judged["ok"]) and not meta["timed_out"],
         "acceptance": judged,
         "agent_test_suite": agent_suite,
         "modified_test_files": modified_test_files(task_dir, work),
@@ -319,21 +379,21 @@ def main() -> int:
         },
         "metrics": run_metrics,
     }
+    for k in ("finalized_offline", "events_lines_unparseable"):
+        if meta.get(k) is not None:
+            result[k] = meta[k]
     (out / "result.json").write_text(json.dumps(result, indent=2) + "\n")
-    if not args.keep_workdir:
-        shutil.rmtree(scratch, ignore_errors=True)
-
     m = run_metrics or {}
     print(
-        f"\n=== {run_id} ===\n"
+        f"\n=== {meta['run_id']} ===\n"
         f"success (hidden+visible tests): {result['success']}  "
         f"[{judged['tests_run']} tests, {judged['failures']} failures, {judged['errors']} errors]\n"
-        f"wall time: {wall:.1f}s   LLM requests: {m.get('llm_requests')}   tool calls: {m.get('tool_calls')}\n"
+        f"wall time: {meta['wall_time_s']:.1f}s   LLM requests: {m.get('llm_requests')}   tool calls: {m.get('tool_calls')}\n"
         f"tokens: uncached in={m.get('uncached_input_tokens')} cached in={m.get('cached_input_tokens')} "
         f"out={m.get('output_tokens')}   cache hit={m.get('cache_hit_rate')}\n"
-        f"saved to {out.relative_to(ROOT)}"
+        f"saved to {out.relative_to(ROOT)}", flush=True
     )
-    return 0 if result["success"] else 1
+    return result
 
 
 if __name__ == "__main__":
