@@ -26,10 +26,8 @@ const data = {
   },
 };
 
-// simulator (model/*.js) and page modules, concatenated in dependency order
-const MODEL = ['prng.js', 'capacity.js', 'cost.js', 'sim.js'].map((f) => rd(`model/${f}`)
-  .replace(/^import .*?;\s*$/gms, '').replace(/^export (?=(async )?function|const|let|class)/gm, '').replace(/^\s*\/\/.*\n/gm, '')).join('\n');
-const PAGES = ['core', 'run', 'measure', 'endpoints', 'cost', 'classroom', 'main'].map((f) => `// ---- ${f}.js\n` + rd(`dashboard/src/js/${f}.js`)).join('\n');
+// page modules, concatenated in dependency order
+const PAGES = ['core', 'run', 'measure', 'endpoints', 'main'].map((f) => `// ---- ${f}.js\n` + rd(`dashboard/src/js/${f}.js`)).join('\n');
 
 const html = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n</head>\n<body>\n` +
   rd('dashboard/src/index.html')
@@ -37,7 +35,7 @@ const html = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\
     .replace('<!--__SCRIPTS__-->', () => [
       `<script>\n${rd('dashboard/vendor/chart.umd.js')}\n</script>`,
       `<script>window.DEMO_DATA = ${JSON.stringify(data).replace(/</g, '\\u003c')};</script>`,
-      `<script>\n${MODEL}\n${PAGES}\n</script>`,
+      `<script>\n${PAGES}\n</script>`,
     ].join('\n')) +
   '\n</body>\n</html>\n';
 mkdirSync(path.join(ROOT, 'dashboard/dist'), { recursive: true });

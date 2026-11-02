@@ -68,21 +68,17 @@ const publicTasksPerHour = () => Math.min(LIMITS.tokens_per_minute / tokensPerTa
 // The dedicated configuration from the Token Factory console. The price is the console's estimate, not an invoice.
 const DEDICATED = { hardware: '2× NVIDIA B200, 1 replica', region: 'us-central1', quantization: 'FP8', gpuHour: 8.7, replicaHour: 17.4 };
 // Performance scenarios for that same replica (same hardware, same price). Inputs, not measurements.
-// Public reference (measured, agent-sized request ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s.
+// A dedicated replica is assumed to be at least as fast as the shared public endpoint. Public reference (measured,
+// agent-sized request ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s, ~3.9 s per step.
 const SCENARIOS = {
-  conservative: { label: 'Conservative', reqSpeed: 120, ttft: 1.5, reqPerReplica: 10 },
-  baseline: { label: 'Baseline', reqSpeed: 200, ttft: 1.0, reqPerReplica: 20 },
-  optimistic: { label: 'Optimistic', reqSpeed: 300, ttft: 0.6, reqPerReplica: 40 },
+  conservative: { label: 'Conservative', reqSpeed: 400, ttft: 1.0, reqPerReplica: 10 },
+  baseline: { label: 'Baseline', reqSpeed: 500, ttft: 0.8, reqPerReplica: 20 },
+  optimistic: { label: 'Optimistic', reqSpeed: 600, ttft: 0.6, reqPerReplica: 40 },
 };
 const ASSUME = { scenario: 'baseline', ...SCENARIOS.baseline };
 // dedicated agent-step latency (s) for a request of `out` output tokens with c requests running at once
 const dedicatedSpeed = (c) => ASSUME.reqSpeed * Math.min(1, ASSUME.reqPerReplica / c);
 const dedicatedLatency = (c, out = 512) => ASSUME.ttft + out / dedicatedSpeed(c);
-// capacity of the single replica in SWE-bench tasks per hour: an agent spends this share of its time in an LLM request
-const llmShare = mean(SWE.runs.map((r) => r.metrics.llm_time_s / r.wall_time_s));
-const meanTaskSeconds = mean(SWE.runs.map((r) => r.wall_time_s));
-const dedicatedAgents = () => ASSUME.reqPerReplica / llmShare; // agents working at once that keep it at its rated load
-const dedicatedTasksPerHour = () => (dedicatedAgents() * 3600) / meanTaskSeconds;
 const scenarioName = () => SCENARIOS[ASSUME.scenario].label;
 const replicaHour = () => DEDICATED.replicaHour;
 /** Scenario selector with the scenario's values read-only, and the fixed configuration. Ids are prefixed per page. */
@@ -97,7 +93,7 @@ function syncAssumptions() {
   for (const el of document.querySelectorAll('[data-assume]')) el.value = ASSUME.scenario;
   for (const el of document.querySelectorAll('[data-assume-values]')) {
     el.innerHTML = `<dt>Speed per request</dt><dd>${ASSUME.reqSpeed} tok/s</dd><dt>Time to first token</dt><dd>${num(ASSUME.ttft, 1)} s</dd>
-      <dt>Requests at that speed</dt><dd>${ASSUME.reqPerReplica}</dd><dt>Capacity</dt><dd>≈ ${num(dedicatedTasksPerHour())} tasks/h</dd>`;
+      <dt>Requests at that speed</dt><dd>${ASSUME.reqPerReplica}</dd>`;
   }
 }
 function bindAssumptions(page, redraw) {
@@ -219,7 +215,7 @@ function alpha(color, a) {
 
 // ------------------------------------------------------------------ router
 const PAGES = {};
-const ORDER = ['run', 'measure', 'endpoints', 'economics', 'classroom'];
+const ORDER = ['run', 'measure', 'endpoints'];
 const inited = new Set();
 const dirty = new Set();
 const currentView = () => (ORDER.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'run');
@@ -251,9 +247,9 @@ async function selfCheck() {
   btn.disabled = true;
   const back = currentView();
   const rows = [];
-  for (const v of ['measure', 'endpoints', 'economics', 'classroom']) {
+  for (const v of ['measure', 'endpoints']) {
     location.hash = v;
-    await new Promise((r) => setTimeout(r, v === 'classroom' ? 2500 : 1200));
+    await new Promise((r) => setTimeout(r, 1200));
     for (const c of document.querySelectorAll(`#view-${v} canvas`)) {
       const inst = Chart.getChart(c);
       let painted = 'n/a';

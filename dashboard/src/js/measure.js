@@ -12,16 +12,16 @@ PAGES.measure = {
     </div>
     <h3 class="msec"><b>A</b> Task overview</h3>
     <div class="tiles tiles-3" id="m-tiles-task"></div>
-    <h3 class="msec"><b>B</b> Token usage &amp; caching</h3>
-    <div class="grid msec-grid">
-      <div class="tiles tiles-stack" id="m-tiles-tokens"></div>
-      <figure class="panel"><figcaption>Cost per run by token type ${ev('measured')}</figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div></figure>
-    </div>
-    <h3 class="msec"><b>C</b> Latency &amp; generation speed</h3>
+    <h3 class="msec"><b>B</b> Latency &amp; generation speed</h3>
     <figure class="panel headline"><figcaption>Public decode speed over time · median of each run ${ev('measured')}</figcaption><div class="chart xl"><canvas id="c-decode-time"></canvas></div>
       <ul class="takeaways" id="m-takeaways"></ul>
       <p class="note" id="m-decode-note"></p>
-    </figure>`,
+    </figure>
+    <h3 class="msec"><b>C</b> Token usage &amp; caching</h3>
+    <div class="grid msec-grid">
+      <div class="tiles tiles-stack" id="m-tiles-tokens"></div>
+      <figure class="panel"><figcaption>Cost per run by token type ${ev('measured')}</figcaption><div class="chart"><canvas id="c-costsplit"></canvas></div></figure>
+    </div>`,
   init() {
     $('m-run').addEventListener('change', (e) => { selectRun(e.target.value); dirty.add('run'); this.draw(); });
   },

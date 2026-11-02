@@ -3,10 +3,8 @@
 École polytechnique, 3 November 2026. The presented dashboard (`dashboard/dist/index.html`, one offline file) tells one story with one model, **`deepseek-ai/DeepSeek-V4-Flash-0731` on Nebius Token Factory Public**:
 
 1. **Run an agent.** Replay any of 9 recorded SWE-bench Verified runs (3 Django issues × 3 trials, stock DSH Web UI): the issue, every agent action and tool call, code edits as diffs, and the official result (8/9 resolved).
-2. **Measure it.** Task overview, token usage and caching, and latency and decode speed, including the per-run public decode speed over time (23–404 tok/s; TTFT stable at 1.1–1.3 s).
+2. **Measure it.** Task overview, latency and decode speed, and token usage and caching, including the per-run public decode speed over time (23–404 tok/s; TTFT stable at 1.1–1.3 s).
 3. **Public vs Dedicated.** Measured public per-request speed under load (separate API load test) against a hypothetical dedicated replica set by adjustable assumptions, plus the public rate limits.
-4. **Cost curves.** Public cost per measured SWE-bench task against an *assumed* dedicated hourly price, with the break-even and the public default-limit ceiling.
-5. **Classroom simulation.** Students replay the 9 recorded runs against the public rate limits (DeepSeek prices and limits).
 
 Sources: [`docs/SWEBENCH_PUBLIC_V4FLASH.md`](docs/SWEBENCH_PUBLIC_V4FLASH.md) (agent runs) and [`docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md`](docs/DEEPSEEK_ENDPOINT_PERFORMANCE.md) (API load test). Build: `npm run build` (= `node dashboard/build.mjs`) inlines `dashboard/src/` (`index.html` shell, `style.css`, `js/core.js` plus one module per page) and the existing exports `data/swebench.json` and `data/deepseek_v4_endpoint_load/summary.json` into one offline `dashboard/dist/index.html`. `npm run export:swebench` regenerates `data/swebench.json` only when new runs are added. Dedicated speed, capacity and GPU-hour price are adjustable **Assumptions** (the dedicated endpoint was never measured). Scenarios for one 2× B200 replica:
 
@@ -14,11 +12,11 @@ Fixed dedicated configuration (Token Factory console): `deepseek-ai/DeepSeek-V4-
 
 | Scenario | Speed per request | TTFT | Requests at that speed |
 |---|---|---|---|
-| Conservative | 120 tok/s | 1.5 s | 10 |
-| Baseline | 200 tok/s | 1.0 s | 20 |
-| Optimistic | 300 tok/s | 0.6 s | 40 |
+| Conservative | 400 tok/s | 1.0 s | 10 |
+| Baseline | 500 tok/s | 0.8 s | 20 |
+| Optimistic | 600 tok/s | 0.6 s | 40 |
 
-Cost curves assume 40 SWE-bench tasks per student per month and a billing schedule of 32 h/month (class sessions) or 730 h/month (always on). Public reference (measured, ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s, so Conservative is slower than public. Dedicated is called attractive only when it is cheaper **and** the replica's scenario capacity covers the traffic (Cost curves and Classroom verdicts).
+Public reference (measured, ~10k in / 512 out, alone): ~200 tok/s, TTFT ~1.2 s. Every scenario assumes the dedicated replica is at least as fast as public.
 
 Check locally in Firefox (the build is self-contained):
 

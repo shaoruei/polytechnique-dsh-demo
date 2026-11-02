@@ -15,7 +15,7 @@ const fs = require('fs');
 
 const MIN_PAINTED = 0.01; // 1% of canvas pixels
 const MIN_COLOR_PIXELS = 25; // pixels that must match a dataset colour
-const VIEWS = ['run', 'measure', 'endpoints', 'economics', 'classroom'];
+const VIEWS = ['run', 'measure', 'endpoints'];
 
 function inspectCanvases(MIN_COLOR_PIXELS) {
   // runs in the page (constants are passed in as arguments)
@@ -125,20 +125,20 @@ async function diagnosticsControl(browser, root) {
     const Log = window.Chart.registry.getScale('linear');
     window.__origBuildTicks = Log.prototype.buildTicks;
     Log.prototype.buildTicks = () => { throw new Error('simulated scale failure'); };
-    location.hash = 'economics';
+    location.hash = 'endpoints';
   });
   await page.waitForTimeout(1200);
   const failed = await page.evaluate(() => ({
-    notices: [...document.querySelectorAll('#view-economics .chart-error')].map((e) => e.textContent),
+    notices: [...document.querySelectorAll('#view-endpoints .chart-error')].map((e) => e.textContent),
     banner: !document.getElementById('diag').hidden,
-    note: document.getElementById('e-note').textContent.length,
-    canvases: document.querySelectorAll('#view-economics canvas').length,
+    note: document.getElementById('ep-limits').textContent.length,
+    canvases: document.querySelectorAll('#view-endpoints canvas').length,
     // a destroyed partial chart must not stay registered on the canvas
-    leftover: [...document.querySelectorAll('#view-economics canvas')].filter((c) => window.Chart.getChart(c)).map((c) => c.id),
+    leftover: [...document.querySelectorAll('#view-endpoints canvas')].filter((c) => window.Chart.getChart(c)).map((c) => c.id),
   }));
   // transient failure ends: restore the scale and redraw through a real input change
   await page.evaluate(() => { window.Chart.registry.getScale('linear').prototype.buildTicks = window.__origBuildTicks; });
-  await page.selectOption('#e-billing', 'always');
+  await page.selectOption('#a-endpoints-scenario', 'optimistic');
   await page.waitForTimeout(1200);
   const recovered = await page.evaluate(inspectCanvases, MIN_COLOR_PIXELS);
   await ctx.close();
@@ -191,7 +191,7 @@ async function interactionControl(browser, root) {
   };
   const checks = [];
   for (const pass of ['hover', 'after']) {
-    for (const view of ['measure', 'run', 'endpoints', 'economics', 'classroom']) {
+    for (const view of ['measure', 'run', 'endpoints']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 900);
       if (pass === 'hover') await hoverAll();
@@ -239,7 +239,7 @@ async function interactionControl(browser, root) {
     console.log('recovery control OK: no partial chart left on the canvas; after the fault is removed, a redraw draws the chart again');
   }
   const ic = await interactionControl(browser, root);
-  if (ic.errors.length || ic.blank.length || ic.canvases < 5 || // every chart of the presentation
+  if (ic.errors.length || ic.blank.length || ic.canvases < 3 || // every chart of the presentation
       ic.anim.ticks || ic.anim.global !== false || ic.anim.perChart.length) {
     problems.push(`interaction control: ${JSON.stringify(ic).slice(0, 600)}`);
   } else {

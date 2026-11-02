@@ -23,7 +23,7 @@ const fs = require('fs');
     page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.googleapis|ERR_FAILED/.test(m.text())) problems.push(`[${scheme}] console: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`[${scheme}] pageerror: ${e.message}`));
     await page.goto('file://' + path.join(root, 'dashboard/dist/index.html'));
-    for (const view of ['run', 'measure', 'endpoints', 'economics', 'classroom']) {
+    for (const view of ['run', 'measure', 'endpoints']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(view === 'classroom' ? 2500 : 700);
       // presentation content: only the DeepSeek / SWE-bench story, no legacy workloads or model
@@ -84,53 +84,26 @@ const fs = require('fs');
         const t = await page.locator('#view-endpoints').innerText();
         if (!/MEASURED/i.test(t) || !/SCENARIO/i.test(t)) problems.push(`[${scheme}] endpoints: measured/scenario labels missing`);
         const series = () => page.evaluate(() => window.Chart.getChart(document.getElementById('c-ep-speed')).data.datasets.map((d) => d.data));
-        const [pub, base] = await series();
-        await page.selectOption('#a-endpoints-scenario', 'conservative');
-        await page.waitForTimeout(200);
-        const [, cons] = await series();
-        // dedicated is not assumed faster: conservative is slower than public for a request alone (1.5 + 512/120 s vs measured)
-        if (!(cons[0] > pub[0]) || Math.abs(cons[0] - (1.5 + 512 / 120)) > 1e-9 || cons[0] === base[0]) problems.push(`[${scheme}] endpoints: scenario model wrong (${pub[0]}, ${base[0]}, ${cons[0]})`);
+        const params = { conservative: [400, 1.0, 10], baseline: [500, 0.8, 20], optimistic: [600, 0.6, 40] };
+        const conc = [1, 2, 5, 10, 20, 30];
+        let prev = null;
+        for (const [name, [speed, ttft, perReplica]] of Object.entries(params)) {
+          await page.selectOption('#a-endpoints-scenario', name);
+          await page.waitForTimeout(150);
+          const [pub, ded] = await series();
+          conc.forEach((c, i) => {
+            const expect = ttft + 512 / (speed * Math.min(1, perReplica / c));
+            if (Math.abs(ded[i] - expect) > 1e-9) problems.push(`[${scheme}] endpoints ${name}: c=${c} latency ${ded[i]} ≠ ${expect}`);
+            if (ded[i] > pub[i]) problems.push(`[${scheme}] endpoints ${name}: dedicated slower than measured public at c=${c}`);
+          });
+          if (prev && ded.some((x, i) => x > prev[i])) problems.push(`[${scheme}] endpoints: ${name} slower than the previous scenario`);
+          prev = ded;
+        }
         await page.selectOption('#a-endpoints-scenario', 'baseline');
         const controls = await page.locator('#view-endpoints input, #view-endpoints select').count();
         if (controls !== 1) problems.push(`[${scheme}] endpoints: ${controls} controls, expected only the scenario selector`);
         const lim = await page.locator('#ep-limits .tile').count();
         if (lim !== 3) problems.push(`[${scheme}] endpoints: rate-limit tiles missing`);
-      }
-      if (view === 'economics') {
-        // no technical sliders: one billing schedule and the shared scenario only
-        const sliders = await page.locator('#view-economics input[type=range]').count();
-        if (sliders) problems.push(`[${scheme}] economics: ${sliders} sliders, expected none`);
-        // mean measured public cost per SWE-bench task, from the 9 recorded runs embedded in the page
-        const costPerTask = await page.evaluate(() => { const r = window.DEMO_DATA.swe.runs; return r.reduce((a, x) => a + x.metrics.cost_usd, 0) / r.length; });
-        for (const scenario of ['conservative', 'baseline', 'optimistic']) {
-          await page.selectOption('#a-economics-scenario', scenario);
-          for (const billing of ['class', 'always']) {
-            await page.selectOption('#e-billing', billing);
-            await page.waitForTimeout(150);
-            const r = await page.evaluate(() => ({ tiles: document.getElementById('e-tiles').innerText, note: document.getElementById('e-note').innerText,
-              cap: document.querySelector('#view-economics [data-assume-values]').innerText }));
-            const hours = billing === 'class' ? 32 : 730;
-            const be = Math.round((17.4 * hours) / (40 * costPerTask)).toLocaleString('en-US');
-            if (!r.tiles.includes(`$${(17.4 * hours).toLocaleString('en-US', { maximumFractionDigits: 0 })} / month`)) problems.push(`[${scheme}] economics ${scenario}/${billing}: replica cost is not 17.40 × ${hours} h`);
-            if (!r.tiles.includes(be.slice(0, -1))) problems.push(`[${scheme}] economics ${scenario}/${billing}: break-even ≠ ${be} (${r.tiles.replace(/\n/g, ' ')})`);
-            // feasibility is consistent: cheaper is only claimed if the replica's capacity covers the break-even
-            const capTph = +r.cap.match(/≈ ([\d,]+) tasks\/h/)[1].replace(/,/g, '');
-            const feasible = capTph >= 17.4 / costPerTask;
-            if (feasible !== /^Dedicated is cheaper/.test(r.note) || (!feasible && !/^Not a recommendation/.test(r.note))) problems.push(`[${scheme}] economics ${scenario}/${billing}: verdict inconsistent with capacity (${capTph} tasks/h; ${r.note})`);
-          }
-        }
-        await page.selectOption('#a-economics-scenario', 'baseline');
-        await page.selectOption('#e-billing', 'class');
-      }
-      if (view === 'classroom') {
-        const before = await page.locator('#s-tiles').innerText();
-        await page.click('.presets button[data-n="120"]');
-        await page.waitForTimeout(3000);
-        const after = await page.locator('#s-tiles').innerText();
-        if (before === after) problems.push(`[${scheme}] classroom: preset did not re-run the simulation`);
-        if (!/over capacity/i.test(after)) problems.push(`[${scheme}] classroom: 120 students should exceed one baseline replica (${after.replace(/\n/g, ' ')})`);
-        await page.click('.presets button[data-n="30"]');
-        await page.waitForTimeout(2000);
       }
       // every visible canvas must have a Chart instance with data
       const empty = await page.evaluate(() => [...document.querySelectorAll('.view:not([hidden]) canvas')]
@@ -141,7 +114,7 @@ const fs = require('fs');
     }
     // phone width: no horizontal page scroll
     await page.setViewportSize({ width: 400, height: 900 });
-    for (const view of ['run', 'measure', 'endpoints', 'economics', 'classroom']) {
+    for (const view of ['run', 'measure', 'endpoints']) {
       await page.evaluate((v) => { location.hash = v; }, view);
       await page.waitForTimeout(600);
       const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
